@@ -1,27 +1,74 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Core Palette CSS Variables */
+  --color-primary: #003527;
+  --color-primary-container: #064e3b;
+  --color-primary-fixed-dim: #95d3ba;
+  --color-secondary: #4059aa;
+  --color-error: #ba1a1a;
+  
+  /* Surface and Background */
+  --color-surface: #f8f9fa;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f3f4f5;
+  --color-surface-container: #edeeef;
+  --color-surface-container-highest: #e1e3e4;
+  
+  /* Text and Outlines */
+  --color-on-surface: #191c1d;
+  --color-on-surface-variant: #404944;
+  --color-outline: #707974;
+
+  /* Typography Layout */
+  --font-sans: 'DM Sans', sans-serif;
+  --font-heading: 'Oswald', sans-serif;
+  --font-label: 'Source Sans 3', sans-serif;
+  
+  /* Radii for modern UI components */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer components {
+  /* Table Styles: 16px padding, hairline horizontal dividers, zero vertical */
+  .chronicle-table {
+    @apply w-full border-collapse text-left bg-surface;
+  }
+  
+  .chronicle-table th {
+    @apply font-label text-sm font-semibold tracking-wide p-4 text-primary;
+    background-color: color-mix(in srgb, var(--color-secondary) 5%, transparent);
+    border-bottom: 0.5px solid var(--color-outline);
+  }
+  
+  .chronicle-table td {
+    @apply p-4 font-sans text-base;
+    border-bottom: 0.5px solid color-mix(in srgb, var(--color-outline) 20%, transparent);
+  }
+
+  .chronicle-table th, .chronicle-table td {
+    @apply border-x-0;
+  }
+
+  /* Form Fields: Minimal signature-like bottom-border */
+  .chronicle-input {
+    @apply w-full bg-transparent border-b py-2 font-sans outline-none transition-colors duration-300;
+    border-bottom-color: color-mix(in srgb, var(--color-outline) 50%, transparent);
+    border-bottom-width: 0.5px;
+  }
+  
+  .chronicle-input:focus {
+    @apply border-b-primary;
+    border-bottom-width: 1px;
   }
 }
 
+/* Base configuration */
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-surface text-on-surface font-sans;
 }
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+h1, h2, h3, h4, h5, h6 {
+  @apply font-heading;
 }
