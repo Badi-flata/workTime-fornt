@@ -3,9 +3,10 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, UserCircle, Briefcase, Calendar as CalendarIcon, Clock, AlertCircle, CalendarX } from 'lucide-react';
 import { useDashboardUIStore } from '@/store/useDashboardUIStore';
+import Image from 'next/image';
 
 export function EmployeeInfoModal() {
-  const { isEmployeeInfoModalOpen, selectedEmployeeId, closeModals, openDetailedAttendanceModal } = useDashboardUIStore();
+  const { isEmployeeInfoModalOpen, selectedEmployee, closeModals, openDetailedAttendanceModal } = useDashboardUIStore();
 
   // In a real app, we would fetch the specific employee details based on selectedEmployeeId.
   // For now, we use a placeholder or derived data.
@@ -38,10 +39,15 @@ export function EmployeeInfoModal() {
             {/* Profile Header */}
             <div className="flex items-center gap-4 mb-8">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                <UserCircle size={40} />
+               {selectedEmployee?.avatar ? (
+                    <Image src={selectedEmployee?.avatar} alt={selectedEmployee?.name} 
+                    width={32} height={32} className="rounded-full object-cover" />
+                ) : (
+               selectedEmployee?.name.charAt(0)
+                )}
               </div>
               <div>
-                <h3 className="text-lg font-bold font-sans text-on-surface">موظف #{selectedEmployeeId}</h3>
+                <h3 className="text-lg font-bold font-sans text-on-surface">موظف #{selectedEmployee?.name}</h3>
                 <div className="flex items-center gap-2 text-on-surface-variant text-sm mt-1">
                   <Briefcase size={14} />
                   <span>المسمى الوظيفي (تطوير)</span>
@@ -57,35 +63,35 @@ export function EmployeeInfoModal() {
                   <CalendarIcon size={16} />
                   <span className="text-sm font-medium">أيام الحضور</span>
                 </div>
-                <p className="text-2xl font-bold font-sans text-on-surface">22</p>
+                <p className="text-2xl font-bold font-sans text-on-surface">{selectedEmployee?.summary?.presentDays||0}</p>
               </div>
               <div className="bg-surface-container-low p-4 rounded-xl">
                 <div className="flex items-center gap-2 text-error mb-1">
                   <CalendarX size={16} />
                   <span className="text-sm font-medium">أيام الغياب</span>
                 </div>
-                <p className="text-2xl font-bold font-sans text-on-surface">0</p>
+                <p className="text-2xl font-bold font-sans text-on-surface">{selectedEmployee?.summary?.absentDays||0}</p>
               </div>
               <div className="bg-surface-container-low p-4 rounded-xl">
                 <div className="flex items-center gap-2 text-secondary mb-1">
                   <Clock size={16} />
                   <span className="text-sm font-medium">مرات التأخير</span>
                 </div>
-                <p className="text-2xl font-bold font-sans text-on-surface">2</p>
+                <p className="text-2xl font-bold font-sans text-on-surface">{selectedEmployee?.summary?.lateDays||0}</p>
               </div>
               <div className="bg-surface-container-low p-4 rounded-xl">
                 <div className="flex items-center gap-2 text-on-surface-variant mb-1">
                   <AlertCircle size={16} />
                   <span className="text-sm font-medium">الخصومات</span>
                 </div>
-                <p className="text-2xl font-bold font-sans text-on-surface">0 <span className="text-sm font-normal">ريال</span></p>
+                <p className="text-2xl font-bold font-sans text-on-surface">{selectedEmployee?.summary?.totalDeductionsInPeriod ||0}<span className="text-sm font-normal">ريال</span></p>
               </div>
             </div>
 
             {/* Actions */}
             <div className="flex gap-3">
               <button 
-                onClick={() => selectedEmployeeId && openDetailedAttendanceModal(selectedEmployeeId)}
+                onClick={() => selectedEmployee && openDetailedAttendanceModal(selectedEmployee)}
                 className="flex-1 bg-primary text-white py-3 rounded-lg font-medium font-sans hover:bg-primary-container transition-colors"
               >
                 سجل الحضور التفصيلي

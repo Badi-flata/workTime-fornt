@@ -1,26 +1,41 @@
 "use client";
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar as CalendarIcon, Clock, ArrowRightLeft } from 'lucide-react';
+import { X, Calendar as CalendarIcon, Clock, ArrowRightLeft  , ChevronRight , ChevronLeft} from 'lucide-react';
 import { useDashboardUIStore } from '@/store/useDashboardUIStore';
+import { useState } from 'react';
+import '../../app/globals.css';
 
 export function DetailedAttendanceModal() {
-  const { isDetailedAttendanceModalOpen, selectedEmployeeId, closeModals, openEmployeeModal } = useDashboardUIStore();
-
+  const { isDetailedAttendanceModalOpen, selectedEmployee , closeModals, openEmployeeModal } = useDashboardUIStore();
+  const [currentPage, setCurrentPage] = useState(1);
   // Mock data for the detailed breakdown
-  const mockDailyBreakdown = [
-    { date: '2026-06-01', status: 'ON_TIME', checkIn: '08:00 AM', checkOut: '04:00 PM', earlyLeaveMinutes: 0, dayDeduction: 0, excuseNotes: null },
-    { date: '2026-06-02', status: 'LATE', checkIn: '08:15 AM', checkOut: '04:00 PM', earlyLeaveMinutes: 0, dayDeduction: 15, excuseNotes: null },
-    { date: '2026-06-03', status: 'ON_TIME', checkIn: '07:55 AM', checkOut: '04:00 PM', earlyLeaveMinutes: 0, dayDeduction: 0, excuseNotes: null },
-    { date: '2026-06-04', status: 'ABSENT', checkIn: null, checkOut: null, earlyLeaveMinutes: 0, dayDeduction: 100, excuseNotes: null },
-    { date: '2026-06-05', status: 'EXCUSED', checkIn: '09:00 AM', checkOut: '04:00 PM', earlyLeaveMinutes: 0, dayDeduction: 0, excuseNotes: 'عذر طبي مستشفى' },
-  ];
-
+  const dailyBreakdown  = selectedEmployee?.dailyBreakdown || [];
+  
   if (!isDetailedAttendanceModalOpen) return null;
+  
+  // Pagination 
+  const totalItems = dailyBreakdown.length;
+  const limit = 1
+
+  const totalPages = Math.ceil(totalItems / limit);
+  const paginatedData = dailyBreakdown.slice((currentPage - 1) * limit, currentPage * limit);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev:number)=>prev + 1)
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev:number)=>prev - 1)
+    }
+  };
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-surface/20 backdrop-blur-sm" dir="rtl">
+      <div className="fixed inset-0 z-50  flex items-center justify-center p-4 bg-on-surface/20 backdrop-blur-sm" dir="rtl">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -32,18 +47,42 @@ export function DetailedAttendanceModal() {
           <div className="flex items-center justify-between p-6 border-b border-outline/10 bg-surface">
             <div className="flex items-center gap-4">
               <button 
-                onClick={() => selectedEmployeeId && openEmployeeModal(selectedEmployeeId)}
+                onClick={() => selectedEmployee && openEmployeeModal(selectedEmployee)}
                 className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors flex items-center gap-2"
               >
                 <ArrowRightLeft size={18} />
               </button>
               <div>
                 <h2 className="text-xl font-heading font-bold text-primary">سجل الحضور التفصيلي</h2>
-                <p className="text-sm text-on-surface-variant font-sans">موظف #{selectedEmployeeId}</p>
-              </div>
+                <p className="text-sm text-on-surface-variant font-sans">الموظف : {selectedEmployee?.name}</p>
+              </div> 
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex justify-baseline items-center gap-4">
+                  <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage <= 1}
+                    className="p-2.5 rounded-lg bg-surface-container-lowest border border-outline/10 hover:bg-surface-container hover:border-outline transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    aria-label="الصفحة السابقة"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                  <span className="text-sm font-heading font-medium text-on-surface-variant">
+                    صفحة <strong className="text-primary">{currentPage}</strong> من <strong>{totalPages}</strong>
+                  </span>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPage >= totalPages}
+                    className="p-2.5 rounded-lg bg-surface-container-lowest border border-outline/10 hover:bg-surface-container hover:border-outline transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    aria-label="الصفحة التالية"
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+                </div>
+              )}
             </div>
             <button 
-              onClick={closeModals}
+            onClick={()=>{ closeModals() ; setCurrentPage(1)}}
               className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors"
             >
               <X size={20} />
@@ -64,7 +103,7 @@ export function DetailedAttendanceModal() {
                 </tr>
               </thead>
               <tbody>
-                {mockDailyBreakdown.map((day, idx) => (
+                {paginatedData.map((day, idx) => (
                   <tr key={idx} className="hover:bg-surface-container-lowest transition-colors">
                     <td className="whitespace-nowrap">
                       <div className="flex items-center gap-2">

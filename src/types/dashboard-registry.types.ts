@@ -31,6 +31,7 @@ export interface AggregatedMetrics {
 
 export interface DailyBreakdownEntry {
   date: string;
+  shift: string | null;
   status: string; // ON_TIME | LATE | ABSENT | EXCUSED | ESCAPY
   checkIn: string | null;
   checkOut: string | null;

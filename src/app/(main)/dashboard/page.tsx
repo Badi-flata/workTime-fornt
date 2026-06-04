@@ -8,22 +8,45 @@ import { ChronicleTable } from '@/components/ui/ChronicleTable';
 import { useGeneralStatsStore } from '@/store/useGeneralStatsStore';
 import { useCardStatsStore } from '@/store/useCardStatsStore';
 import { useDashboardUIStore } from '@/store/useDashboardUIStore';
-import { Users, Clock, AlertTriangle, CalendarX2 } from 'lucide-react';
+import { Users, Clock, AlertTriangle, CalendarX2, ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function DashboardPage() {
   const { disciplineRate, overallRating, fetchGeneralStats } = useGeneralStatsStore();
-  const { metrics, registry, fetchCardMetrics } = useCardStatsStore();
-  const { activeTab, setActiveTab, openEmployeeModal } = useDashboardUIStore();
+  const { meta, metrics, registry, isLoading, error, fetchCardMetrics } = useCardStatsStore();
+  const {
+    activeTab, turnColumns,
+    Pagination: { page },
+    setPagination, setCurrentPage, setTurnColumns, setActiveTab, openEmployeeModal
+  } = useDashboardUIStore();
+    
+  // Fetch data on mount and when activeTab or page changes
+  useEffect(() => {
+    fetchGeneralStats();
+  }, [fetchGeneralStats]);
 
   useEffect(() => {
-    // Initial data fetch simulating dashboard mount
-    fetchGeneralStats();
-    fetchCardMetrics({ start: '2026-06-01', end: '2026-06-30', mode: 'MONTHLY' });
-  }, [fetchGeneralStats, fetchCardMetrics]);
+    // Map frontend tab names to backend mode values
+    const modeMap: Record<string, string> = {
+      'ALL': 'ALL',
+      'DAILY': 'daily',
+      'WEEKLY': 'weekly',
+      'MONTHLY': 'monthly',
+    };
+    fetchCardMetrics({ 
+      mode: modeMap[activeTab] || 'ALL',
+      page: String(page),
+      limit: '5',
+    });
+  }, [activeTab, page, fetchCardMetrics]);
 
-  // Uses the actual registry data from backend, if available.
-  // Fallback to empty array if no backend is running yet.
+  // Sync pagination meta from backend response
+  useEffect(() => {
+    if (meta?.pagination) {
+      setPagination(meta.pagination);
+    }
+  }, [meta?.pagination, setPagination]);
+
   const tableData = registry || [];
 
   return (
@@ -36,21 +59,33 @@ export default function DashboardPage() {
           </div>
           
           <div className="flex bg-surface-container-low rounded-lg p-1 border border-outline/10">
-            {['DAILY', 'WEEKLY', 'MONTHLY'].map((tab) => (
+            {['ALL', 'DAILY', 'WEEKLY', 'MONTHLY'].map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab as 'DAILY' | 'WEEKLY' | 'MONTHLY')}
+                onClick={() => setActiveTab(tab as 'ALL' | 'DAILY' | 'WEEKLY' | 'MONTHLY')}
                 className={`px-4 py-2 rounded-md font-label font-bold text-sm transition-all ${
                   activeTab === tab 
                     ? 'bg-white text-primary shadow-sm' 
                     : 'text-on-surface-variant hover:bg-surface-container-highest'
                 }`}
               >
-                {tab === 'DAILY' ? 'يومي' : tab === 'WEEKLY' ? 'أسبوعي' : 'شهري'}
+                {tab === 'DAILY' ? 'يومي' : tab === 'WEEKLY' ? 'أسبوعي' : tab === 'MONTHLY' ? 'شهري' : 'الكل'}
               </button>
             ))}
           </div>
         </div>
+
+        {/* Error Banner */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-error/10 border border-error/20 text-error rounded-lg p-4 text-sm font-sans"
+          >
+            <strong>خطأ في جلب البيانات:</strong> {error}
+            <p className="text-xs mt-1 text-on-surface-variant">تأكد من تشغيل الخادم وتسجيل الدخول بحساب مدير (SUPER_ADMIN).</p>
+          </motion.div>
+        )}
 
         {/* Top Cards Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -100,7 +135,7 @@ export default function DashboardPage() {
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
             <div className="w-4 h-4 bg-error rounded-full mb-4 animate-pulse shadow-[0_0_15px_rgba(186,26,26,0.6)]"></div>
             <h3 className="text-lg font-heading font-semibold mb-2">نبض الحضور الحي</h3>
-            <p className="text-3xl font-bold font-sans mb-1">42 / 50</p>
+            <p className="text-3xl font-bold font-sans mb-1">{metrics?.totalPresent || 0} / {meta?.totalSubordinates || 0}</p>
             <p className="text-primary-fixed-dim text-sm font-label">موظف متواجد الآن</p>
           </motion.div>
         </div>
@@ -114,9 +149,66 @@ export default function DashboardPage() {
         >
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-heading font-semibold text-primary">السجل الموحد للموظفين</h2>
+            
+            {/* Column View Toggle */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-on-surface-variant font-label ml-2">
+                {turnColumns === 1 ? 'عرض الملخص' : 'عرض التفاصيل اليومية'}
+              </span>
+              <button
+                onClick={() => setTurnColumns("poved", turnColumns)}
+                disabled={turnColumns === 1}
+                className="p-1.5 rounded-md bg-surface-container-low border border-outline/10 hover:bg-surface-container hover:border-outline transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                aria-label="العرض السابق"
+              >
+                <ChevronRight size={16} />
+              </button>
+              <span className="text-sm font-bold font-label text-primary min-w-[20px] text-center">{turnColumns}</span>
+              <button
+                onClick={() => setTurnColumns("next", turnColumns)}
+                disabled={turnColumns === 2}
+                className="p-1.5 rounded-md bg-surface-container-low border border-outline/10 hover:bg-surface-container hover:border-outline transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                aria-label="العرض التالي"
+              >
+                <ChevronLeft size={16} />
+              </button>
+            </div>
           </div>
-          <ChronicleTable data={tableData} onRowClick={openEmployeeModal} />
+
+          {isLoading ? (
+            <div className="flex justify-center items-center py-16">
+              <div className="w-8 h-8 border-3 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+              <span className="mr-3 text-on-surface-variant font-sans">جاري تحميل البيانات...</span>
+            </div>
+          ) : (
+            <ChronicleTable data={tableData} onRowClick={openEmployeeModal} turnColumns={turnColumns} />
+          )}
         </motion.div>
+
+        {/* Pagination Controls */}
+        {meta?.pagination && meta.pagination.totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4">
+            <button
+              onClick={() => setCurrentPage("poved", page)}
+              disabled={page <= 1}
+              className="p-2.5 rounded-lg bg-surface-container-lowest border border-outline/10 hover:bg-surface-container hover:border-outline transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="الصفحة السابقة"
+            >
+              <ChevronRight size={18} />
+            </button>
+            <span className="text-sm font-heading font-medium text-on-surface-variant">
+              صفحة <strong className="text-primary">{page}</strong> من <strong>{meta.pagination.totalPages}</strong>
+            </span>
+            <button
+              onClick={() => setCurrentPage("next", page)}
+              disabled={page >= meta.pagination.totalPages}
+              className="p-2.5 rounded-lg bg-surface-container-lowest border border-outline/10 hover:bg-surface-container hover:border-outline transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="الصفحة التالية"
+            >
+              <ChevronLeft size={18} />
+            </button>
+          </div>
+        )}
       </div>
     </Fragment>
   );

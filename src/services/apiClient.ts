@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { OptimizedDashboardResponse } from '../types/dashboard-registry.types';
+import { useAuthStore } from '../store/useAuthStore';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3030';
 
@@ -7,9 +8,15 @@ export const apiClient = axios.create({
   baseURL: API_URL,
 });
 
+// Temporary dev token for seamless frontend testing
+const DEV_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ij8_Pz8gPz8_Pz8_PyIsInVzZXJJZCI6IjcxYzA2NThhLTk5NWMtNDA0My05N2I1LWJlMWY5Yzc0NjRkOCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc4MDQ5OTUzOSwiZXhwIjoxNzgwNTg1OTM5fQ.FZzKq8iCHLRuqRK6f5l31k-bdQP5b0m9UQZ2UEVCMXA';
+
 // Request Interceptor for Auth Token
 apiClient.interceptors.request.use((config) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  // Attempt to get token from Zustand auth store first, fallback to DEV_TOKEN
+  const storeToken = typeof window !== 'undefined' ? useAuthStore.getState().token : null;
+  const token = storeToken || DEV_TOKEN;
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -64,7 +71,7 @@ export const API = {
   // 👑 Manager Exclusive APIs
   managing: {
     getDashboard: () => apiClient.get('/managing/dashboard'),
-    getDashboardRegistry: (params?: Record<string, string>) => 
+    getDashboardRegistry: (params?: { mode?: string; page?: string; limit?: string; dateAnchor?: string; startDate?: string; endDate?: string }) => 
       apiClient.get<OptimizedDashboardResponse>('/managing/dashboard-registry', { params }),
     addEmployee: (id: string, data: EmployeeAddPayload) => apiClient.post(`/managing/add-employee/${id}`, data),
     deleteEmployee: (id: string) => apiClient.delete(`/managing/delete-employee/${id}`),
