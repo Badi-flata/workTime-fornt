@@ -1,4 +1,4 @@
-import { PaginationMeta , RegistryEntry } from '@/types/dashboard-registry.types';
+import { PaginationMeta , RegistryEntry , Modes , DisciplineRating , StatusFilter} from '@/types/dashboard-registry.types';
 import { create } from 'zustand';
 
 interface DashboardUIState {
@@ -14,26 +14,33 @@ interface DashboardUIState {
 
   turnColumns:number;
   
-  // Filtering & Search
+  //Search
   searchQuery: string;
-  activeTab: 'ALL'| 'DAILY' | 'WEEKLY' | 'MONTHLY';
+  // mode query
+  activeTab:Modes;
+  // date query
   dateAnchor: string;
   customStartDate: string;
   customEndDate: string;
-  statusFilter: 'ALL'| 'EXCELLENT' | 'VERY_GOOD' | 'GOOD' | 'NEEDS_IMPROVEMENT';
-  statusDaily : 'ALL' |'ON_TIME' | 'LATE' | 'ABSENT' | 'EXCUSED' | 'LEAVE';
+  //Filter
+  statusDiscipline: DisciplineRating;
+  statusFilter:StatusFilter;
+  dataFilter: RegistryEntry[]
 
   // Actions
-  openEmployeeModal: (data: RegistryEntry) => void;
+  openEmployeeModal: (Data: RegistryEntry) => void;
   openDetailedAttendanceModal: (data: RegistryEntry) => void;
   closeModals: () => void;
-  // Filter & Search Actions
+  // Search Actions
   setSearchQuery: (query: string) => void;
-  setActiveTab: (tab: 'ALL'| 'DAILY' | 'WEEKLY' | 'MONTHLY') => void;
+  //date query
+  setActiveTab: (tab:Modes) => void;
   setDateAnchor: (dateAnchor: string) => void;
   setCustomDate: (dateType: 'start'| 'end', date: string) => void;
-  setStatusFilter: (status: 'ALL'| 'EXCELLENT' | 'VERY_GOOD' | 'GOOD' | 'NEEDS_IMPROVEMENT') => void;
-  setStatusDaily: (status: 'ON_TIME' | 'LATE' | 'ABSENT' | 'EXCUSED' | 'LEAVE') => void;
+  //Filter
+  setStatusDiscipline: (status:DisciplineRating) => void;
+  setStatusFilter: (status:StatusFilter) => void;
+  setDataFilter: (data:RegistryEntry[], mode:Modes, statusFil?:StatusFilter , statusDiscip?: DisciplineRating) => void ;
   // Pagination
     setPagination: (pagination: PaginationMeta) => void;
   setCurrentPage:( actType:'next' | 'poved' , page:number) => void
@@ -47,17 +54,21 @@ export const useDashboardUIStore = create<DashboardUIState>((set) => ({
   // Pagination
   Pagination:{page:1,limit:10,totalItems:10 ,totalPages:1},
   turnColumns:1,
-  // Filter & Search State
+  //Search 
   searchQuery: '',
+  // mode query
   activeTab: 'ALL',
+  // data query
   dateAnchor: '',
   customStartDate: '',
   customEndDate: '',
+  //Filter
   statusFilter: 'ALL',
-  statusDaily: 'ALL',
+  statusDiscipline: 'ALL',
+  dataFilter:[],
 
 
-  openEmployeeModal: (data) => set({ isEmployeeInfoModalOpen: true, selectedEmployee: data }),
+  openEmployeeModal: (Data) => set({ isEmployeeInfoModalOpen: true, selectedEmployee: Data }),
   openDetailedAttendanceModal: (data) => set({ isDetailedAttendanceModalOpen: true, selectedEmployee: data }),
   closeModals: () => set({ 
     isEmployeeInfoModalOpen: false, 
@@ -82,5 +93,51 @@ export const useDashboardUIStore = create<DashboardUIState>((set) => ({
   setDateAnchor: (dateAnchor) => set({ dateAnchor }),
   setCustomDate: (dateType, date) => set({ [dateType === 'start' ? 'customStartDate' : 'customEndDate']: date }),
   setStatusFilter: (status) => set({ statusFilter: status }),
-  setStatusDaily: (status) => set({ statusDaily: status })
+  setStatusDiscipline: (status) => set({ statusDiscipline: status }),
+  setDataFilter: (data,mod,statusFil,statusDiscip) => {
+    let dataFil : any[] = []
+    let dailyFilter: any[] = data
+     if(mod !== 'ALL'){
+  if(statusFil && statusFil !== 'ALL' && mod === 'DAILY'){
+    for ( const item of data){
+      const att = item.dailyBreakdown
+       if(att && att[0].status === statusFil){
+        //
+       for(const dayFil of att){
+       if(dayFil.status == statusFil){
+        dailyFilter.push(dayFil)
+      }}
+      dataFil.push({
+       employeeId:item.employeeId,
+       name:item.name,
+       role:item.role,
+       avatar:item.avatar,
+       disciplineRating:item.disciplineRating,
+       summary:item.summary,
+       dailyBreakdown: dailyFilter
+      })
+}
+    }
+  }else if(statusDiscip && statusDiscip !== 'ALL'){
+    for ( const item of data){
+      const att = item
+       if(att && att.disciplineRating === statusDiscip){
+        //
+      dataFil.push({
+       employeeId:item.employeeId,
+       name:item.name,
+       role:item.role,
+       avatar:item.avatar,
+       disciplineRating:item.disciplineRating,
+       summary:item.summary,
+       dailyBreakdown: item.dailyBreakdown
+      })
+    }
+  }
+  } 
+ }else{
+    dataFil = data ||[]
+  }
+ set({dataFilter:dataFil})
+  }
 }));

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { Fragment } from 'react';
 import { StatCard } from '@/components/ui/StatCard';
+import { RegistryEntry  } from '@/types/dashboard-registry.types';
 import { GeneralEvaluationCard } from '@/components/ui/GeneralEvaluationCard';
 import { ChronicleTable } from '@/components/ui/ChronicleTable';
 import { useGeneralStatsStore } from '@/store/useGeneralStatsStore';
@@ -10,14 +11,17 @@ import { useCardStatsStore } from '@/store/useCardStatsStore';
 import { useDashboardUIStore } from '@/store/useDashboardUIStore';
 import { Users, Clock, AlertTriangle, CalendarX2, ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { join } from 'path';
 
 export default function DashboardPage() {
   const { disciplineRate, overallRating, fetchGeneralStats } = useGeneralStatsStore();
   const { meta, metrics, registry, isLoading, error, fetchCardMetrics } = useCardStatsStore();
   const {
-    activeTab, turnColumns,
-    Pagination: { page },
-    setPagination, setCurrentPage, setTurnColumns, setActiveTab, openEmployeeModal
+    activeTab, turnColumns,statusDiscipline,
+    Pagination: { page }, statusFilter, dataFilter,
+    setPagination, setCurrentPage, setTurnColumns,
+     setActiveTab, openEmployeeModal,setStatusFilter,
+     setStatusDiscipline,setDataFilter
   } = useDashboardUIStore();
     
   // Fetch data on mount and when activeTab or page changes
@@ -27,16 +31,12 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Map frontend tab names to backend mode values
-    const modeMap: Record<string, string> = {
-      'ALL': 'ALL',
-      'DAILY': 'daily',
-      'WEEKLY': 'weekly',
-      'MONTHLY': 'monthly',
-    };
+  
     fetchCardMetrics({ 
-      mode: modeMap[activeTab] || 'ALL',
+      mode: activeTab || 'ALL',
       page: String(page),
       limit: '5',
+      dateAnchor:'2026-05-31'
     });
   }, [activeTab, page, fetchCardMetrics]);
 
@@ -47,8 +47,15 @@ export default function DashboardPage() {
     }
   }, [meta?.pagination, setPagination]);
 
-  const tableData = registry || [];
+   useEffect(() => {
+    setDataFilter(registry,activeTab,statusFilter,statusDiscipline)
+    
+  }, [registry, statusDiscipline,statusFilter, setDataFilter])
+  
+  const tableData = dataFilter || [];
+  
 
+  
   return (
     <Fragment>
       <div className="space-y-8 pb-12">
@@ -180,8 +187,53 @@ export default function DashboardPage() {
               <div className="w-8 h-8 border-3 border-primary/20 border-t-primary rounded-full animate-spin"></div>
               <span className="mr-3 text-on-surface-variant font-sans">جاري تحميل البيانات...</span>
             </div>
-          ) : (
-            <ChronicleTable data={tableData} onRowClick={openEmployeeModal} turnColumns={turnColumns} />
+          ) : (<>
+          <div className="flex bg-surface-container-low rounded-lg p-1 border border-outline/10">
+            {activeTab === 'DAILY' ? (['ALL',"ON_TIME","LATE","ABSENT","EXCUSED","ESCAPY"].map((stat) => (
+              <button
+                key={stat}
+                onClick={() => setStatusFilter(stat as 'ALL' | 'ON_TIME' | 'LATE' | 'ABSENT' | 'EXCUSED' | 'ESCAPY')}
+                className={`px-4 py-2 rounded-md font-label font-bold text-sm transition-all ${
+                  statusFilter === stat 
+                    ? 'bg-white text-primary shadow-sm' 
+                    : 'text-on-surface-variant hover:bg-surface-container-highest'
+                }`}
+              >
+                {
+                 stat === 'ON_TIME' ? 'حاضر' :
+                 stat === 'LATE' ? 'متأخر' :
+                 stat === 'ABSENT' ? 'غياب' :
+                 stat === 'EXCUSED' ? 'عذر' :
+                 stat === 'ESCAPY' ?'هروب' :
+                  'الكل'
+                 }
+              </button>
+            ))
+          )
+          :
+          (['ALL', 'EXCELLENT' , 'VERY_GOOD' , 'GOOD' , 'NEEDS_IMPROVEMENT'].map((stat) => (
+              <button
+                key={stat}
+                onClick={() => setStatusDiscipline(stat as 'ALL'| 'EXCELLENT' | 'VERY_GOOD' | 'GOOD' | 'NEEDS_IMPROVEMENT')}
+                className={`px-4 py-2 rounded-md font-label font-bold text-sm transition-all ${
+                  statusDiscipline === stat 
+                    ? 'bg-white text-primary shadow-sm' 
+                    : 'text-on-surface-variant hover:bg-surface-container-highest'
+                }`}
+              >
+                { 
+                 stat === 'EXCELLENT' ?  'ممتاز':
+                  stat === 'VERY_GOOD' ? 'جيد جداً' :
+                  stat === 'GOOD' ? 'جيد' :
+                   stat === 'NEEDS_IMPROVEMENT' ? 'يحتاج تحسين' :
+                    'الكل'
+                   }
+              </button>
+            )))
+        }
+          </div>
+
+            <ChronicleTable data={tableData} onRowClick={openEmployeeModal} turnColumns={turnColumns} /></>
           )}
         </motion.div>
 

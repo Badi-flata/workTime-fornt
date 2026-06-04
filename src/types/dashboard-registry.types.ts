@@ -1,4 +1,8 @@
-export type DisciplineRating = 'EXCELLENT' | 'VERY_GOOD' | 'GOOD' | 'NEEDS_IMPROVEMENT';
+export type DisciplineRating =  'ALL' | 'EXCELLENT' | 'VERY_GOOD' | 'GOOD' | 'NEEDS_IMPROVEMENT';
+
+export type StatusFilter = 'ALL' | 'ON_TIME' | 'LATE' | 'ABSENT' | 'EXCUSED' | 'ESCAPY';
+
+export type Modes = 'ALL' | 'DAILY' | 'WEEKLY' | 'MONTHLY';
 
 export interface PeriodScope {
   start: string; // ISO String (Date only, yyyy-MM-dd)

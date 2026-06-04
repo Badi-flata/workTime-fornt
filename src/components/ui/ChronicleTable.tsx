@@ -6,6 +6,9 @@ import Image from 'next/image';
 
 interface ChronicleTableProps {
   data: RegistryEntry[];
+  //Filter
+  
+
   /** Which column-set to display: 1 = summary view, 2 = daily breakdown view */
   turnColumns?: number;
   onRowClick?: (data: RegistryEntry) => void;
@@ -31,7 +34,7 @@ const COLUMNS_VIEW_2 = ['الموظف', 'التخصص / المنصب', 'التق
 
 export function ChronicleTable({ data, onRowClick, turnColumns = 1 }: ChronicleTableProps) {
   const columns = turnColumns === 1 ? COLUMNS_VIEW_1 : COLUMNS_VIEW_2;
-
+  
   return (
     <div className="overflow-x-auto rounded-lg border border-outline/10 shadow-sm">
       <table className="chronicle-table">
@@ -53,7 +56,7 @@ export function ChronicleTable({ data, onRowClick, turnColumns = 1 }: ChronicleT
                 transition={{ delay: idx * 0.04, duration: 0.25 }}
                 onClick={() => onRowClick?.(row)}
                 className="hover:bg-surface-container-low transition-colors cursor-pointer group"
-              >
+                >
                 {/* — Column: Employee Name & Avatar (shared) — */}
                 <td>
                   <div className="flex items-center gap-3">
