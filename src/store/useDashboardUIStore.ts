@@ -1,143 +1,114 @@
-import { PaginationMeta , RegistryEntry , Modes , DisciplineRating , StatusFilter} from '@/types/dashboard-registry.types';
+/**
+ * useDashboardUIStore
+ * ───────────────────
+ * مسؤول فقط عن حالة واجهة المستخدم:
+ * - النوافذ المنبثقة والموظف المحدد
+ * - التنقل بين الصفحات والأعمدة
+ * - التبويب النشط (ALL / DAILY / WEEKLY / MONTHLY)
+ * - نقطة تثبيت التاريخ (dateAnchor) لإرسالها للباك-إند
+ *
+ * الفلترة انتقلت إلى useRegistryFilterStore (منفصل ومُعاد الاستخدام)
+ */
+
+import { PaginationMeta, RegistryEntry, Modes } from '@/types/dashboard-registry.types';
 import { create } from 'zustand';
 
 interface DashboardUIState {
-  // Modals state
+  // ── Modals ─────────────────────────────────────────────────────
   isEmployeeInfoModalOpen: boolean;
   isDetailedAttendanceModalOpen: boolean;
-  
-  // Selected Data for Modals
   selectedEmployee: RegistryEntry | null;
 
-  // Pagination 
-  Pagination:PaginationMeta
+  // ── Pagination ─────────────────────────────────────────────────
+  pagination: PaginationMeta;
 
-  turnColumns:number;
-  
-  //Search
-  searchQuery: string;
-  // mode query
-  activeTab:Modes;
-  // date query
+  // ── View ───────────────────────────────────────────────────────
+  /** عدد مجموعة الأعمدة النشطة (1 = ملخص، 2 = تفاصيل يومية) */
+  turnColumns: number;
+
+  // ── Query Params → ترسل للباك-إند ─────────────────────────────
+  activeTab: Modes;
   dateAnchor: string;
   customStartDate: string;
   customEndDate: string;
-  //Filter
-  statusDiscipline: DisciplineRating;
-  statusFilter:StatusFilter;
-  dataFilter: RegistryEntry[]
 
-  // Actions
-  openEmployeeModal: (Data: RegistryEntry) => void;
-  openDetailedAttendanceModal: (data: RegistryEntry) => void;
+  // ── Actions: Modals ────────────────────────────────────────────
+  openEmployeeModal: (employee: RegistryEntry) => void;
+  openDetailedAttendanceModal: (employee: RegistryEntry) => void;
   closeModals: () => void;
-  // Search Actions
-  setSearchQuery: (query: string) => void;
-  //date query
-  setActiveTab: (tab:Modes) => void;
-  setDateAnchor: (dateAnchor: string) => void;
-  setCustomDate: (dateType: 'start'| 'end', date: string) => void;
-  //Filter
-  setStatusDiscipline: (status:DisciplineRating) => void;
-  setStatusFilter: (status:StatusFilter) => void;
-  setDataFilter: (data:RegistryEntry[], mode:Modes, statusFil?:StatusFilter , statusDiscip?: DisciplineRating) => void ;
-  // Pagination
-    setPagination: (pagination: PaginationMeta) => void;
-  setCurrentPage:( actType:'next' | 'poved' , page:number) => void
-  setTurnColumns:( actType:'next' | 'poved' , currentColumn:number) => void
+
+  // ── Actions: Pagination ────────────────────────────────────────
+  setPagination: (pagination: PaginationMeta) => void;
+  setCurrentPage: (direction: 'next' | 'prev', current: number) => void;
+
+  // ── Actions: View ──────────────────────────────────────────────
+  setTurnColumns: (direction: 'next' | 'prev', current: number) => void;
+
+  // ── Actions: Query ─────────────────────────────────────────────
+  setActiveTab:  (tab: Modes) => void;
+  setDateAnchor: (date: string) => void;
+  setCustomDate: (type: 'start' | 'end', date: string) => void;
 }
 
 export const useDashboardUIStore = create<DashboardUIState>((set) => ({
+  // ── Initial State ──────────────────────────────────────────────
   isEmployeeInfoModalOpen: false,
   isDetailedAttendanceModalOpen: false,
   selectedEmployee: null,
-  // Pagination
-  Pagination:{page:1,limit:10,totalItems:10 ,totalPages:1},
-  turnColumns:1,
-  //Search 
-  searchQuery: '',
-  // mode query
+
+  pagination: { page: 1, limit: 10, totalItems: 0, totalPages: 1 },
+
+  turnColumns: 1,
+
   activeTab: 'ALL',
-  // data query
   dateAnchor: '',
   customStartDate: '',
   customEndDate: '',
-  //Filter
-  statusFilter: 'ALL',
-  statusDiscipline: 'ALL',
-  dataFilter:[],
 
+  // ── Modals ──────────────────────────────────────────────────────
+  openEmployeeModal: (employee) =>
+    set({ isEmployeeInfoModalOpen: true, selectedEmployee: employee }),
 
-  openEmployeeModal: (Data) => set({ isEmployeeInfoModalOpen: true, selectedEmployee: Data }),
-  openDetailedAttendanceModal: (data) => set({ isDetailedAttendanceModalOpen: true, selectedEmployee: data }),
-  closeModals: () => set({ 
-    isEmployeeInfoModalOpen: false, 
-    isDetailedAttendanceModalOpen: false, 
-    selectedEmployee: null 
-  }),
-   //Pagination
-   setPagination: (pagination: PaginationMeta) => set({ Pagination: pagination }),
-     setCurrentPage: 
-     (type , page ) =>  { 
-     page = type === "next" ? page + 1 : page - 1
-     set(({Pagination})=>({Pagination:{...Pagination,page}}))
-             },
-       setTurnColumns:
-    (type ,currentColumn) => {
-      currentColumn = type === "next" ? currentColumn + 1 :  currentColumn - 1
-     set({turnColumns:currentColumn })
-    },
-  // Filter & Search Actions
-  setSearchQuery: (query) => set({ searchQuery: query }),
-  setActiveTab: (tab) => set({ activeTab: tab }),
-  setDateAnchor: (dateAnchor) => set({ dateAnchor }),
-  setCustomDate: (dateType, date) => set({ [dateType === 'start' ? 'customStartDate' : 'customEndDate']: date }),
-  setStatusFilter: (status) => set({ statusFilter: status }),
-  setStatusDiscipline: (status) => set({ statusDiscipline: status }),
-  setDataFilter: (data,mod,statusFil,statusDiscip) => {
-    let dataFil : any[] = []
-    let dailyFilter: any[] = data
-     if(mod !== 'ALL'){
-  if(statusFil && statusFil !== 'ALL' && mod === 'DAILY'){
-    for ( const item of data){
-      const att = item.dailyBreakdown
-       if(att && att[0].status === statusFil){
-        //
-       for(const dayFil of att){
-       if(dayFil.status == statusFil){
-        dailyFilter.push(dayFil)
-      }}
-      dataFil.push({
-       employeeId:item.employeeId,
-       name:item.name,
-       role:item.role,
-       avatar:item.avatar,
-       disciplineRating:item.disciplineRating,
-       summary:item.summary,
-       dailyBreakdown: dailyFilter
-      })
-}
-    }
-  }else if(statusDiscip && statusDiscip !== 'ALL'){
-    for ( const item of data){
-      const att = item
-       if(att && att.disciplineRating === statusDiscip){
-        //
-      dataFil.push({
-       employeeId:item.employeeId,
-       name:item.name,
-       role:item.role,
-       avatar:item.avatar,
-       disciplineRating:item.disciplineRating,
-       summary:item.summary,
-       dailyBreakdown: item.dailyBreakdown
-      })
-    }
-  }
-  } 
- }else{
-    dataFil = data ||[]
-  }
- set({dataFilter:dataFil})
-  }
+  openDetailedAttendanceModal: (employee) =>
+    set({ isDetailedAttendanceModalOpen: true, selectedEmployee: employee }),
+
+  closeModals: () =>
+    set({
+      isEmployeeInfoModalOpen: false,
+      isDetailedAttendanceModalOpen: false,
+      selectedEmployee: null,
+    }),
+
+  // ── Pagination ──────────────────────────────────────────────────
+  setPagination: (pagination) => set({ pagination }),
+
+  setCurrentPage: (direction, current) =>
+    set((state) => ({
+      pagination: {
+        ...state.pagination,
+        page: direction === 'next' ? current + 1 : Math.max(1, current - 1),
+      },
+    })),
+
+  // ── View ────────────────────────────────────────────────────────
+  setTurnColumns: (direction, current) =>
+    set({
+      turnColumns:
+        direction === 'next'
+          ? Math.min(2, current + 1)
+          : Math.max(1, current - 1),
+    }),
+
+  // ── Query ───────────────────────────────────────────────────────
+  setActiveTab: (tab) =>
+    set({
+      activeTab: tab,
+      // نعيد ضبط العمود عند تغيير التبويب: DAILY → عمود التفاصيل (2)، غيره → ملخص (1)
+      turnColumns: tab === 'DAILY' ? 2 : 1,
+    }),
+
+  setDateAnchor: (date) => set({ dateAnchor: date }),
+
+  setCustomDate: (type, date) =>
+    set(type === 'start' ? { customStartDate: date } : { customEndDate: date }),
 }));

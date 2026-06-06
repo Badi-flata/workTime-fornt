@@ -17,7 +17,7 @@ export interface PaginationMeta {
 }
 
 export interface DashboardMeta {
-  periodScope: PeriodScope;
+  periodScope: string;
   totalSubordinates: number;
   activeShiftContext: string;
   pagination: PaginationMeta;

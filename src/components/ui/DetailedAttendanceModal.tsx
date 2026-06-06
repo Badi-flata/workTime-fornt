@@ -16,7 +16,7 @@ export function DetailedAttendanceModal() {
   
   // Pagination 
   const totalItems = dailyBreakdown.length;
-  const limit = 1
+  const limit = 5
 
   const totalPages = Math.ceil(totalItems / limit);
   const paginatedData = dailyBreakdown.slice((currentPage - 1) * limit, currentPage * limit);

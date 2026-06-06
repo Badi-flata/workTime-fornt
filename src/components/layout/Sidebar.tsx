@@ -91,7 +91,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 bg-surface-container-lowest border-l border-outline/20 flex flex-col h-screen font-sans shrink-0">
+    <aside className="w-[max(29% ,300)]: bg-surface-container-lowest border-l border-outline/20 flex flex-col h-screen font-sans shrink-0">
       {/* Logo */}
       <div className="h-16 flex items-center px-6 border-b border-outline/20">
         <h1 className="text-xl font-heading font-bold text-primary tracking-wide">WorkTime</h1>
