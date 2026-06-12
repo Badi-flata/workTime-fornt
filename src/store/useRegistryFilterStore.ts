@@ -15,7 +15,6 @@ import {
   Modes,
   RegistryEntry,
   StatusFilter,
-  DailyBreakdownEntry,
 } from '@/types/dashboard-registry.types';
 
 // ─── شكل موظف يومي مُبسَّط للعرض السريع في وضع DAILY ───
@@ -68,7 +67,7 @@ interface RegistryFilterState {
    * الدالة الرئيسية — تأخذ البيانات الخام والوضع الحالي
    * وتُنتج filteredRegistry أو filteredDailyRows حسب الوضع.
    */
-  applyFilters: (data: RegistryEntry[], mode: Modes, pagination: { page: number; limit: number }) => void;
+  applyFilters: (data: RegistryEntry[], mode: Modes, pagination?: { pageDash: number; limitDash?: number }) => void;
 }
 
 
@@ -164,7 +163,7 @@ export const useRegistryFilterStore = create<RegistryFilterState>((set, get) => 
       }
       
       const totalItems = rows.length;
-      const limit = pagination.limit;
+      const limit = pagination?.limitDash||5;
       const totalPagesFiltered = Math.ceil(totalItems / limit) || 1;
       
       // Ensure dailyPage doesn't exceed new max

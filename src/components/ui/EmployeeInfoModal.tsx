@@ -1,12 +1,12 @@
 "use client";
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, UserCircle, Briefcase, Calendar as CalendarIcon, Clock, AlertCircle, CalendarX } from 'lucide-react';
-import { useDashboardUIStore } from '@/store/useDashboardUIStore';
+import { X, Briefcase, Calendar as CalendarIcon, Clock, AlertCircle, CalendarX } from 'lucide-react';
+import { useCardUIStore } from '@/store/useCardUIStore';
 import Image from 'next/image';
 
 export function EmployeeInfoModal() {
-  const { isEmployeeInfoModalOpen, selectedEmployee, closeModals, openDetailedAttendanceModal } = useDashboardUIStore();
+  const { isEmployeeInfoModalOpen, selectedEmployee, closeModals, openDetailedAttendanceModal } = useCardUIStore();
 
   // In a real app, we would fetch the specific employee details based on selectedEmployeeId.
   // For now, we use a placeholder or derived data.

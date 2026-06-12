@@ -189,7 +189,7 @@ export function DatePicker({ value, onChange, placeholder = 'بحث بتاريخ
                 اليوم
               </button>
               <button
-                onClick={(e) => clearDate(e as any)}
+                onClick={clearDate}
                 className="text-xs font-bold text-error hover:text-error/80 transition-colors"
               >
                 مسح

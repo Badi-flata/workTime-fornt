@@ -3,7 +3,7 @@
 import { RegistryEntry } from '@/types/dashboard-registry.types';
 import { DailyEmployeeRow } from '@/store/useRegistryFilterStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
+import  Image from 'next/image';
 
 // ─── Shared column config ───────────────────────────────────────
 
@@ -71,7 +71,7 @@ interface ChronicleTableProps {
   /** هل نحن في وضع DAILY؟ */
   isDaily?: boolean;
   /** مجموعة الأعمدة: 1 = ملخص، 2 = تفاصيل يومية (يُستخدم فقط مع data) */
-  turnColumns?: number;
+  turnColumnsDash?: number;
   onRowClick?: (employeeId: string) => void;
 }
 
@@ -81,14 +81,14 @@ export function ChronicleTable({
   data = [],
   dailyData = [],
   isDaily = false,
-  turnColumns = 1,
+  turnColumnsDash = 1,
   onRowClick,
 }: ChronicleTableProps) {
 
   // اختر الأعمدة المناسبة
   const columns = isDaily
     ? COLS_DAILY
-    : turnColumns === 2
+    : turnColumnsDash === 2
       ? COLS_BREAKDOWN
       : COLS_SUMMARY;
 
@@ -159,7 +159,7 @@ export function ChronicleTable({
             {/* ══ Summary / Breakdown rows ══ */}
             {!isDaily && data.map((row, idx) => (
               <motion.tr
-                key={`${row.employeeId}-${turnColumns}`}
+                key={`${row.employeeId}-${turnColumnsDash}`}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
@@ -181,7 +181,7 @@ export function ChronicleTable({
                 </td>
 
                 {/* ── View 1: Summary ── */}
-                {turnColumns === 1 && (
+                {turnColumnsDash === 1 && (
                   <>
                     <td className="text-primary font-bold tabular-nums">{row.summary.presentDays}</td>
                     <td className="text-error font-bold tabular-nums">{row.summary.absentDays}</td>
@@ -200,7 +200,7 @@ export function ChronicleTable({
                 )}
 
                 {/* ── View 2: Daily Breakdown (first entry) ── */}
-                {turnColumns === 2 && (() => {
+                {turnColumnsDash === 2 && (() => {
                   const entry = row.dailyBreakdown?.[0];
                   return (
                     <>

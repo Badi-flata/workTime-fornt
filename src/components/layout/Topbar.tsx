@@ -1,41 +1,55 @@
 "use client";
 
-import { Bell, Search, ChevronDown } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bell, Search, ChevronDown, Menu, X, Settings } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import clsx from 'clsx';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useEffect } from 'react';
-
-// Map route paths to Arabic page titles
-const pageTitles: Record<string, string> = {
-  '/dashboard': 'لوحة التحكم الرئيسية',
-  '/attendance-reports': 'لوحة التحكم بسجلات الحضور',
-  '/live-pulse': 'نبض الحضور الحي',
-  '/employees': 'دليل الموظفين',
-  '/employee-profile': 'الملف الشخصي للموظف',
-  '/employee-dashboard': 'لوحة تحكم الموظف الشخصية',
-  '/attendance-log': 'سجل الحضور التفصيلي',
-  '/clock': 'تسجيل الحضور والانصراف',
-  '/departments': 'إدارة الأقسام والورديات',
-  '/settings': 'الإعدادات',
-};
-
+import { navSections } from './Sidebar';
+import {Logo } from '@/components/ui/Logo'
 export function Topbar() {
   const pathname = usePathname();
-  const pageTitle = pageTitles[pathname || ''] || 'WorkTime';
   const { user, initializeAuth } = useAuthStore();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     initializeAuth();
   }, [initializeAuth]);
 
-  return (
-    <header className="h-16 bg-surface-container-lowest border-b border-outline/20 flex items-center justify-between px-6 font-sans shrink-0">
-      {/* Breadcrumb / Page Title */}
-      <div className="flex items-center gap-2">
-        <h2 className="text-lg font-heading font-semibold text-on-surface">{pageTitle}</h2>
-      </div>
+  // Close mobile menu when pathname changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
-      {/* Right Side: Search + Notifications + Profile */}
+  return (
+    <header className="h-16 bg-white border-b shadow  border-outline/15 flex items-center justify-between px-6 font-sans shrink-0 relative z-30">
+      {/* ── BREADCRUMB / MOBILE MENU TOGGLE ── */}
+      <motion.div
+      
+      className="flex items-center shrink gap-3">
+        {/* Burger menu button visible only on mobile */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="p-2 -mr-2 rounded-lg text-on-surface-variant right-[40%] shadow shadow-slate-400  hover:bg-slate-400/40 hover:text-white  transition-colors md:hidden"
+          aria-label="قائمة التنقل الجوالة"
+        >
+          {isMobileMenuOpen ? <X size={25} /> : <Menu size={25} />}
+        </button>
+        
+      </motion.div>
+      {/* ── LOGO ── */}
+      <div 
+        className={clsx(
+          "h-16 flex items-center  md:absolute right-0 px-4 shrink-0 transition-all duration-300",
+          
+        )}
+      >
+        <Logo size={56} showText={true} orientation="horizontal" className="justify-start pr-1" />
+        
+      </div>
+      {/* ── RIGHT SIDE: SEARCH + NOTIFICATIONS + PROFILE ── */}
       <div className="flex items-center gap-4">
         {/* Search */}
         <div className="relative hidden md:block">
@@ -54,17 +68,75 @@ export function Topbar() {
         </button>
 
         {/* Profile */}
-        <div className="flex items-center gap-3 border-r border-outline/20 pr-4 mr-2">
-          <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+        <div className="flex items-center gap-3 border-r max-[400px]:hidden border-outline/20 pr-4 mr-2">
+          <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm select-none">
             {user?.avatar || 'أ'}
           </div>
-          <div className="text-right hidden lg:block">
+          <div className="text-right hidden lg:block select-none">
             <p className="text-sm font-semibold text-on-surface leading-tight">{user?.name || 'مستخدم'}</p>
             <p className="text-xs text-on-surface-variant">{user?.role || '---'}</p>
           </div>
           <ChevronDown size={14} className="text-on-surface-variant" />
         </div>
       </div>
+      
+      {/* ── MOBILE NAV DROPDOWN (GLASSMORPHISM) ── */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="absolute top-full right-4 left-4 mt-2 z-50 bg-white/95 dark:bg-surface-container-lowest/95 
+                       backdrop-blur-md rounded-2xl shadow-xl border border-outline/15 p-4 md:hidden overflow-y-auto max-h-[calc(100vh-80px)] flex flex-col space-y-4"
+          >
+            {navSections.map((section) => (
+              <div key={section.label} className="space-y-1.5">
+                <p className="px-3 text-[10px] font-label font-bold text-on-surface-variant/50 uppercase tracking-wider select-none">
+                  {section.label}
+                </p>
+                <div className="grid grid-cols-1 gap-1">
+                  {section.items.map((item) => {
+                    const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={clsx(
+                          'flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 select-none',
+                          isActive
+                            ? 'bg-primary/10 text-primary border-r-[3px] border-primary font-bold'
+                            : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface'
+                        )}
+                      >
+                        <item.icon size={18} strokeWidth={isActive ? 2.5 : 2} className="shrink-0" />
+                        <span>{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {/* Mobile Settings Link */}
+            <div className="pt-2 border-t border-outline/10">
+              <Link 
+                href="/settings"
+                className={clsx(
+                  'flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 select-none',
+                  pathname === '/settings'
+                    ? 'bg-primary/10 text-primary border-r-[3px] border-primary font-bold'
+                    : 'text-on-surface-variant hover:bg-surface-container-low'
+                )}
+              >
+                <Settings size={18} className="shrink-0" />
+                <span>الإعدادات</span>
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

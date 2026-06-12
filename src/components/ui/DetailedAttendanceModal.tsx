@@ -2,12 +2,12 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar as CalendarIcon, Clock, ArrowRightLeft  , ChevronRight , ChevronLeft} from 'lucide-react';
-import { useDashboardUIStore } from '@/store/useDashboardUIStore';
+import { useCardUIStore } from '@/store/useCardUIStore';
 import { useState } from 'react';
 import '../../app/globals.css';
 
 export function DetailedAttendanceModal() {
-  const { isDetailedAttendanceModalOpen, selectedEmployee , closeModals, openEmployeeModal } = useDashboardUIStore();
+  const { isDetailedAttendanceModalOpen, selectedEmployee , closeModals, openEmployeeModal } = useCardUIStore();
   const [currentPage, setCurrentPage] = useState(1);
   // Mock data for the detailed breakdown
   const dailyBreakdown  = selectedEmployee?.dailyBreakdown || [];

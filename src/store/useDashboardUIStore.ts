@@ -10,21 +10,18 @@
  * الفلترة انتقلت إلى useRegistryFilterStore (منفصل ومُعاد الاستخدام)
  */
 
-import { PaginationMeta, RegistryEntry, Modes } from '@/types/dashboard-registry.types';
+import { PaginationMeta, Modes } from '@/types/dashboard-registry.types';
 import { create } from 'zustand';
 
-interface DashboardUIState {
-  // ── Modals ─────────────────────────────────────────────────────
-  isEmployeeInfoModalOpen: boolean;
-  isDetailedAttendanceModalOpen: boolean;
-  selectedEmployee: RegistryEntry | null;
 
+interface DashboardUIState {
   // ── Pagination ─────────────────────────────────────────────────
-  pagination: PaginationMeta;
+  paginationDash: {pageDash:number, limitDash?:number, totalItemsDash?:number , totalPagesDash?:number};
 
   // ── View ───────────────────────────────────────────────────────
   /** عدد مجموعة الأعمدة النشطة (1 = ملخص، 2 = تفاصيل يومية) */
-  turnColumns: number;
+  turnColumnsDash: number;
+
 
   // ── Query Params → ترسل للباك-إند ─────────────────────────────
   activeTab: Modes;
@@ -32,17 +29,14 @@ interface DashboardUIState {
   customStartDate: string;
   customEndDate: string;
 
-  // ── Actions: Modals ────────────────────────────────────────────
-  openEmployeeModal: (employee: RegistryEntry) => void;
-  openDetailedAttendanceModal: (employee: RegistryEntry) => void;
-  closeModals: () => void;
-
+  
   // ── Actions: Pagination ────────────────────────────────────────
-  setPagination: (pagination: PaginationMeta) => void;
+  setPaginationDash: (pagination:PaginationMeta ) => void;
   setCurrentPage: (direction: 'next' | 'prev', current: number) => void;
 
   // ── Actions: View ──────────────────────────────────────────────
-  setTurnColumns: (direction: 'next' | 'prev', current: number) => void;
+  setTurnColumnsDash: (direction: 'next' | 'prev', current: number) => void;
+ 
 
   // ── Actions: Query ─────────────────────────────────────────────
   setActiveTab:  (tab: Modes) => void;
@@ -52,59 +46,52 @@ interface DashboardUIState {
 
 export const useDashboardUIStore = create<DashboardUIState>((set) => ({
   // ── Initial State ──────────────────────────────────────────────
-  isEmployeeInfoModalOpen: false,
-  isDetailedAttendanceModalOpen: false,
-  selectedEmployee: null,
+ 
+  paginationDash: { pageDash:1, limitDash: 5, totalItemsDash: 0, totalPagesDash: 1 },
 
-  pagination: { page: 1, limit: 10, totalItems: 0, totalPages: 1 },
-
-  turnColumns: 1,
-
+  turnColumnsDash: 1,
+  
   activeTab: 'ALL',
   dateAnchor: '',
   customStartDate: '',
   customEndDate: '',
 
-  // ── Modals ──────────────────────────────────────────────────────
-  openEmployeeModal: (employee) =>
-    set({ isEmployeeInfoModalOpen: true, selectedEmployee: employee }),
-
-  openDetailedAttendanceModal: (employee) =>
-    set({ isDetailedAttendanceModalOpen: true, selectedEmployee: employee }),
-
-  closeModals: () =>
-    set({
-      isEmployeeInfoModalOpen: false,
-      isDetailedAttendanceModalOpen: false,
-      selectedEmployee: null,
-    }),
+  
+ 
 
   // ── Pagination ──────────────────────────────────────────────────
-  setPagination: (pagination) => set({ pagination }),
+  setPaginationDash: (pagination) => set({
+
+    paginationDash:{pageDash:pagination.page,
+    limitDash:pagination.limit,
+     totalItemsDash:pagination.totalItems,
+     totalPagesDash:pagination.totalPages} 
+    }),
 
   setCurrentPage: (direction, current) =>
     set((state) => ({
-      pagination: {
-        ...state.pagination,
-        page: direction === 'next' ? current + 1 : Math.max(1, current - 1),
+      paginationDash: {
+        ...state.paginationDash,
+        pageDash: direction === 'next' ? current + 1 : Math.max(1, current - 1),
       },
     })),
 
   // ── View ────────────────────────────────────────────────────────
-  setTurnColumns: (direction, current) =>
+  setTurnColumnsDash: (direction, current) =>
     set({
-      turnColumns:
+      turnColumnsDash:
         direction === 'next'
           ? Math.min(2, current + 1)
           : Math.max(1, current - 1),
     }),
 
+  
   // ── Query ───────────────────────────────────────────────────────
   setActiveTab: (tab) =>
     set({
       activeTab: tab,
       // نعيد ضبط العمود عند تغيير التبويب: DAILY → عمود التفاصيل (2)، غيره → ملخص (1)
-      turnColumns: tab === 'DAILY' ? 2 : 1,
+      turnColumnsDash: tab === 'DAILY' ? 2 : 1,
     }),
 
   setDateAnchor: (date) => set({ dateAnchor: date }),

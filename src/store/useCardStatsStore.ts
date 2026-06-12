@@ -10,6 +10,8 @@ interface FetchParams {
   dateAnchor?: string;
   startDate?: string;
   endDate?: string;
+  status?: string;
+  excludeBreakdown?: boolean;
 }
 
 interface CardStatsState {
@@ -18,8 +20,11 @@ interface CardStatsState {
   registry: RegistryEntry[];
   isLoading: boolean;
   error: string | null;
+  modalRegistry: RegistryEntry[];
+  modalIsLoading: boolean;
 
   fetchCardMetrics: (params: FetchParams) => Promise<void>;
+  fetchModalRegistry: (params: FetchParams) => Promise<void>;
   setLivePulseData: (data: Partial<AggregatedMetrics>) => void;
 }
 
@@ -29,6 +34,8 @@ export const useCardStatsStore = create<CardStatsState>((set) => ({
   registry: [],
   isLoading: false,
   error: null,
+  modalRegistry: [],
+  modalIsLoading: false,
 
   fetchCardMetrics: async (params) => {
     set({ isLoading: true, error: null });
@@ -60,6 +67,26 @@ export const useCardStatsStore = create<CardStatsState>((set) => ({
       }
       
       set({ error: message, isLoading: false });
+    }
+  },
+
+  fetchModalRegistry: async (params) => {
+    set({ modalIsLoading: true, error: null });
+    try {
+      const response = await API.managing.getDashboardRegistry(params);
+      const { registry } = response.data;
+      set({ 
+        modalRegistry: registry ?? [],
+        modalIsLoading: false 
+      });
+    } catch (err: unknown) {
+      let message = 'فشل في جلب سجلات الموظفين للبطاقة';
+      if (err instanceof AxiosError) {
+        message = err.response?.data?.message || err.message;
+      } else if (err instanceof Error) {
+        message = err.message;
+      }
+      set({ error: message, modalIsLoading: false });
     }
   },
 
