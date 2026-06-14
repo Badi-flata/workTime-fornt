@@ -2,31 +2,70 @@
 @layer theme, base, mui, components, utilities;
 @source "./src/**/*.{js,jsx}";
 @theme {
-  /* Core Palette CSS Variables */
+  /* ── Core Brand Palette ── */
   --color-primary: #003527;
   --color-primary-container: #064e3b;
+  --color-primary-fixed: #b0f0d6;
   --color-primary-fixed-dim: #95d3ba;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #80bea6;
+  --color-on-primary-fixed-variant: #0b513d;
+  --color-surface-tint: #2b6954;
+
+  /* ── Secondary ── */
   --color-secondary: #4059aa;
+  --color-secondary-container: #8fa7fe;
+  --color-secondary-fixed: #dce1ff;
+  --color-secondary-fixed-dim: #b6c4ff;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #1d3989;
+  --color-on-secondary-fixed: #00164e;
+  --color-on-secondary-fixed-variant: #264191;
+
+  /* ── Tertiary ── */
+  --color-tertiary: #480177;
+  --color-tertiary-container: #60258f;
+  --color-tertiary-fixed: #f2daff;
+  --color-tertiary-fixed-dim: #e0b6ff;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #d29aff;
+  --color-on-tertiary-fixed: #2d004f;
+  --color-on-tertiary-fixed-variant: #632892;
+
+  /* ── Error ── */
   --color-error: #ba1a1a;
-  
-  /* Surface and Background */
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  /* ── Surface & Background ── */
+  --color-background: #f8f9fa;
+  --color-on-background: #191c1d;
   --color-surface: #f8f9fa;
+  --color-surface-bright: #f8f9fa;
+  --color-surface-dim: #d9dadb;
+  --color-surface-variant: #e1e3e4;
   --color-surface-container-lowest: #ffffff;
   --color-surface-container-low: #f3f4f5;
   --color-surface-container: #edeeef;
+  --color-surface-container-high: #e7e8e9;
   --color-surface-container-highest: #e1e3e4;
-  
-  /* Text and Outlines */
+  --color-inverse-surface: #2e3132;
+  --color-inverse-on-surface: #f0f1f2;
+  --color-inverse-primary: #95d3ba;
+
+  /* ── Text & Outlines ── */
   --color-on-surface: #191c1d;
   --color-on-surface-variant: #404944;
   --color-outline: #707974;
+  --color-outline-variant: #bfc9c3;
 
-  /* Typography Layout */
+  /* ── Typography ── */
   --font-sans: 'DM Sans', sans-serif;
   --font-heading: 'Oswald', sans-serif;
   --font-label: 'Source Sans 3', sans-serif;
-  
-  /* Radii for modern UI components */
+
+  /* ── Radii ── */
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 1rem;
