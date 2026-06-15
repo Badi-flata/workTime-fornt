@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { Bell, Search, ChevronDown, Menu, X, Settings, LogOut } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { Bell, Search, ChevronDown, Menu, X, Settings } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,27 +11,8 @@ import { navSections } from './Sidebar';
 import {Logo } from '@/components/ui/Logo'
 export function Topbar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { user, logout, initializeAuth } = useAuthStore();
+  const { user, initializeAuth } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const profileRef = useRef<HTMLDivElement>(null);
-
-  const handleLogout = () => {
-    logout();
-    router.replace('/login');
-  };
-
-  // إغلاق قائمة البروفايل عند النقر خارجها
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
-        setIsProfileMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   useEffect(() => {
     initializeAuth();
@@ -86,53 +67,16 @@ export function Topbar() {
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
         </button>
 
-        {/* Profile + Logout Dropdown */}
-        <div ref={profileRef} className="relative flex items-center gap-3 border-r max-[400px]:hidden border-outline/20 pr-4 mr-2">
-          <button
-            id="topbar-profile-btn"
-            onClick={() => setIsProfileMenuOpen((p) => !p)}
-            className="flex items-center gap-3 cursor-pointer rounded-xl p-1 hover:bg-surface-container-low transition-colors"
-            aria-label="قائمة المستخدم"
-            aria-expanded={isProfileMenuOpen}
-          >
-            <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm select-none">
-              {user?.avatar || 'أ'}
-            </div>
-            <div className="text-right hidden lg:block select-none">
-              <p className="text-sm font-semibold text-on-surface leading-tight">{user?.name || 'مستخدم'}</p>
-              <p className="text-xs text-on-surface-variant">{user?.role || '---'}</p>
-            </div>
-            <ChevronDown
-              size={14}
-              className={clsx('text-on-surface-variant transition-transform duration-200', isProfileMenuOpen && 'rotate-180')}
-            />
-          </button>
-
-          {/* Dropdown */}
-          <AnimatePresence>
-            {isProfileMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -8, scale: 0.96 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -8, scale: 0.96 }}
-                transition={{ duration: 0.18, ease: 'easeOut' }}
-                className="absolute top-full left-0 mt-3 w-48 bg-white border border-outline/15 rounded-2xl shadow-xl z-50 overflow-hidden"
-              >
-                <div className="px-4 py-3 border-b border-outline/10">
-                  <p className="text-sm font-semibold text-on-surface truncate">{user?.name}</p>
-                  <p className="text-xs text-on-surface-variant truncate">{user?.role}</p>
-                </div>
-                <button
-                  id="topbar-logout-btn"
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-error hover:bg-red-50 transition-colors"
-                >
-                  <LogOut size={16} />
-                  <span>تسجيل الخروج</span>
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+        {/* Profile */}
+        <div className="flex items-center gap-3 border-r max-[400px]:hidden border-outline/20 pr-4 mr-2">
+          <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm select-none">
+            {user?.avatar || 'أ'}
+          </div>
+          <div className="text-right hidden lg:block select-none">
+            <p className="text-sm font-semibold text-on-surface leading-tight">{user?.name || 'مستخدم'}</p>
+            <p className="text-xs text-on-surface-variant">{user?.role || '---'}</p>
+          </div>
+          <ChevronDown size={14} className="text-on-surface-variant" />
         </div>
       </div>
       
