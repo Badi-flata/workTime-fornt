@@ -1,16 +1,16 @@
 import { ReactNode } from 'react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { Layouts } from '@/components/layout/Layouts';
 import { EmployeeInfoModal } from '@/components/ui/EmployeeInfoModal';
 import { DetailedAttendanceModal } from '@/components/ui/DetailedAttendanceModal';
 import { StatisticEmployeeCard } from '@/components/ui/StatistcEmployeesCard';
 
 export default function MainLayout({ children }: { children: ReactNode }) {
   return (
-    <DashboardLayout>
+    <Layouts>
       {children}
       <StatisticEmployeeCard/>
       <EmployeeInfoModal />
       <DetailedAttendanceModal />
-    </DashboardLayout>
+    </Layouts>
   );
 }

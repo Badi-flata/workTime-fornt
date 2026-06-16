@@ -6,11 +6,11 @@ import { Topbar } from './Topbar';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 
-interface DashboardLayoutProps {
+interface LayoutsProps {
   children: ReactNode;
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+export function Layouts({ children }: LayoutsProps) {
   const pathname = usePathname();
 
   return (
