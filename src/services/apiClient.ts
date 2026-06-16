@@ -25,7 +25,7 @@ apiClient.interceptors.request.use((config) => {
 
 // Shared payload/param types
 interface LoginPayload { phone: string; password: string }
-interface SignUpPayload { name: string; phone: string; password: string; role?: string }
+interface SignUpPayload { name: string; phone: string; password: string; role?: string; department: string; email: string; jobTitle: string }
 interface ProfileUpdatePayload { name?: string; phone?: string; imageProfile?: string }
 interface ShiftPayload { name: string; startTime: string; endTime: string; gracePeriodMinIn?: number; gracePeriodMinOut?: number; departmentId: string }
 interface AuditPayload { employeeProfileId: string; shiftId: string; departmentId: string; salary?: number }

@@ -5,17 +5,29 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { API } from '@/services/apiClient';
 import { Logo } from '@/components/ui/Logo';
+import { Role } from '@/types/dashboard-registry.types';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { isAuthenticated, login, initializeAuth } = useAuthStore();
+  const { isAuthenticated, logUp, initializeAuth } = useAuthStore();
 
+  const [name, setName] = useState('');
+  const [department, setDepartment] = useState('employee');
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [role, setRole] = useState<Role>(Role.EMPLOYEE);
   const [password, setPassword] = useState('');
+  const [jobTitle, setJobTitle] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+
+  // ── Label maps ────────────────────────────────────────────────────
+  const mapRole: Record<Role, string> = {
+   EMPLOYEE : 'موظف', 
+   MANAGER : 'مدير', 
+  };
 
   useEffect(() => {
     initializeAuth();
@@ -33,13 +45,23 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await API.public.loginIn({ phone, password });
+      const res = await API.public.logUp(
+        {
+          name,
+          department,
+          email,
+          phone,
+          role,
+          password,
+          jobTitle,
+        }
+      );
       const { token, user } = res.data as {
         token: string;
-        user: { id: string; name: string; role: string; imageProfile?: string };
+        user: { id: string; name: string; role: string;};
       };
 
-      login(
+      logUp(
         {
           id: user.id,
           name: user.name,
@@ -140,7 +162,7 @@ export default function LoginPage() {
 
           {/* Footer */}
           <div className="relative z-10 mt-12 text-on-primary/60 font-label text-xs">
-            © 2025 WORKTIME Chronicle
+            © 2026 WORKTIME Chronicle
           </div>
         </div>
 
@@ -150,16 +172,110 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="flex flex-col items-center mb-10 gap-2">
             <Logo size={72} showText={false} />
-            <h1 className="font-heading text-3xl text-primary font-bold tracking-tight mt-2">
-              تسجيل الدخول
-            </h1>
+             <div className="mb-10 text-center md:text-right">
+                <h1 className="font-headline text-headline-lg text-primary font-bold tracking-tight mb-2">إنشاء حساب مدير</h1>
+                <p className="font-body text-body-md text-on-surface-variant">الرجاء إدخال بياناتك لإنشاء حساب إداري جديد.</p>
+             </div>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} noValidate className="space-y-6">
+             
+            <div className="flex lg:scale-[1.3] lg:translate-x-[14%] bg-surface-container-low rounded-lg p-1 border-2 border-secondary/15 hover:border-secondary">
+                     {(Object.keys(mapRole) as Role[]).map((tab) => (
+                       <button
+                         key={tab}
+                         onClick={() => setRole(tab)}
+                         className={`px-4 py-2 rounded-md font-label font-bold text-sm transition-all ${
+                           role === tab
+                             ? 'bg-white text-primary shadow-sm'
+                             : 'text-on-surface-variant hover:bg-surface-container-highest'
+                         }`}
+                       >
+                         {mapRole[tab]}
+                       </button>
+                     ))}
+                   </div>
 
-            {/* Phone Field */}
-            <div className="space-y-2">
+            {/* full Name & Deparmtnt */}
+           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'> 
+            {/* full Name */}
+           <div className="space-y-1">
+              <label htmlFor="login-phone" className="block font-label text-sm font-semibold text-on-surface tracking-wide">
+               الاسم الكامل
+              </label>
+              <div className="relative flex items-center">
+                {/* Icon */}
+                <span className="absolute right-4 text-outline pointer-events-none" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                </span>
+                <input
+                  id="logUp-name"
+                  type="tel"
+                  autoComplete="tel"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="الاسم الكامل"
+                  dir="rtl"
+                  className="w-full bg-surface-container-low border border-outline-variant/40 rounded-xl py-3.5 pr-12 pl-4 text-on-surface font-sans text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-left placeholder:text-outline/50 shadow-sm"
+                />
+              </div>
+            </div>
+           {/* department Name */}
+            <div className='space-y-1'> 
+              <label htmlFor="login-deparmnet" className="block font-label text-sm font-semibold text-on-surface tracking-wide">
+              اسم المنشأة / القسم
+              </label>
+              <div className="relative flex items-center">
+                {/* Icon */}
+                <span className="absolute right-4 text-outline pointer-events-none" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                </span>
+                <input
+                  id="logUp-department"
+                  type="text"
+                  autoComplete="department"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  placeholder="القسام"
+                  dir="rtl"
+                  className="w-full bg-surface-container-low border border-outline-variant/40 rounded-xl py-3.5 pr-12 pl-4 text-on-surface font-sans text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-left placeholder:text-outline/50 shadow-sm"
+                />
+              </div>
+            </div>
+         </div>
+
+         {/* Email */}
+         <div className='space-y-1'>
+           <div className="relative flex items-center">
+                {/* Icon */}
+                <span className="block font-label text-label-md text-on-surface" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                </span>
+                <input
+                  id="logUp-Email"
+                  type="text"
+                  autoComplete="department"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="البريد الاكتروني"
+                  dir="rtl"
+                  className="w-full bg-surface-container-low border border-outline-variant/40 rounded-xl py-3.5 pr-12 pl-4 text-on-surface font-sans text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-left placeholder:text-outline/50 shadow-sm"
+                />
+              </div>
+         </div>
+
+            {/* Phone Field & Roles */}
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            {/* Phone */}
+            <div className="space-y-1">
               <label htmlFor="login-phone" className="block font-label text-sm font-semibold text-on-surface tracking-wide">
                 رقم الهاتف
               </label>
@@ -182,6 +298,33 @@ export default function LoginPage() {
                   className="w-full bg-surface-container-low border border-outline-variant/40 rounded-xl py-3.5 pr-12 pl-4 text-on-surface font-sans text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-left placeholder:text-outline/50 shadow-sm"
                 />
               </div>
+              </div>
+            {/* Role */}
+            <div className="space-y-1">
+              <label htmlFor="login-role" className="block font-label text-sm font-semibold text-on-surface tracking-wide">
+                الوظفية
+              </label>
+              <div className="relative flex items-center">
+                {/* Icon */}
+                <span className="absolute right-4 text-outline pointer-events-none" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                </span>
+                <input
+                  id="logUp-rloe"
+                  type="tel"
+                  autoComplete="tel"
+                  required
+                  value={jobTitle}
+                  onChange={(e) => setJobTitle(e.target.value)}
+                  placeholder='المسمى الوظيفي'
+                  dir="rtl"
+                  className="w-full bg-surface-container px-4 py-3 pb-2 border-0 border-b border-primary text-primary focus:ring-0 transition-colors font-body text-body-md appearance-none rounded-t-md cursor-not-allowed"
+                />
+              </div>
+            </div>
+
             </div>
 
             {/* Password Field */}
@@ -227,6 +370,7 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
+              <p className="text-xs text-outline font-label mt-1">يجب أن تحتوي على 8 أحرف على الأقل، أرقام ورموز.</p>
             </div>
 
             {/* Remember Me + Forgot */}
