@@ -18,7 +18,8 @@ export default function RootLayout({
 }>) {
   return ( 
     <html lang="ar" dir="rtl">
-      <body className={`${dmSans.variable} ${sourceSans.variable} ${oswald.variable} antialiased bg-surface text-on-surface`}>
+      <body className={`${dmSans.variable} ${sourceSans.variable} ${oswald.variable} 
+                       antialiased bg-surface text-on-surface`}>
         {children}
       </body>
     </html>
