@@ -97,7 +97,7 @@ function extractDailyRows(
       checkOut: day.checkOut,
       status: day.status,
       shift: day.shift,
-      dayDeduction: day.dayDeduction,
+      dayDeduction: day.deduction,
       excuseNotes: day.excuseNotes,
       date: day.date,
     });

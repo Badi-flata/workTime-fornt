@@ -62,7 +62,7 @@ interface useCardUIState {
    let result = [...data]
    if(fil === "DEDUCTED"){
     result  = result.filter((e) =>
-          e.dailyBreakdown.some((d) => d.dayDeduction > 0),
+          e.dailyBreakdown.some((d) => d.deduction > 0),
         );
     } else if (fil === "EARLY_LEAVE") {
       result  = result.filter((e) =>

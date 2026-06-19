@@ -7,7 +7,7 @@ import { API } from '@/services/apiClient';
 import { Logo } from '@/components/ui/Logo';
 import { Role } from '@/types/dashboard-registry.types';
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const router = useRouter();
   const { isAuthenticated, logUp, initializeAuth } = useAuthStore();
 

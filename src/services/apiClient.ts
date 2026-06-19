@@ -2,7 +2,7 @@ import axios from 'axios';
 import { OptimizedDashboardResponse } from '../types/dashboard-registry.types';
 import { useAuthStore } from '../store/useAuthStore';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3030';
+const API_URL = process.env.NEXT_DEVELOPMENT_API_URL || process.env.NEXT_PUBLIC_API_URL;
 
 export const apiClient = axios.create({
   baseURL: API_URL,

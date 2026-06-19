@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "WorkTime | منصة إدارة الحضور",
   description: "نظام إدارة الحضور والانصراف الاحترافي",
 };
-// ${dmSans.variable} ${sourceSans.variable} ${oswald.variable} 
+// 
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return ( 
     <html lang="ar" dir="rtl">
-      <body className={`antialiased bg-surface text-on-surface`}>
+      <body className={`${dmSans.variable} ${sourceSans.variable} ${oswald.variable} antialiased bg-surface text-on-surface`}>
         {children}
       </body>
     </html>

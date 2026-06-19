@@ -43,7 +43,7 @@ export interface DailyBreakdownEntry {
   checkIn: string | null;
   checkOut: string | null;
   earlyLeaveMinutes: number;
-  dayDeduction: number;
+  deduction: number;
   excuseNotes: string | null;
 }
 
