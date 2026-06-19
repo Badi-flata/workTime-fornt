@@ -141,8 +141,8 @@ export function DetailedAttendanceModal() {
                       {day.excuseNotes || '---'}
                     </td>
                     <td className="font-bold font-sans">
-                      {day.dayDeduction > 0 ? (
-                        <span className="text-error">{day.dayDeduction}</span>
+                      {day.deduction > 0 ? (
+                        <span className="text-error">{day.deduction}</span>
                       ) : (
                         <span className="text-outline">0</span>
                       )}
