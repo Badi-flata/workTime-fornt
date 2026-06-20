@@ -10,7 +10,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { isAuthenticated, login, initializeAuth } = useAuthStore();
 
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,7 +34,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await API.public.loginIn({ phone, password });
+      const res = await API.public.loginIn({ password,  email});
       const { token, user } = res.data as {
         token: string;
         user: { id: string; name: string; role: string; imageProfile?: string };
@@ -166,20 +166,21 @@ export default function LoginPage() {
               </label>
               <div className="relative flex items-center">
                 {/* Icon */}
-                <span className="absolute right-4 text-outline pointer-events-none" aria-hidden="true">
+                 <span className="absolute right-4 text-outline pointer-events-none" aria-hidden="true">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
                   </svg>
                 </span>
                 <input
-                  id="login-phone"
-                  type="tel"
-                  autoComplete="tel"
+                  id="login-email"
+                  type="email"
+                  autoComplete="email"
                   required
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="05xxxxxxxx"
-                  dir="ltr"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email Address"
+                  dir="rtl"
                   className="w-full bg-surface-container-low border border-outline-variant/40 rounded-xl py-3.5 pr-12 pl-4 text-on-surface font-sans text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-left placeholder:text-outline/50 shadow-sm"
                 />
               </div>
