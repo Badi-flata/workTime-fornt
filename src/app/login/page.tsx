@@ -22,11 +22,11 @@ export default function LoginPage() {
     initializeAuth();
   }, [initializeAuth]);
 
-  // useEffect(() => {
-  //   if (isAuthenticated) {
-  //     router.replace('/dashboard');
-  //   }
-  // }, [isAuthenticated, router]);
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/dashboard');
+    }
+  }, [isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
