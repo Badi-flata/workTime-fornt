@@ -15,7 +15,9 @@ export function Topbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
     initializeAuth();
+  }
   }, [initializeAuth]);
 
   // Close mobile menu when pathname changes
