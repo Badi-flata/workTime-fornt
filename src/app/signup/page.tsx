@@ -30,7 +30,9 @@ export default function SignUpPage() {
   };
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
     initializeAuth();
+  }
   }, [initializeAuth]);
 
   useEffect(() => {

@@ -18,7 +18,9 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
     initializeAuth();
+  }
   }, [initializeAuth]);
 
   useEffect(() => {
