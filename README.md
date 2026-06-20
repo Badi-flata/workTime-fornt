@@ -1,8 +1,44 @@
 <p align="center">
-  <img src="https://nextjs.org/icons/next.svg" width="80" alt="Next.js Logo" />
+  <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="silverRingGrad" x1="50" y1="82" x2="0" y2="22" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#475569" />
+        <stop offset="30%" stopColor="#94a3b8" />
+        <stop offset="70%" stopColor="#cbd5e1" />
+        <stop offset="100%" stopColor="#ffffff" />
+      </linearGradient>
+      <linearGradient id="emeraldRingGrad" x1="50" y1="22" x2="100" y2="82" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#0f452f" />
+        <stop offset="50%" stopColor="#1b7550" />
+        <stop offset="100%" stopColor="#2bbb76" />
+      </linearGradient>
+      <linearGradient id="checkmarkGrad" x1="85" y1="22" x2="36" y2="58" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#105739" />
+        <stop offset="100%" stopColor="#3cd18c" />
+      </linearGradient>
+      <filter id="logoShadow" x="-10%" y="-10%" width="125%" height="125%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#000000" floodOpacity="0.1" />
+      </filter>
+    </defs>
+    <g filter="url(#logoShadow)">
+      <path d="M 50 82 A 30 30 0 0 1 50 22" stroke="url(#silverRingGrad)" strokeWidth="4.5" strokeLinecap="round" />
+      <path d="M 50 22 A 30 30 0 0 1 50 82" stroke="url(#emeraldRingGrad)" strokeWidth="4.5" strokeLinecap="round" />
+      <circle cx="50" cy="27" r="1.5" fill="#94a3b8" />
+      <circle cx="74" cy="52" r="1.5" fill="#1b7550" opacity="0.6" />
+      <circle cx="50" cy="77" r="1.5" fill="#64748b" opacity="0.6" />
+      <circle cx="26" cy="52" r="1.5" fill="#94a3b8" />
+      <path d="M36,44 L50,58 L85,22" fill="none" stroke="url(#checkmarkGrad)" strokeWidth="6.5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="50" cy="58" r="2.5" fill="#136141" />
+    </g>
+  </svg>
 </p>
 
-<h1 align="center">WorkTime — Frontend</h1>
+<h1 align="center">
+  <span style="color: #1b7550;">WORK</span><span style="color: #1e1e1e;">TIME</span> — Frontend
+</h1>
+<p align="center" style="margin-top: -10px; font-weight: bold; color: #64748b;">
+  منصة إدارة الحضور الذكية
+</p>
 
 <p align="center">
   A modern, RTL-first <strong>Attendance & Workforce Management Dashboard</strong> built with <strong>Next.js 14</strong>, <strong>TypeScript</strong>, <strong>Tailwind CSS v4</strong>, and <strong>Zustand</strong>.
