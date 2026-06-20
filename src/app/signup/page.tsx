@@ -380,12 +380,12 @@ export default function SignUpPage() {
               </div>
               <p className="text-xs text-outline font-label mt-1">يجب أن تحتوي على 8 أحرف على الأقل، أرقام ورموز.</p>
             </div>
-            
+
             {/* both boxes */}
             <div className="flex flex-wrap items-center flex-row justify-around pt-1">
             {/* agree to terms */}
               <div className='space-y-1'>
-              <div className="flex items-center gap-2">
+              <div className="flex-r items-center gap-2">
                 <input
                   id="agreement"
                   name="agreement"
