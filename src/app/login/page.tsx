@@ -16,18 +16,17 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isAgree, setIsAgree] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
     initializeAuth();
-  }
   }, [initializeAuth]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/dashboard');
-    }
-  }, [isAuthenticated, router]);
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     router.replace('/dashboard');
+  //   }
+  // }, [isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -231,9 +230,30 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Remember Me + Forgot */}
-            <div className="flex items-center justify-between pt-1">
-              <div className="flex items-center gap-2">
+          
+            <div className="flex flex-wrap items-center  justify-around pt-1">
+            {/* agree to terms */}
+              <div className='space-y-1'>
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  id="agreement"
+                  name="agreement"
+                  type="checkbox"
+                  checked={isAgree}
+                  onChange={() => setIsAgree(!isAgree)}
+                  className="h-4 w-4 rounded border-outline-variant  text-primary focus:ring-primary bg-surface cursor-pointer"
+                />
+                <label htmlFor="agreement" className="text-sm font-label text-on-surface-variant cursor-pointer select-none">
+                  موافقة على الشروط
+                </label>
+              <button type="button" className="text-sm font-label font-bold text-primary hover:text-primary-container transition-colors hover:underline">
+                الشروط والاحكام
+              </button>
+              </div>
+              </div>
+              {/* remember me - Forgot password */}
+              <div className='space-y-1'>
+              <div className="flex  flex-wrap items-center gap-2">
                 <input
                   id="remember-me"
                   name="remember-me"
@@ -245,11 +265,13 @@ export default function LoginPage() {
                 <label htmlFor="remember-me" className="text-sm font-label text-on-surface-variant cursor-pointer select-none">
                   تذكرني
                 </label>
-              </div>
               <button type="button" className="text-sm font-label font-medium text-primary hover:text-primary-container transition-colors hover:underline">
                 نسيت كلمة المرور؟
               </button>
+              </div>
+              </div>
             </div>
+
 
             {/* Error Message */}
             {error && (
@@ -269,7 +291,7 @@ export default function LoginPage() {
               <button
                 id="login-submit-btn"
                 type="submit"
-                disabled={loading}
+                disabled={loading || isAgree ===false}
                 className="w-full flex justify-center items-center gap-2 py-4 px-4 border border-transparent rounded-lg shadow-sm font-heading text-lg font-bold text-on-primary bg-primary hover:bg-primary-container focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? (
@@ -293,6 +315,25 @@ export default function LoginPage() {
                 )}
               </button>
             </div>
+
+           <div className="mx-2 my-2 flex-wrap flex justify-around items-center gap-2">
+             <div className='space-y-1'> 
+              <label htmlFor="agreement" className="text-[18px] font-medium text-on-surface-variant cursor-pointer select-none">
+                   هل لديك حساب؟ 
+                </label>
+            <button onClick={() => router.push('/login')} type="button" className="text-[15px]  font-medium  text-primary hover:text-primary-container transition-colors hover:underline">
+                 تسجيل الدخول
+              </button>
+              </div>
+              <div className='space-y-2'>
+              <label htmlFor="agreement" className="text-[18px] font-medium text-on-surface-variant cursor-pointer select-none">
+                   هل نسيت كلمة المرور؟ 
+                </label>
+            <button onClick={() => router.push('/login')} type="button" className="text-[15px]  font-medium  text-secondary hover:text-primary-container transition-colors hover:underline">
+                 إعادة تعيين كلمة المرور
+              </button>
+              </div>
+              </div>
           </form>
 
           {/* Footer note */}

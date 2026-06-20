@@ -12,16 +12,17 @@ export default function SignUpPage() {
   const { isAuthenticated, logUp, initializeAuth } = useAuthStore();
 
   const [name, setName] = useState('');
-  const [department, setDepartment] = useState('employee');
+  const [department, setDepartment] = useState('الإدارة العامة');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [role, setRole] = useState<Role>(Role.EMPLOYEE);
+  const [role, setRole] = useState<Role>(Role.MANAGER);
   const [password, setPassword] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isAgree, setIsAgree] = useState(false);
 
   // ── Label maps ────────────────────────────────────────────────────
   const mapRole: Record<Role, string> = {
@@ -30,16 +31,16 @@ export default function SignUpPage() {
   };
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+   
     initializeAuth();
-  }
+ 
   }, [initializeAuth]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/dashboard');
-    }
-  }, [isAuthenticated, router]);
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     router.replace('/dashboard');
+  //   }
+  // }, [isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,12 +184,13 @@ export default function SignUpPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} noValidate className="space-y-6">
              
-            <div className="flex lg:scale-[1.3] lg:translate-x-[14%] bg-surface-container-low rounded-lg p-1 border-2 border-secondary/15 hover:border-secondary">
+            <div className="flex lg:scale-[1.2] my-8  mx-5 justify-around items-center w-[min(58%,180px)] bg-surface-container-low border
+             border-outline-variant/80 rounded-xl p-1 shadow text-on-surface font-sans text-base outline-none ">
                      {(Object.keys(mapRole) as Role[]).map((tab) => (
                        <button
                          key={tab}
                          onClick={() => setRole(tab)}
-                         className={`px-4 py-2 rounded-md font-label font-bold text-sm transition-all ${
+                         className={`px-4 py-2 rounded-md font-label font-bold text-sm  focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all  shadow-sm ${
                            role === tab
                              ? 'bg-white text-primary shadow-sm'
                              : 'text-on-surface-variant hover:bg-surface-container-highest'
@@ -210,13 +212,13 @@ export default function SignUpPage() {
                 {/* Icon */}
                 <span className="absolute right-4 text-outline pointer-events-none" aria-hidden="true">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    <circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                   </svg>
                 </span>
                 <input
                   id="logUp-name"
-                  type="tel"
-                  autoComplete="tel"
+                   type="text"
+                  autoComplete="name"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -235,7 +237,7 @@ export default function SignUpPage() {
                 {/* Icon */}
                 <span className="absolute right-4 text-outline pointer-events-none" aria-hidden="true">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="9" y1="22" x2="9" y2="16"/><line x1="15" y1="22" x2="15" y2="16"/><path d="M9 16h6"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/>
                   </svg>
                 </span>
                 <input
@@ -246,7 +248,7 @@ export default function SignUpPage() {
                   onChange={(e) => setDepartment(e.target.value)}
                   placeholder="القسام"
                   dir="rtl"
-                  className="w-full bg-surface-container-low border border-outline-variant/40 rounded-xl py-3.5 pr-12 pl-4 text-on-surface font-sans text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-left placeholder:text-outline/50 shadow-sm"
+                  className="w-full bg-surface-container-low border border-outline-variant/40 rounded-xl py-3.5 pr-12 pl-4  font-sans text-on-surface text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-left placeholder:text-outline/50 shadow-sm"
                 />
               </div>
             </div>
@@ -254,20 +256,24 @@ export default function SignUpPage() {
 
          {/* Email */}
          <div className='space-y-1'>
+           <label htmlFor="logUp-Email" className="block font-label text-sm font-semibold text-on-surface tracking-wide">
+             البريد الإلكتروني
+           </label>
            <div className="relative flex items-center">
                 {/* Icon */}
-                <span className="block font-label text-label-md text-on-surface" aria-hidden="true">
+                <span className="absolute right-4 text-outline pointer-events-none" aria-hidden="true">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
                   </svg>
                 </span>
                 <input
                   id="logUp-Email"
-                  type="text"
-                  autoComplete="department"
+                  type="email"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="البريد الاكتروني"
+                  placeholder="البريد الإلكتروني"
                   dir="rtl"
                   className="w-full bg-surface-container-low border border-outline-variant/40 rounded-xl py-3.5 pr-12 pl-4 text-on-surface font-sans text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-left placeholder:text-outline/50 shadow-sm"
                 />
@@ -304,13 +310,13 @@ export default function SignUpPage() {
             {/* Role */}
             <div className="space-y-1">
               <label htmlFor="login-role" className="block font-label text-sm font-semibold text-on-surface tracking-wide">
-                الوظفية
+                الوظيفة
               </label>
               <div className="relative flex items-center">
                 {/* Icon */}
-                <span className="absolute right-4 text-outline pointer-events-none" aria-hidden="true">
+                <span className="absolute right-4 focus:text-primary text-outline pointer-events-none" aria-hidden="true">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
                   </svg>
                 </span>
                 <input
@@ -322,7 +328,7 @@ export default function SignUpPage() {
                   onChange={(e) => setJobTitle(e.target.value)}
                   placeholder='المسمى الوظيفي'
                   dir="rtl"
-                  className="w-full bg-surface-container px-4 py-3 pb-2 border-0 border-b border-primary text-primary focus:ring-0 transition-colors font-body text-body-md appearance-none rounded-t-md cursor-not-allowed"
+                  className="w-full bg-surface-container-low border border-outline-variant/40 rounded-xl py-3.5 pr-12 pl-4 text-on-surface font-sans text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-left placeholder:text-outline/50 shadow-sm"
                 />
               </div>
             </div>
@@ -374,9 +380,30 @@ export default function SignUpPage() {
               </div>
               <p className="text-xs text-outline font-label mt-1">يجب أن تحتوي على 8 أحرف على الأقل، أرقام ورموز.</p>
             </div>
-
-            {/* Remember Me + Forgot */}
-            <div className="flex items-center justify-between pt-1">
+            
+            {/* both boxes */}
+            <div className="flex flex-wrap items-center flex-row justify-around pt-1">
+            {/* agree to terms */}
+              <div className='space-y-1'>
+              <div className="flex items-center gap-2">
+                <input
+                  id="agreement"
+                  name="agreement"
+                  type="checkbox"
+                  checked={isAgree}
+                  onChange={() => setIsAgree(!isAgree)}
+                  className="h-4 w-4 rounded border-outline-variant  text-primary focus:ring-primary bg-surface cursor-pointer"
+                />
+                <label htmlFor="agreement" className="text-sm font-label text-on-surface-variant cursor-pointer select-none">
+                  موافقة على الشروط
+                </label>
+              </div>
+              <button type="button" className="text-sm font-label font-bold text-primary hover:text-primary-container transition-colors hover:underline">
+                الشروط والاحكام
+              </button>
+              </div>
+              {/* remember me - Forgot password */}
+              <div className='space-y-1'>
               <div className="flex items-center gap-2">
                 <input
                   id="remember-me"
@@ -393,6 +420,7 @@ export default function SignUpPage() {
               <button type="button" className="text-sm font-label font-medium text-primary hover:text-primary-container transition-colors hover:underline">
                 نسيت كلمة المرور؟
               </button>
+              </div>
             </div>
 
             {/* Error Message */}
@@ -413,7 +441,7 @@ export default function SignUpPage() {
               <button
                 id="login-submit-btn"
                 type="submit"
-                disabled={loading}
+                disabled={loading || isAgree === false} 
                 className="w-full flex justify-center items-center gap-2 py-4 px-4 border border-transparent rounded-lg shadow-sm font-heading text-lg font-bold text-on-primary bg-primary hover:bg-primary-container focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? (
@@ -437,6 +465,15 @@ export default function SignUpPage() {
                 )}
               </button>
             </div>
+
+            <div className="pt-2 flex-wrap flex justify-center items-center gap-2">
+              <label htmlFor="agreement" className="text-[18px] font-medium text-on-surface-variant cursor-pointer select-none">
+                   هل لديك حساب؟ 
+                </label>
+            <button onClick={() => router.push('/login')} type="button" className="text-sm  font-medium  text-primary hover:text-primary-container transition-colors hover:underline">
+                 تسجيل الدخول
+              </button>
+              </div>
           </form>
 
           {/* Footer note */}
