@@ -162,7 +162,7 @@ export default function LoginPage() {
             {/* Phone Field */}
             <div className="space-y-2">
               <label htmlFor="login-phone" className="block font-label text-sm font-semibold text-on-surface tracking-wide">
-                رقم الهاتف
+                البريد الإلكتروني
               </label>
               <div className="relative flex items-center">
                 {/* Icon */}
