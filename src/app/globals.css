@@ -109,6 +109,7 @@
 /* Card Hover Pseudo-elements smooth transitions */
 .primary, .secondary,.missing , .error, .surface {
   position: relative;
+  transform: translate(0, 0);
 }
 
 .primary:before,
@@ -134,6 +135,13 @@
 .surface:hover:before {
   opacity: 1;
   transform: translate(15px, 15px);
+}
+.primary:hover,
+.secondary:hover,
+.missing:hover,
+.error:hover,
+.surface:hover {
+  translate: (-10%, -5%);
 }
 
 .primary:before {

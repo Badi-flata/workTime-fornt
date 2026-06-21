@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/useAuthStore';
 import { StatCard , StatisticFilter  } from '@/components/ui/StatCard';
 import { GeneralEvaluationCard } from '@/components/ui/GeneralEvaluationCard';
 import { ChronicleTable } from '@/components/ui/ChronicleTable';
@@ -36,6 +38,25 @@ const DISCIPLINE_LABELS: Record<DisciplineRating, string> = {
 
 export default function DashboardPage() {
   // ── Stores ────────────────────────────────────────────────────
+ const router = useRouter();
+  const { isAuthenticated, initializeAuth } = useAuthStore();
+
+
+  useEffect(() => {
+    initializeAuth();
+    console.log(isAuthenticated);
+  }, [initializeAuth, isAuthenticated]);
+  
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/dashboard');
+    } else {
+      router.replace('/login');
+    }
+   }, [isAuthenticated, router]);
+
+
+
   const { fetchGeneralStats } = useGeneralStatsStore();
   const { meta, metrics, registry, isLoading, error, fetchCardMetrics } = useCardStatsStore();
 

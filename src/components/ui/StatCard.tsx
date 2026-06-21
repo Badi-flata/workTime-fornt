@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
 import clsx from 'clsx';
+import "../../app/globals.css"
 
 export type StatisticFilter = "ON_TIME" | "LATE" | "ABSENT" | "DEDUCTED" | "ESCAPY" | "EXCUSED" | "EARLY_LEAVE";
 
@@ -52,7 +53,7 @@ export function StatCard({numberSize  , title, value, icon, trend, variant = 'su
   
   return (
     <div 
-      className={`${className} relative z-50 transition-all duration-300 ease hover:-translate-x-1 hover:-translate-y-1.5 z-20 w-full`}
+      className={`${className}  relative z-10  transition-all duration-300  hover:translate-x-[-5%] hover:translate-y-[-10%]  w-full`}
     >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
