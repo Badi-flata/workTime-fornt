@@ -1,26 +1,6 @@
 'use client';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/useAuthStore';
 
 export default function Home() {
-  const router = useRouter();
-  const { isAuthenticated, initializeAuth } = useAuthStore();
-
-
-  useEffect(() => {
-    initializeAuth();
-    console.log(isAuthenticated);
-  }, [initializeAuth, isAuthenticated]);
-  
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/dashboard');
-    } else {
-      router.replace('/login');
-    }
-   }, [isAuthenticated, router]);
-  
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-surface-container-lowest" dir="rtl">
       <div className="relative flex flex-col items-center space-y-4">
@@ -90,7 +70,7 @@ export default function Home() {
             WORK<span className="text-[#1e1e1e]">TIME</span>
           </h2>
           <p className="text-xs font-sans font-bold text-slate-500 mt-1 animate-pulse">
-            {isAuthenticated ? "جاري التحويل إلى لوحة التحكم..." : "جاري التحويل إلى تسجيل الدخول..."}
+            جاري التحميل والتوجيه...
           </p>
         </div>
       </div>

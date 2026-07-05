@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { StatCard , StatisticFilter  } from '@/components/ui/StatCard';
 import { GeneralEvaluationCard } from '@/components/ui/GeneralEvaluationCard';
@@ -16,12 +15,13 @@ import {
   ChevronRight, ChevronLeft,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Modes, StatusFilter, DisciplineRating } from '@/types/dashboard-registry.types';
+import { StatusFilter, DisciplineRating } from '@/types/dashboard-registry.types';
 import { useCardUIStore } from '@/store/useCardUIStore';
+import { ModesTabs } from '@/components/ui/ModesTabs';
 
 // ── Label maps ────────────────────────────────────────────────────
-const TAB_LABEL: Record<Modes, string> = {
-  ALL: 'الكل', DAILY: 'يومي', WEEKLY: 'أسبوعي', MONTHLY: 'شهري',
+const TAB_LABEL: Record<string, string> = {
+  ALL: 'الكل', DAILY: 'يومي', WEEKLY: 'أسبوعي', MONTHLY: 'شهري',  
 };
 
 const STATUS_LABELS: Record<StatusFilter, string> = {
@@ -37,29 +37,15 @@ const DISCIPLINE_LABELS: Record<DisciplineRating, string> = {
 // ─────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  // ── Stores ────────────────────────────────────────────────────
- const router = useRouter();
-  const { isAuthenticated, initializeAuth } = useAuthStore();
-
-
-  useEffect(() => {
-    initializeAuth();
-    console.log(isAuthenticated);
-  }, [initializeAuth, isAuthenticated]);
-  
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/dashboard');
-    } else {
-      router.replace('/login');
-    }
-   }, [isAuthenticated, router]);
-
-
-
-  const { fetchGeneralStats } = useGeneralStatsStore();
+  const { user } = useAuthStore();
+   
+   
+   
+   // ── DATA Fetching Stores ────────────────────────────────────────────────────
+   const { fetchGeneralStats } = useGeneralStatsStore();
   const { meta, metrics, registry, isLoading, error, fetchCardMetrics } = useCardStatsStore();
 
+  // ── dashboard  states ────────────────────────────────────────────────────
   const {
     activeTab, 
     turnColumnsDash,
@@ -67,22 +53,35 @@ export default function DashboardPage() {
     setTurnColumnsDash, setCurrentPage,
     setPaginationDash,  setActiveTab,
   } = useDashboardUIStore();
-
+  
+  // ──  cards states ────────────────────────────────────────────────────
   const {
     openEmployeeModal,
     openStatisticEmployeesCard,
   }= useCardUIStore()
 
+  // ──  filters states ────────────────────────────────────────────────────
   const {
     searchDate, statusFilter, disciplineFilter,
     filteredRegistry, filteredDailyRows, totalPagesFiltered, dailyPage,
     setSearchDate, setStatusFilter, setDisciplineFilter, setDailyPage,
     applyFilters, resetFilters,
   } = useRegistryFilterStore();
+  
+  
+  // ── only on preview case:set Employee IDs for check in/out ───────────────────────
+   
+  const role = user?.role === "SUPER_ADMIN";
 
+  useEffect(() =>{
+    if (!role) return;
+  const employeeIds = registry.map((r) => r.employeeId);
+      window.localStorage.setItem("employeeId",JSON.stringify(employeeIds));
+   }, [registry, role]);
+  
   // ── Fetch on mount / tab / page change ───────────────────────
-  useEffect(() => { fetchGeneralStats(); }, [fetchGeneralStats]);
-
+  useEffect(() =>{ fetchGeneralStats(); }, [fetchGeneralStats]);
+  
   useEffect(() => {
     fetchCardMetrics({
       mode: activeTab,
@@ -101,12 +100,12 @@ export default function DashboardPage() {
   useEffect(() => {
     applyFilters(registry, activeTab, { pageDash, limitDash });
   }, [registry, activeTab, statusFilter, disciplineFilter, searchDate, dailyPage, pageDash, limitDash, applyFilters]);
-
+  
   // ── Reset filters on tab change ───────────────────────────────
   useEffect(() => {
     resetFilters();
   }, [activeTab, resetFilters]);
-
+  
   // ── Resolve clicked employee → open modal ─────────────────────
   const handleRowClick = useCallback((employeeId: string) => {
     const employee = registry.find((r) => r.employeeId === employeeId);
@@ -122,10 +121,10 @@ export default function DashboardPage() {
   // ── Derived data ──────────────────────────────────────────────
   const isDaily = activeTab === 'DAILY';
   const showFilterBar = !isLoading;
+ 
   const TotalPages = isDaily ? totalPagesFiltered : (meta?.pagination?.totalPages || totalPagesDash);
-
-
-
+  console.log(TAB_LABEL[activeTab]);
+  // ── source code ───────────────────────────────────────────────────
   return (
     <div className="space-y-8 pb-12" dir="rtl">
 
@@ -141,21 +140,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Mode tabs */}
-        <div className="flex lg:scale-[1.3] lg:translate-x-[14%] bg-surface-container-low rounded-lg p-1 border-2 border-secondary/15 hover:border-secondary">
-          {(Object.keys(TAB_LABEL) as Modes[]).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-md font-label font-bold text-sm transition-all ${
-                activeTab === tab
-                  ? 'bg-white text-primary shadow-sm'
-                  : 'text-on-surface-variant hover:bg-surface-container-highest'
-              }`}
-            >
-              {TAB_LABEL[tab]}
-            </button>
-          ))}
-        </div>
+       <ModesTabs activeTab={activeTab} 
+       className='lg:scale-[1.3] lg:translate-x-[14%]'       
+       setActiveTab={setActiveTab}
+        TAB_LABEL={TAB_LABEL}  />
       </div>
 
       {/* ── Error Banner ── */}
@@ -181,7 +169,7 @@ export default function DashboardPage() {
         {/* Row 1 (3 wider cards) */}
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[...Array(3)].map((_, i) => (
+            {[...Array(3)].map((_, i) =>(
               <div key={i} className="h-[180px] bg-surface-container-lowest border border-outline/10 rounded-2xl p-5 flex flex-col justify-between animate-pulse">
                 <div className="flex justify-between items-start">
                   <div className="h-5 w-28 bg-surface-container-highest rounded" />
@@ -224,7 +212,7 @@ export default function DashboardPage() {
         {/* Row 2 (4 smaller cards) */}
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(4)].map((_, i) => (
+            {[...Array(4)].map((_, i) =>(
               <div key={i} className="h-[150px] bg-surface-container-lowest border border-outline/10 rounded-2xl p-5 flex flex-col justify-between animate-pulse">
                 <div className="flex justify-between items-start">
                   <div className="h-5 w-24 bg-surface-container-highest rounded" />
@@ -341,7 +329,7 @@ export default function DashboardPage() {
           )}
           
           {/* Column toggle — مخفي في وضع DAILY لأن الأعمدة ثابتة */}
-          {!isDaily && (
+          {!isDaily &&  (
             <div className="flex items-center gap-2">
               <span className="text-xs text-on-surface-variant font-label ml-2">
                 {turnColumnsDash === 1 ? 'عرض الملخص' : 'عرض التفاصيل'}
@@ -386,7 +374,7 @@ export default function DashboardPage() {
             {/* ── DAILY: Status filter tabs ── */}
             {isDaily && (
               <div className="flex bg-surface-container-low rounded-lg p-0.5 border border-outline/10 flex-wrap">
-                {(Object.keys(STATUS_LABELS) as StatusFilter[]).map((s) => (
+                {(Object.keys(STATUS_LABELS) as StatusFilter[]).map((s) =>(
                   <button
                     key={s}
                     onClick={() => setStatusFilter(s)}
@@ -405,7 +393,7 @@ export default function DashboardPage() {
             {/* ── ALL / WEEKLY / MONTHLY: Discipline filter tabs ── */}
             {!isDaily && (
               <div className="flex bg-surface-container-low rounded-lg p-0.5 border border-outline/10 flex-wrap">
-                {(Object.keys(DISCIPLINE_LABELS) as DisciplineRating[]).map((d) => (
+                {(Object.keys(DISCIPLINE_LABELS) as DisciplineRating[]).map((d) =>(
                   <button
                     key={d}
                     onClick={() => setDisciplineFilter(d)}
@@ -427,11 +415,11 @@ export default function DashboardPage() {
         {isLoading ? (
           <div className="space-y-4 animate-pulse">
             <div className="flex justify-between border-b border-outline/10 pb-2">
-              {[...Array(5)].map((_, i) => (
+              {[...Array(5)].map((_, i) =>(
                 <div key={i} className="h-4 w-20 bg-surface-container-highest rounded" />
               ))}
             </div>
-            {[...Array(5)].map((_, i) => (
+            {[...Array(5)].map((_, i) =>(
               <div key={i} className="flex justify-between items-center py-3 border-b border-outline/5">
                 <div className="flex items-center gap-3 w-1/4">
                   <div className="w-8 h-8 rounded-full bg-surface-container-highest" />

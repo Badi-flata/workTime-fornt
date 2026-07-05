@@ -67,7 +67,7 @@ export default function SignUpPage() {
       logUp(
         {
           id: user.id,
-          name: user.name,
+          name: (user as { fullName?: string; name?: string }).fullName || user.name,
           role: user.role,
         },
         token

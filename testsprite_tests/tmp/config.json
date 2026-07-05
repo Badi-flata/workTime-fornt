@@ -1,0 +1,19 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3000/workTime-fornt/",
+  "loginUser": "admin@worktime.sa",
+  "loginPassword": "Admin@2026",
+  "executionArgs": {
+    "projectName": "frontend",
+    "projectPath": "c:\\Learn\\React-Apps\\workTime\\frontend",
+    "testIds": [],
+    "additionalInstruction": "The login page is at /workTime-fornt/login. Use email: admin@worktime.sa and password: Admin@2026. The base path is /workTime-fornt/. All authenticated pages are under this base path. The JWT token for direct API auth is: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Itij2K3ZhdivINin2YTYpdiv2KfYsdmKIiwidXNlcklkIjoiNmE4ZTlkOGQtNDdlMS00ZGU2LWFlMWUtNGM1ZjFiYTJlNzk1Iiwicm9sZSI6IlNVUEVSX0FETUlOIiwiaWF0IjoxNzgyNTQ3NTgwLCJleHAiOjE3ODUxMzk1ODB9.TUxP_MILe9c6G6FTR6ATWLNlHPneoQ4-5lguMGRuPas",
+    "serverMode": "development",
+    "envs": {
+      "API_KEY": "sk-user-aW_i5mmLMH9QEb3svxlEAZx6WenHhTrR2gVh24_xUi8aSBVKFm5yBpC2MsY0GNrah7cdfxH4IrbOI4GRijXzoRs4whvElWnx4DDhNt_qGOFFA6TtasBRxC57rPcP0fuRSL4"
+    }
+  },
+  "serverPort": 55191
+}

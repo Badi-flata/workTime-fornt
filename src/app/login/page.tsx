@@ -43,7 +43,7 @@ export default function LoginPage() {
       login(
         {
           id: user.id,
-          name: user.name,
+          name: (user as { fullName?: string; name?: string }).fullName || user.name,
           role: user.role,
         },
         token
@@ -53,7 +53,7 @@ export default function LoginPage() {
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string } } };
       setError(
-        axiosErr?.response?.data?.message ?? 'رقم الهاتف أو كلمة المرور غير صحيحة'
+        axiosErr?.response?.data?.message ?? 'البريد الاكتروني أو كلمة المور غير صحيحة'
       );
     } finally {
       setLoading(false);
@@ -141,7 +141,7 @@ export default function LoginPage() {
 
           {/* Footer */}
           <div className="relative z-10 mt-12 text-on-primary/60 font-label text-xs">
-            © 2025 WORKTIME Chronicle
+            © 2026 WORKTIME Chronicle
           </div>
         </div>
 

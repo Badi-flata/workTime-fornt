@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { OptimizedDashboardResponse } from '../types/dashboard-registry.types';
+import { OptimizedDashboardResponse ,Modes } from '../types/dashboard-registry.types';
 import { useAuthStore } from '../store/useAuthStore';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3030"
@@ -7,7 +7,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3030"
 export const apiClient = axios.create({
   baseURL: API_URL,
 });
+ 
 
+//  window.localStorage.clear()
 
 // Temporary dev token for seamless frontend testing
  const DEV_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ij8_Pz8gPz8_Pz8_PyIsInVzZXJJZCI6IjcxYzA2NThhLTk5NWMtNDA0My05N2I1LWJlMWY5Yzc0NjRkOCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc4MDU4OTAyMiwiZXhwIjoxNzgzMTgxMDIyfQ.uMTHLvZWJqIeDj32YldQBS5_-Rw-dqPriaIC_rQH-hw";
@@ -35,6 +37,8 @@ interface ExcusePayload { type: 'IN' | 'OUT'; notes: string }
 interface DepartmentPayload { name: string; description?: string }
 interface EmployeeAddPayload { shiftId: string; departmentId: string; salary?: number }
 interface DeductionPayload { periodStart: string; periodEnd: string }
+interface CheckInPayload { shifId: string; employeeId?:string ,checkIn: string; notes?:string; excused?:{type:"LATE"|"ABSENT",reason:string} }
+interface CheckOutPayload { attendId: string; shifId: string; employeeId?:string , checkOut: Date;notes?:string; excused?:{type:"EARLY_DEPARTURE"|"ABSENT",reason:string}|null }
 
 // Centralized API Endpoints mapped directly from Backend README
 export const API = {
@@ -65,8 +69,10 @@ export const API = {
 
   // 👷 Employee Attendance APIs
   attendance: {
-    checkIn: () => apiClient.post('/attendance/check-in'),
-    checkOut: () => apiClient.post('/attendance/check-out'),
+    checkIn: (querys:CheckInPayload) => apiClient.post('/attendance/check-in',querys),
+    checkOut: (querys:CheckOutPayload) => apiClient.post('/attendance/check-out',querys),
+    fetchSourceData: (params?: { employeeId?: string ,date?:string}) => apiClient.get('/attendance/shift', { params }),
+    getPeriodReport: (data:{dateAnchor?:string,mode:Modes,employeeId?:string}) => apiClient.get('/attendance/bounded-period-report', { params: data }),
     submitExcuse: (data: ExcusePayload) => apiClient.post('/attendance/submit-excuse', data),
   },
 

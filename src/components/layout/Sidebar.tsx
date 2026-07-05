@@ -29,10 +29,10 @@ export const navSections = [
         screen: 'Manager_Dashboard_Main' 
       },
       { 
-        href: '/attendance-reports', 
-        label: 'سجلات الحضور', 
+        href: '/attendance-departure-check', 
+        label: 'سجلات الحضور والانصراف', 
         icon: ClipboardList,
-        screen: 'Attendance_Reports_Dashboard_Main' 
+        screen: 'Attendance_Departure_Check' 
       },
       { 
         href: '/live-pulse', 

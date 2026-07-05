@@ -72,3 +72,5 @@ pids
 *.pid
 *.seed
 *.pid.lock
+
+testsprite_tests\tmp\config.json

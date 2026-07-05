@@ -3,8 +3,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useCheckAttendStore } from '@/store/useCheckAttendStore';
-import { ModesTabs } from '@/components/ui/ModesTabs';
+import { useCheckAttendStore } from '../../../store/useCheckAttendStore';
+import { ModesTabs } from '../../../components/ui/ModesTabs';
 import { ShiftCountdown } from '@/components/ui/ShiftCountdown';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 

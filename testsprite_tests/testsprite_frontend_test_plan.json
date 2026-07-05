@@ -1,0 +1,693 @@
+[
+  {
+    "id": "TC001",
+    "title": "Sign in and reach the home redirect",
+    "description": "An employee can sign in with valid credentials and land on the authenticated home redirect.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the authenticated home redirect is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Check in for the current shift",
+    "description": "An employee can record a check-in from the attendance page and see the attendance status update afterward.",
+    "category": "Attendance Check-in and Check-Out",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the attendance check page"
+      },
+      {
+        "type": "action",
+        "description": "Click the check-in control"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the attendance status is updated to reflect check-in"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Access attendance check after login",
+    "description": "An employee can sign in and open the attendance page to see the current shift countdown and attendance status.",
+    "category": "Attendance Check-in and Check-out",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the attendance check page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the current shift countdown is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the attendance status is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Check out after being checked in",
+    "description": "An employee can check out from the attendance page after checking in and see the attendance status update afterward.",
+    "category": "Attendance Check-in and Check-Out",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the attendance check page"
+      },
+      {
+        "type": "action",
+        "description": "Click the check-in control"
+      },
+      {
+        "type": "action",
+        "description": "Click the check-out control"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the attendance status is updated to reflect check-out"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Block direct access to a protected page",
+    "description": "An unauthorized visitor who opens a protected page directly is redirected to login and can then sign in successfully.",
+    "category": "Protected Route Access",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the login page is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the authenticated home redirect is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Create a new department record",
+    "description": "A manager can create a department record from the departments page and see the new department appear in the list.",
+    "category": "Department Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/departments"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new department"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the department name field with a unique department name"
+      },
+      {
+        "type": "action",
+        "description": "Save the department record"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new department appears in the department list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Review dashboard attendance summary and open employee details",
+    "description": "A manager can open the dashboard, review the attendance summary, and navigate into employee details from the overview.",
+    "category": "Admin Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Click the employee details entry from the overview"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the attendance summary is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify employee details are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Browse employees and open a profile",
+    "description": "A manager can review the employee directory, search for a worker, and open that worker's profile successfully.",
+    "category": "Employee Directory and Profiles",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to view the employees page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the employee search field with a unique name"
+      },
+      {
+        "type": "action",
+        "description": "Open an employee profile from the results"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify employee profile details are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Update an existing department record",
+    "description": "A manager can edit an existing department record and see the updated department information saved in the list.",
+    "category": "Department Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/departments"
+      },
+      {
+        "type": "action",
+        "description": "Open a department record for editing"
+      },
+      {
+        "type": "action",
+        "description": "Change the department name to a unique updated name"
+      },
+      {
+        "type": "action",
+        "description": "Save the department record"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated department appears in the department list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "View employee profile details",
+    "description": "A manager can open the employee profile page and review the detailed employee information shown there.",
+    "category": "Employee Directory and Profiles",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/employee-profile"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify employee profile details are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify attendance-related profile information is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Review department management area",
+    "description": "A manager can open the departments page and review the existing department records before making changes.",
+    "category": "Department Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/departments"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify department records are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Review attendance history and open departments",
+    "description": "A manager can open the attendance log to inspect history and then navigate to department management.",
+    "category": "Attendance Log and Departments",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the attendance log"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open departments"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify attendance history is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify department management is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Review attendance history entries",
+    "description": "A manager can open the attendance log and inspect stored attendance history records.",
+    "category": "Attendance Log",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/attendance-log"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify attendance history records are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Search results narrow employee browsing",
+    "description": "A manager can search within the employee list and see the results update to match the search criteria.",
+    "category": "Employee Directory and Profiles",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to view the employees page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the employee search field with a valid name fragment"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the employee results are filtered"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC015",
+    "title": "Scan attendance log for a specific record",
+    "description": "A manager can filter or scan the attendance log and see matching entries in the history list.",
+    "category": "Attendance Log",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/attendance-log"
+      },
+      {
+        "type": "action",
+        "description": "Filter the attendance log using a valid search value"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the attendance log shows matching entries"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC016",
+    "title": "Register with validation feedback",
+    "description": "A new user can open signup and see validation feedback when required registration inputs are incomplete or invalid.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/signup"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify validation feedback is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC017",
+    "title": "Display shift countdown stage transitions",
+    "description": "An employee can view the shift countdown on the attendance page and see the countdown stage change as time progresses.",
+    "category": "Attendance Check-in and Check-Out",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the attendance check page"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the countdown stage to change"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the shift countdown stage is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC018",
+    "title": "Handle an empty employee search",
+    "description": "A manager can search for a non-matching employee name and see that no results are returned.",
+    "category": "Employee Directory and Profiles",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to view the employees page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the employee search field with a unique non-matching value"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty results state is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC019",
+    "title": "Show invalid credentials feedback on login",
+    "description": "A user entering incorrect credentials sees an invalid credentials error and stays on the login experience.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /workTime-fornt/login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with invalid@example.com"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with wrong-password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an invalid credentials error message is visible"
+      }
+    ],
+    "priority": "Low"
+  }
+]

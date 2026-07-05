@@ -1,0 +1,111 @@
+version: "2"
+type: frontend
+tech_stack:
+  - TypeScript
+  - React 18
+  - Next.js 14 (App Router)
+  - TailwindCSS 4
+  - Zustand (State Management)
+  - Axios (HTTP Client)
+  - Framer Motion (Animations)
+routes:
+  - path: /workTime-fornt/login
+    file: src/app/login/page.tsx
+    auth_required: false
+    description: User login page with email and password form
+  - path: /workTime-fornt/signup
+    file: src/app/signup/page.tsx
+    auth_required: false
+    description: User registration page
+  - path: /workTime-fornt/
+    file: src/app/page.tsx
+    auth_required: true
+    description: Home redirect page
+  - path: /workTime-fornt/attendance-departure-check
+    file: src/app/(main)/attendance-departure-check/page.tsx
+    auth_required: true
+    description: Employee attendance check-in/out page with shift countdown timer
+  - path: /workTime-fornt/dashboard
+    file: src/app/(main)/dashboard/page.tsx
+    auth_required: true
+    description: Admin dashboard with employee management
+  - path: /workTime-fornt/departments
+    file: src/app/(main)/departments/page.tsx
+    auth_required: true
+    description: Department management page
+  - path: /workTime-fornt/employees
+    file: src/app/(main)/employees/page.tsx
+    auth_required: true
+    description: Employee list management page
+  - path: /workTime-fornt/employee-profile
+    file: src/app/(main)/employee-profile/page.tsx
+    auth_required: true
+    description: Employee profile details page
+  - path: /workTime-fornt/attendance-log
+    file: src/app/(main)/attendance-log/page.tsx
+    auth_required: true
+    description: Attendance log history page
+features:
+  - name: User Authentication (Login)
+    description: Login with email and password credentials to access the system
+    files:
+      - src/app/login/page.tsx
+      - src/store/useAuthStore.ts
+      - src/services/apiClient.ts
+    entry_route: /workTime-fornt/login
+    user_interactions:
+      - Fill email input field with admin@worktime.sa
+      - Fill password input field with Admin@2026
+      - Click login/submit button
+      - See error message on invalid credentials
+      - Redirect to home after successful login
+    api_calls:
+      - method: POST
+        endpoint: /users/loginIn
+    auth_required: false
+  - name: User Registration (Signup)
+    description: Register a new user account
+    files:
+      - src/app/signup/page.tsx
+      - src/store/useAuthStore.ts
+    entry_route: /workTime-fornt/signup
+    user_interactions:
+      - Fill registration form fields
+      - Click register button
+      - See validation errors for invalid input
+    api_calls:
+      - method: POST
+        endpoint: /users/logUp
+    auth_required: false
+  - name: Attendance Check-in/Check-out
+    description: Record attendance with shift countdown timer showing 4 stages
+    files:
+      - src/app/(main)/attendance-departure-check/page.tsx
+      - src/components/ui/ShiftCountdown.tsx
+    entry_route: /workTime-fornt/attendance-departure-check
+    user_interactions:
+      - View countdown timer showing current shift stage
+      - Click check-in button
+      - Click check-out button
+      - View attendance status
+    api_calls:
+      - method: POST
+        endpoint: /attendance/check-in
+      - method: POST
+        endpoint: /attendance/check-out
+      - method: GET
+        endpoint: /attendance/shift
+    auth_required: true
+  - name: Admin Dashboard
+    description: Dashboard showing employee attendance overview and management controls
+    files:
+      - src/app/(main)/dashboard/page.tsx
+    entry_route: /workTime-fornt/dashboard
+    user_interactions:
+      - View employee attendance summary
+      - Navigate to employee details
+    api_calls:
+      - method: GET
+        endpoint: /managing/dashboard
+    auth_required: true
+known_limitations: []
