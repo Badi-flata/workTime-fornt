@@ -96,15 +96,15 @@ export function AuthGuard({ children }: AuthGuardProps) {
   // - Show nothing for other routes as they are redirecting to /login
   if (!isAuthenticated) {
     if (isPublicRoute || pathname === '/') {
-      return <>{children}</>;
+      router.replace('/login');
     }
     return null;
   }
 
   // If authenticated and visiting root or public routes, hide content while redirect is in progress
-  if (pathname === '/' || isPublicRoute) {
-    return null;
-  }
+  // if (pathname === '/' || isPublicRoute) {
+  //   return null;
+  // }
 
   // If authenticated but has NO permission, show a beautiful access denied screen
   if (!hasPermission) {
