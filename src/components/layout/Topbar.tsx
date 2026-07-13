@@ -99,7 +99,7 @@ export function Topbar() {
                        backdrop-blur-md rounded-2xl shadow-xl border border-outline/15 p-4  overflow-y-auto max-md:max-h-[calc(100vh-80px)] flex-1 flex-col space-y-4"
               >
                 {/* logOut */}
-                <button onClick={() => logout()} className="pt-2   border-outline/10 flex items-center gap-2">
+                <button onClick={() =>{  setIsProfileOpen(false); logout()}} className="pt-2   border-outline/10 flex items-center gap-2">
                   <div className="px-3 text-surface-container-high  bg-red-700 rounded-2xl py-3">
                   <LogOut size={20} className="shrink-0 " />
                   </div>
