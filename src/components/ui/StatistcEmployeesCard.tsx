@@ -44,7 +44,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 const COUNT_COLOR: Record<string, string[]> = {
   ON_TIME:  ["text-primary font-bold bg-primary/5 text-primary border border-primary/10 tabular-nums",'bg-outline/5'],
-   LATE:     ["text-orange-500 font-bold bg-orange-500/5  border border-orange-500/10 tabular-nums" ,'bg-orange-500/5'],
+   LATE:    ["text-orange-500 font-bold bg-orange-500/5  border border-orange-500/10 tabular-nums" ,'bg-orange-500/5'],
   ABSENT:   ["text-error font-bold bg-error/5 text-error border border-error/10 tabular-nums" ,'bg-error/5'],
   EXCUSED:  ["bg-secondary/5 text-on-surface-variant border border-secondary/10  font-bold tabular-nums text-on-surface-variant",'bg-secondary/5'],
   ESCAPY:   ["bg-error/5 text-error border border-error/10 font-bold tabular-nums text-error" ,'bg-outline/5'],
@@ -136,13 +136,13 @@ export function StatisticEmployeeCard() {
           className="main bg-surface-container-lowest p-6 rounded-2xl shadow-xl border border-outline/10 w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]"
         >
           {/* Header */}
-            <div className="flex mb-3 items-center justify-between gap-4">
+            <div className="flex mb-3 flex-wrap-reverse items-center justify-between gap-4">
              
               <div>
                 <h2 className="text-xl font-heading font-bold text-primary">{`سجلات ${STATUS_LABELS[statisticFilter]}`}</h2>
               </div> 
               {periodScope && (
-            <div className="flex items-center gap-2 bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10 select-none">
+            <div className="flex max-md:scale-[0.8] items-center gap-2 bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10 select-none">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
               <span className="text-xs font-sans font-bold text-primary">
                 {periodScope}
@@ -191,7 +191,7 @@ export function StatisticEmployeeCard() {
           </div>
 
           {/* Table Content */}
-          <div className="overflow-auto rounded-4xl bg-slate-200  flex-1 p-6">
+          <div className="overflow-x-auto rounded-lg border border-outline/10 shadow-sm">
             <table className="chronicle-table rounded-2xl ">
               <thead>
                <tr>
@@ -202,25 +202,27 @@ export function StatisticEmployeeCard() {
               </thead>
               <tbody>
                 
-            {modalIsLoading ?(
-              <tr>
-                <td colSpan={Columns.length}>
-                  <div className="space-y-4 py-8 animate-pulse">
-                    {[...Array(5)].map((_, i) => (
-                      <div key={i} className="flex justify-between items-center h-12 bg-white/40 rounded-xl px-6">
-                        <div className="flex items-center gap-3 w-1/3">
-                          <div className="w-8 h-8 rounded-full bg-white/60" />
-                          <div className="h-4 w-24 bg-white/60 rounded" />
-                        </div>
-                        <div className="h-4 w-20 bg-white/60 rounded" />
-                        <div className="h-6 w-16 bg-white/60 rounded-full" />
-                        <div className="h-4 w-12 bg-white/60 rounded" />
-                      </div>
-                    ))}
-                  </div>
-                </td>
-              </tr>
-            )
+           {modalIsLoading ? (
+          <div className="space-y-4 animate-pulse">
+            <div className="flex justify-between border-b border-outline/10 pb-2">
+              {[...Array(5)].map((_, i) =>(
+                <div key={i} className="h-4 w-20 bg-surface-container-highest rounded" />
+              ))}
+            </div>
+            {[...Array(5)].map((_, i) =>(
+              <div key={i} className="flex justify-between items-center py-3 border-b border-outline/5">
+                <div className="flex items-center gap-3 w-1/4">
+                  <div className="w-8 h-8 rounded-full bg-surface-container-highest" />
+                  <div className="h-4 w-24 bg-surface-container-highest rounded" />
+                </div>
+                <div className="h-4 w-20 bg-surface-container-highest rounded" />
+                <div className="h-6 w-16 bg-surface-container-highest rounded-full" />
+                <div className="h-4 w-12 bg-surface-container-highest rounded" />
+                <div className="h-4 w-8 bg-surface-container-highest rounded" />
+              </div>
+            ))}
+          </div>
+        ) 
             :
             paginatedData && paginatedData.length > 0 ? paginatedData.map((employee, index) => (
 
@@ -317,6 +319,7 @@ export function StatisticEmployeeCard() {
               </tbody>
             </table>
   
+              </div>
             {/* ── Pagination ── */}
       {TotalPages > 1 && (
         <div className="flex justify-center mt-3 items-center gap-4">
@@ -344,7 +347,6 @@ export function StatisticEmployeeCard() {
           </button>
         </div>
       )}
-              </div>
         </motion.div>
       </div>
     </AnimatePresence>

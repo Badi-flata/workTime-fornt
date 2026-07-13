@@ -74,10 +74,9 @@
 @layer components {
 
   .Affect{
-    @apply  hover:border-2 hover:outline-4  hover:outline-primary/10  
-             hover:border-secondary/50
-             focus:border-2 focus:outline-4  focus:outline-primary/10  
-             focus:border-secondary/50
+    @apply   hover:border-2 hover:outline-4  hover:outline-primary/10  
+             hover:border-secondary/50  hover:scale-[1.07]
+            
   }
 
   /* Table Styles: 16px padding, hairline horizontal dividers, zero vertical */

@@ -53,7 +53,7 @@ export function StatCard({numberSize  , title, value, icon, trend, variant = 'su
   
   return (
     <div 
-      className={`${className}  relative z-10  transition-all duration-300  hover:translate-x-[-5%] hover:translate-y-[-10%]  w-full`}
+      className={`${className}  relative z-10  transition-all duration-300  hover:translate-x-[-2%] hover:translate-y-[-5%]  w-full`}
     >
       <motion.div
         initial={{ opacity: 0, y: 20 }}

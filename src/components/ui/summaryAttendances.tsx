@@ -124,8 +124,9 @@ export function SummaryAttendances({
                   <div className={`w-8 h-8 bg-surface-container-highest  rounded-full  flex items-center justify-center shrink-0 z-10 border-2 border-white`}>
                     <span className={`material-symbols-outlined  text-[60px]`}/>
                   </div>
-                  <div
-                    className="  w-[80%] h-25 my-4 border-surface-container-highest border    shadow rounded-lg p-3 ">
+                  <motion.div
+                  whileFocus={{scale:0.9 }}
+                    className="   w-[80%] h-25 my-4 border-surface-container-highest border    shadow rounded-lg p-3 ">
                     <div className="flex flex-row w-full h-20  justify-between  rounded-full  p-1">
                       <span className="font-label-md w-11 h-4 relative -top-2 bg-surface-container-highest  text-label-md  rounded text-on-surface"/>
                       <span className={`px-2 py-0.5  w-5 h-3 text-[10px] bg-surface-container-highest   rounded font-bold`}/>
@@ -134,7 +135,7 @@ export function SummaryAttendances({
                       <span className="font-body-md w-8 h-3   bg-surface-container-highest  text-label-md  rounded text-on-surface"/>|
                       <span className={`px-2 py-0.5  w-8 h-3 text-[10px] bg-surface-container-highest   rounded font-bold`}/>
                     </div>
-                  </div>
+                  </motion.div>
                 </motion.div>
             ))}
           </div>
@@ -193,30 +194,34 @@ export function SummaryAttendances({
                   <div className={`w-8 h-8 rounded-full ${bgIcon} flex items-center justify-center shrink-0 z-10 border-2 border-white`}>
                     <span className={`material-symbols-outlined ${iconColor} text-[16px]`}>{icon}</span>
                   </div>
-                  <div
+                  <button
                  
                   onClick={()=> onClickTob?.(attendanceId)}
-                  className="flex-1 bg-surface-bright Affect  shadow rounded-lg p-3 ">
+                  className="flex-1 transition-all duration-300 
+                  focus:border-2 focus:outline-4  focus:outline-primary/10  
+                  focus:border-secondary/50 focus:scale-[0.9]
+                  hover:translate-x-[-2%] hover:translate-y-[-5%]
+                  bg-surface-bright Affect  shadow rounded-lg p-3 ">
                     <div className="flex justify-between items-center mb-1">
                       <span className="font-label-md text-label-md text-on-surface">{formattedDate}</span>
                       <span className={`${statusColor} px-2 py-0.5 rounded text-[10px] font-bold`}>{statusLabel}</span>
                     </div>
                     {isPresent && (
-                      <p className="font-body-md text-sm text-outline">
+                      <p className="font-body-md text-sm justify-self-start text-outline">
                         دخول: {day.checkIn} | خروج: {day.checkOut}
                       </p>
                     )}
                     {(isAbsent || isExcused) && (
-                      <p className="font-body-md text-sm text-outline">
+                      <p className="font-body-md text-sm justify-self-start text-outline">
                         {day.excuses && day.excuses.length > 0 ? day.excuses[0]?.reason : (isExcused ? 'غياب بعذور' : 'غياب بدون عذر')}
                       </p>
                     )}
                     {isEscaped && (
-                      <p className="font-body-md text-sm text-outline">
+                      <p className="font-body-md text-sm justify-self-start text-outline">
                         خرج مبكراً: {day.earlyLeaveMinutes || '--'} دقيقة
                       </p>
                     )}
-                  </div>
+                  </button>
                 </motion.div>
               );
             })
