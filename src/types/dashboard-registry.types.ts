@@ -37,6 +37,7 @@ export interface AggregatedMetrics {
 }
 
 export interface DailyBreakdownEntry {
+  attendanceId:number;
   date: string;
   shift: string | null;
   status: string; // ON_TIME | LATE | ABSENT | EXCUSED | ESCAPY
@@ -48,19 +49,26 @@ export interface DailyBreakdownEntry {
 }
 
 export interface EmployeeSummary {
+ totalDays: number;
   presentDays: number;
+  onTimeDays: number;
+  lateDays: number;
   absentDays: number;
   excusedDays: number;
   escapedDays: number;
-  lateDays: number;
   earlyDepartureDays: number;
-  totalDeductionsInPeriod: number;
+  deductionDays: number;
+  totalDeductions: number;
+  totalWorkedMinutes: number;
+  totalWorkedHours: number;
+  totalDelayMinutes: number;
+  totalEarlyLeaveMinutes: number;
 }
 
 export interface RegistryEntry {
   employeeId: string;
   name: string;
-  role: string; // jobTitle
+  jobTitle: string; // jobTitle
   avatar: string; // imageProfile URL or empty string
   disciplineRating: DisciplineRating;
   summary: EmployeeSummary;

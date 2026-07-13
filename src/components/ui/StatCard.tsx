@@ -49,7 +49,7 @@ const color = {
 }
 
 export function StatCard({numberSize  , title, value, icon, trend, variant = 'surface', delay = 0,
-                         statisticFilter, onClick , className ="" , text ,limit }: StatCardProps) {
+                         statisticFilter, onClick , className ="" , text , limit }: StatCardProps) {
   
   return (
     <div 
@@ -81,7 +81,7 @@ export function StatCard({numberSize  , title, value, icon, trend, variant = 'su
           <div>
             {limit ? (
               <div className="flex items-baseline gap-1 font-heading font-extrabold" dir="ltr">
-                <span className="text-sm font-medium text-slate-400">/ {limit}</span>
+                <span className="text-sm font-medium text-slate-400"> {limit}/</span>
                 <span style={numberSize ? { fontSize: numberSize } : undefined} className={`text-3xl ${colors_text[variant]}`}>
                   {value}
                 </span>

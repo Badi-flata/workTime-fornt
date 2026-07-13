@@ -8,9 +8,14 @@ interface ShiftCountdownProps {
   shiftEndTime?: string;       // e.g., "17:00"
   gracePeriodMinIn?: number;    // e.g., 15
   gracePeriodMinOut?: number;   // e.g., 30
+  periodOfTime?:string;
+ workTimNear?:(near:boolean)=>void
+ shiftEnded?:(shiftEnded:boolean)=>void
+ garceOut?:(garOut:boolean)=>void
+
 }
 
-type Phase = 'PREPARATION' | 'GRACE_IN' | 'SHIFT_WORK' | 'GRACE_OUT' | 'OFF_WORK';
+type Phase = 'PREPARATION' | 'GRACE_IN' | 'SHIFT_WORK' | 'GRACE_OUT' | 'OFF_WORK'|"PAST_REPORT";
 
 interface PhaseDetail {
   phase: Phase;
@@ -22,19 +27,26 @@ interface PhaseDetail {
 }
 // only to perview and testing
 const da = new Date()
-const d =new  Date(da.getTime() - 10*60*1000) 
-const t = new Date(da.getTime() + 60*60*1000);
+const d =new  Date(da.getTime() + 3*60*1000 ) 
+const t = new Date(d.getTime()  + 6*60*1000);
 
-console.log("time:",format(t,"HH:mm"))
-console.log("time:",format(d,"HH:mm"))
 export function ShiftCountdown({
-  shiftStartTime = format(d,"HH:mm")  ,
-  shiftEndTime = format(t,"HH:mm"),
-  gracePeriodMinIn = 15,
-  gracePeriodMinOut = 3
+  shiftStartTime =format(d,"HH:mm"),
+  shiftEndTime =format(t,"HH:mm") ,
+  gracePeriodMinIn = 1,
+  gracePeriodMinOut = 1,
+  periodOfTime = format(new Date(), "yyyy-MM-dd"),
+  workTimNear,
+  shiftEnded,
+  garceOut
 }: ShiftCountdownProps) {
   const [time, setTime] = useState<Date | null>(null);
   const [phaseDetail, setPhaseDetail] = useState<PhaseDetail | null>(null);
+
+  console.log("time start",format(d,"HH:mm"));
+  console.log("time end",format(t,"HH:mm"));
+  
+  const pastReport = periodOfTime !== format((time || new Date()), "yyyy-MM-dd");
 
   // Initialize time on client side to avoid SSR mismatch
   useEffect(() => {
@@ -46,14 +58,14 @@ export function ShiftCountdown({
   }, []);
 
   useEffect(() => {
-    if (!time) return;
+    if (!time || pastReport) return;
 
     // Helper to get phase details for a specific base date
     const getPhaseForBaseDate = (baseDate: Date): PhaseDetail | null => {
-      const sHours = parseInt(shiftStartTime.split(':')[0], 10) || 0;
+      const sHours = parseInt(shiftStartTime.split(':')[0], 10)   || 0;
       const sMinutes = parseInt(shiftStartTime.split(':')[1], 10) || 0;
-      const eHours = parseInt(shiftEndTime.split(':')[0], 10) || 0;
-      const eMinutes = parseInt(shiftEndTime.split(':')[1], 10) || 0;
+      const eHours = parseInt(shiftEndTime.split(':')[0], 10)     || 0;
+      const eMinutes = parseInt(shiftEndTime.split(':')[1], 10)   || 0;
 
       // Construct Start Time (S)
       const S = new Date(baseDate);
@@ -66,14 +78,16 @@ export function ShiftCountdown({
         E.setDate(E.getDate() + 1); // Spans across midnight
       }
 
-      const pStart = new Date(S.getTime() - 30 * 60 * 1000); // 30 mins before shift
-      const gInEnd = new Date(S.getTime() + gracePeriodMinIn * 60 * 1000);
+      const pStart =  new Date(S.getTime() - 30 * 60 * 1000); // 30 mins before shift
+      const gInEnd =  new Date(S.getTime() + gracePeriodMinIn * 60 * 1000);
       const gOutEnd = new Date(E.getTime() + gracePeriodMinOut * 60 * 1000);
 
-      const currentTimeMs = time.getTime();
-
+      const currentTimeMs =  time.getTime() ;
       // Check which phase the current time fits into
       if (currentTimeMs >= pStart.getTime() && currentTimeMs < S.getTime()) {
+        garceOut?.(false);
+        shiftEnded?.(false);
+        workTimNear?.(true);
         return {
           phase: 'PREPARATION',
           targetTime: S,
@@ -84,6 +98,9 @@ export function ShiftCountdown({
         };
       }
       if (currentTimeMs >= S.getTime() && currentTimeMs < gInEnd.getTime()) {
+        garceOut?.(false);
+        shiftEnded?.(false);
+        workTimNear?.(false);
         return {
           phase: 'GRACE_IN',
           targetTime: gInEnd,
@@ -94,6 +111,9 @@ export function ShiftCountdown({
         };
       }
       if (currentTimeMs >= gInEnd.getTime() && currentTimeMs < E.getTime()) {
+        garceOut?.(false);
+        shiftEnded?.(false);
+        workTimNear?.(false);
         return {
           phase: 'SHIFT_WORK',
           targetTime: E,
@@ -104,6 +124,9 @@ export function ShiftCountdown({
         };
       }
       if (currentTimeMs >= E.getTime() && currentTimeMs < gOutEnd.getTime()) {
+        garceOut?.(true);
+        shiftEnded?.(false);
+        workTimNear?.(false);
         return {
           phase: 'GRACE_OUT',
           targetTime: gOutEnd,
@@ -112,6 +135,12 @@ export function ShiftCountdown({
           color: '#c5221f', // Red
           bgColor: '#fce8e6',
         };
+      }
+      if (currentTimeMs >= gOutEnd.getTime()) {
+        shiftEnded?.(true);
+        garceOut?.(false);
+        workTimNear?.(false);
+        return null;
       }
 
       return null;
@@ -132,9 +161,9 @@ export function ShiftCountdown({
         break;
       }
     }
-
+   
     setPhaseDetail(detectedPhase);
-  }, [time, shiftStartTime, shiftEndTime, gracePeriodMinIn, gracePeriodMinOut]);
+  }, [time, shiftStartTime, shiftEndTime, gracePeriodMinIn, gracePeriodMinOut, garceOut, shiftEnded, workTimNear, pastReport]);
 
   if (!time) {
     return (
@@ -143,7 +172,20 @@ export function ShiftCountdown({
       </div>
     );
   }
-
+;
+    
+  
+  // If outside working hours, show off work interface
+  if ((pastReport && !phaseDetail) ||  phaseDetail?.phase === 'PAST_REPORT') {
+    return (
+      <div className="flex flex-col items-center justify-center w-64 h-64 mb-8 rounded-full bg-surface-container-low border border-outline-variant/30 relative">
+        <div className="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-2">
+          <span className="material-symbols-outlined text-outline text-[32px]">lock_clock</span>
+        </div>
+        <p className="font-label-lg text-[#5f6368] font-bold">سجل حضور وانصراف  قديم</p>
+      </div>
+    );
+  }
   // If outside working hours, show off work interface
   if (!phaseDetail || phaseDetail.phase === 'OFF_WORK') {
     return (

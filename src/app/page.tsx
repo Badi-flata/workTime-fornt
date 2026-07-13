@@ -63,7 +63,7 @@ export default function Home() {
             </g>
           </svg>
         </div>
-        
+
         {/* Text */}
         <div className="flex flex-col items-center">
           <h2 className="text-xl font-heading font-extrabold text-[#1b7550] tracking-wider">

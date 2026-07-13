@@ -23,18 +23,18 @@ const STATUS_LABEL: Record<string, string> = {
   ESCAPY:   'هروب',
 };
 
-const RATING_COLOR: Record<string, string> = {
-  EXCELLENT:         'bg-primary/10 text-primary',
-  VERY_GOOD:         'bg-secondary/10 text-secondary',
-  GOOD:              'bg-outline/10 text-on-surface-variant',
-  NEEDS_IMPROVEMENT: 'bg-error/10 text-error',
+const RATING_COLOR: Record<string, string[]> = {
+  EXCELLENT:         ['bg-primary/5 text-primary border border-primary/10','bg-primary','bg-outline/5 '],
+  VERY_GOOD:         ['bg-secondary/5 text-secondary border border-secondary/10','bg-secondary','bg-outline/5 '],
+  GOOD:              ['bg-orange-500/5  text-on-surface-variant border border-orange-500/10','bg-orange-500','bg-orange-500/5 '],
+  NEEDS_IMPROVEMENT: ['bg-error/5  text-error border border-error/10','bg-error','bg-outline/5 '],
 };
 
 const RATING_LABEL: Record<string, string> = {
   EXCELLENT:         'ممتاز',
   VERY_GOOD:         'جيد جداً',
   GOOD:              'جيد',
-  NEEDS_IMPROVEMENT: 'يحتاج تحسين',
+  NEEDS_IMPROVEMENT: 'متدني',
 };
 
 // ─── Column definitions ─────────────────────────────────────────
@@ -102,7 +102,7 @@ export function ChronicleTable({
         {/* ── Header ── */}
         <thead>
           <tr>
-            {columns.map((col) => <th key={col}>{col}</th>)}
+            {columns.map((col) => <th key={col} >{col}</th>)}
           </tr>
         </thead>
 
@@ -171,13 +171,16 @@ export function ChronicleTable({
                 <td><AvatarCell name={row.name} avatar={row.avatar} /></td>
 
                 {/* المنصب */}
-                <td className="text-on-surface-variant">{row.role}</td>
+                <td className="text-on-surface-variant">{row.jobTitle}</td>
 
                 {/* التقييم */}
-                <td>
-                  <span className={`px-2.5 py-1 rounded-md text-xs font-bold font-label ${RATING_COLOR[row.disciplineRating] || ''}`}>
-                    {RATING_LABEL[row.disciplineRating] || row.disciplineRating}
-                  </span>
+                <td className='w-[140px]'>
+                  <div className={`flex  w-[min(80%,140px)] items-center gap-2 ${RATING_COLOR[row.disciplineRating][0]} px-3 py-1.5 rounded-lg  select-none`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${RATING_COLOR[row.disciplineRating][1]} animate-pulse`} />
+                    <span className={` font-sans leading-5 font-medium ${RATING_COLOR[row.disciplineRating][2]}`}>
+                      {RATING_LABEL[row.disciplineRating] || row.disciplineRating} 
+                    </span>
+                  </div>
                 </td>
 
                 {/* ── View 1: Summary ── */}
@@ -187,9 +190,9 @@ export function ChronicleTable({
                     <td className="text-error font-bold tabular-nums">{row.summary.absentDays}</td>
                     <td className="text-secondary font-bold tabular-nums">{row.summary.lateDays}</td>
                     <td className="tabular-nums whitespace-nowrap">
-                      {row.summary.totalDeductionsInPeriod > 0 ? (
+                      {row.summary.totalDeductions > 0 ? (
                         <span className="text-error font-bold">
-                          {row.summary.totalDeductionsInPeriod.toLocaleString('ar-SA')}
+                          {row.summary.totalDeductions.toLocaleString('ar-SA')}
                           <span className="text-on-surface-variant text-xs font-normal mr-1">ر.س</span>
                         </span>
                       ) : (

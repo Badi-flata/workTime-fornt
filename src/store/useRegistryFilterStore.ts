@@ -21,7 +21,7 @@ import {
 export interface DailyEmployeeRow {
   employeeId: string;
   name: string;
-  role: string;
+  jobTitle: string;
   avatar: string;
   disciplineRating: DisciplineRating;
   /** وقت دخول اليوم المحدد */
@@ -90,7 +90,7 @@ function extractDailyRows(
     rows.push({
       employeeId: entry.employeeId,
       name: entry.name,
-      role: entry.role,
+      jobTitle: entry.jobTitle,
       avatar: entry.avatar,
       disciplineRating: entry.disciplineRating,
       checkIn: day.checkIn,
@@ -158,6 +158,7 @@ export const useRegistryFilterStore = create<RegistryFilterState>((set, get) => 
     if (mode === 'DAILY') {
       // ── وضع DAILY: أسطر مُبسَّطة لكل يوم مع فلتر الحالة ──────
       const rows: DailyEmployeeRow[] = [];
+      let result :DailyEmployeeRow[] = [];
       for (const entry of data) {
         rows.push(...extractDailyRows(entry, statusFilter, searchDate));
       }
@@ -172,9 +173,15 @@ export const useRegistryFilterStore = create<RegistryFilterState>((set, get) => 
         set({ dailyPage: validPage });
          }
      
-      const paginatedData = rows.slice((validPage - 1) * limit, validPage * limit);
+       result = rows.slice((validPage - 1) * limit, validPage * limit);
 
-      set({ filteredDailyRows: paginatedData, totalPagesFiltered, filteredRegistry: [] });
+      // فلتر التاريخ (اختياري) — نُبقي فقط الموظفين الذين لهم سجل في ذلك التاريخ
+
+      if (searchDate) {
+        result = result.filter((e) =>
+          e.date === searchDate);
+      }
+      set({ filteredDailyRows: result, totalPagesFiltered, filteredRegistry: [] });
     } else {
       // ── وضع ALL / WEEKLY / MONTHLY: فلترة حسب الانضباط ─────────
       let result = [...data];
@@ -184,12 +191,6 @@ export const useRegistryFilterStore = create<RegistryFilterState>((set, get) => 
         result = result.filter((e) => e.disciplineRating === disciplineFilter);
       }
 
-      // فلتر التاريخ (اختياري) — نُبقي فقط الموظفين الذين لهم سجل في ذلك التاريخ
-      if (searchDate) {
-        result = result.filter((e) =>
-          e.dailyBreakdown.some((d) => d.date === searchDate),
-        );
-      }
 
       set({ filteredRegistry: result, filteredDailyRows: [], totalPagesFiltered: 1 });
     }

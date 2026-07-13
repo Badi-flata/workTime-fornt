@@ -84,7 +84,7 @@ export function EmployeeInfoModal() {
                   <AlertCircle size={16} />
                   <span className="text-sm font-medium">الخصومات</span>
                 </div>
-                <p className="text-2xl font-bold font-sans text-on-surface">{selectedEmployee?.summary?.totalDeductionsInPeriod ||0}<span className="text-sm font-normal">ريال</span></p>
+                <p className="text-2xl font-bold font-sans text-on-surface">{selectedEmployee?.summary?.totalDeductions ||0}<span className="text-sm font-normal">ريال</span></p>
               </div>
             </div>
 

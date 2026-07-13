@@ -39,6 +39,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     setLoading(false);
   }, [initializeAuth]);
 
+ console.log("isAuth",isAuthenticated)
   useEffect(() => {
     if (loading) return;
 
@@ -46,7 +47,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
     // 2. Redirect to login if not authenticated and trying to access a protected route
     if (!isAuthenticated) {
-      if (!isPublicRoute) {
+      if(pathname.startsWith("/signup")){
+        router.replace(pathname);
+      } else {
         router.replace('/login');
       }
       return;
@@ -56,13 +59,12 @@ export function AuthGuard({ children }: AuthGuardProps) {
     const role = user?.role;
 
     // If visiting login/signup or the root page, redirect to their home page
-    if (isPublicRoute || pathname === '/') {
+    if (isAuthenticated && (isPublicRoute || pathname === '/')) {
       if (role === 'SUPER_ADMIN' || role === 'MANAGER') {
         router.replace('/dashboard');
       } else if (role === 'EMPLOYEE') {
         router.replace('/employee-dashboard');
       }
-      return;
     }
 
     // 4. Verify access permission for protected pages
@@ -80,31 +82,95 @@ export function AuthGuard({ children }: AuthGuardProps) {
   }, [isAuthenticated, user, pathname, loading, router]);
 
   // Show a premium loading screen during initial loading
-  if (loading) {
-    return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#f8f9fa]" dir="rtl">
-        <div className="w-12 h-12 border-4 border-[#1b7550] border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-[#1b7550] font-bold font-sans text-sm animate-pulse">جاري التحميل...</p>
-      </div>
-    );
-  }
+   if (loading) {
+     return (
+       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-surface-container-lowest" dir="rtl">
+      <div className="relative flex flex-col items-center space-y-4">
+        {/* Animated Logo */}
+        <div className="w-24 h-24 relative">
+          <svg
+            viewBox="0 0 100 100"
+            className="w-full h-full"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <linearGradient id="silverRingGrad" x1="50" y1="82" x2="0" y2="22" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#475569" />
+                <stop offset="50%" stopColor="#94a3b8" />
+                <stop offset="100%" stopColor="#cbd5e1" />
+              </linearGradient>
+              <linearGradient id="emeraldRingGrad" x1="50" y1="22" x2="100" y2="82" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#0f452f" />
+                <stop offset="50%" stopColor="#1b7550" />
+                <stop offset="100%" stopColor="#2bbb76" />
+              </linearGradient>
+              <linearGradient id="checkmarkGrad" x1="85" y1="22" x2="36" y2="58" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#105739" />
+                <stop offset="100%" stopColor="#3cd18c" />
+              </linearGradient>
+            </defs>
+            
+            {/* Outer Ring & Clock Ticks - spinning smoothly */}
+            <g className="animate-[spin_4s_linear_infinite]" style={{ transformOrigin: '50px 50px' }}>
+              <path
+                d="M 50 82 A 30 30 0 0 1 50 22"
+                stroke="url(#silverRingGrad)"
+                strokeWidth="5"
+                strokeLinecap="round"
+              />
+              <path
+                d="M 50 22 A 30 30 0 0 1 50 82"
+                stroke="url(#emeraldRingGrad)"
+                strokeWidth="5"
+                strokeLinecap="round"
+              />
+              <circle cx="50" cy="27" r="2" fill="#94a3b8" />
+              <circle cx="74" cy="52" r="2" fill="#1b7550" />
+              <circle cx="50" cy="77" r="2" fill="#64748b" />
+              <circle cx="26" cy="52" r="2" fill="#94a3b8" />
+            </g>
+            
+            {/* Checkmark & Center Pin - pulsing softly in place */}
+            <g className="animate-[pulse_2s_ease-in-out_infinite]" style={{ transformOrigin: '50px 50px' }}>
+              <path
+                d="M36,44 L50,58 L85,22"
+                fill="none"
+                stroke="url(#checkmarkGrad)"
+                strokeWidth="7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="50" cy="58" r="3" fill="#136141" />
+            </g>
+          </svg>
+        </div>
 
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+        {/* Text */}
+        <div className="flex flex-col items-center">
+          <h2 className="text-xl font-heading font-extrabold text-[#1b7550] tracking-wider">
+            WORK<span className="text-[#1e1e1e]">TIME</span>
+          </h2>
+          <p className="text-xs font-sans font-bold text-slate-500 mt-1 animate-pulse">
+            جاري التحميل والتوجيه...
+          </p>
+        </div>
+      </div>
+    </div>
+    );
+   }
 
   // If not authenticated:
   // - Show login/signup directly
   // - Show nothing for other routes as they are redirecting to /login
   if (!isAuthenticated) {
-    if (isPublicRoute || pathname === '/') {
-      router.replace('/login');
+    if (pathname.endsWith("/login") || pathname.endsWith('/') || pathname.endsWith("/signup")  ) {
+    return <>{children}</>
     }
     return null;
   }
 
-  // If authenticated and visiting root or public routes, hide content while redirect is in progress
-  // if (pathname === '/' || isPublicRoute) {
-  //   return null;
-  // }
+ 
 
   // If authenticated but has NO permission, show a beautiful access denied screen
   if (!hasPermission) {

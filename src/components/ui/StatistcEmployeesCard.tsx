@@ -42,38 +42,28 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 
-const STATUS_COLOR: Record<string, string> = {
-  ON_TIME:  'bg-primary/10 text-primary',
-  LATE:     'bg-secondary/10 text-secondary',
-  ABSENT:   'bg-error/10 text-error',
-  EXCUSED:  'bg-outline/10 text-on-surface-variant',
-  ESCAPY:   'bg-error/20 text-error',
-  DEDUCTED:   'bg-error/20 text-error',
-  EARLY_LEAVE: 'bg-orange-100 text-orange-700',
-};
-
-const COUNT_COLOR: Record<string, string> = {
-  ON_TIME:  "text-primary font-bold tabular-nums",
-  LATE:     "text-secondary font-bold tabular-nums" ,
-  ABSENT:   "text-error font-bold tabular-nums" ,
-  EXCUSED:  "bg-outline/10  font-bold tabular-nums text-on-surface-variant",
-  ESCAPY:   "bg-error/20  font-bold tabular-nums text-error" ,
-  DEDUCTED: "bg-error/20  font-bold tabular-nums text-error",
-  EARLY_LEAVE: "text-orange-700 font-bold tabular-nums",
+const COUNT_COLOR: Record<string, string[]> = {
+  ON_TIME:  ["text-primary font-bold bg-primary/5 text-primary border border-primary/10 tabular-nums",'bg-outline/5'],
+   LATE:     ["text-orange-500 font-bold bg-orange-500/5  border border-orange-500/10 tabular-nums" ,'bg-orange-500/5'],
+  ABSENT:   ["text-error font-bold bg-error/5 text-error border border-error/10 tabular-nums" ,'bg-error/5'],
+  EXCUSED:  ["bg-secondary/5 text-on-surface-variant border border-secondary/10  font-bold tabular-nums text-on-surface-variant",'bg-secondary/5'],
+  ESCAPY:   ["bg-error/5 text-error border border-error/10 font-bold tabular-nums text-error" ,'bg-outline/5'],
+  DEDUCTED: ["bg-error/5 text-error border border-error/10 font-bold tabular-nums text-error",'bg-outline/5'],
+EARLY_LEAVE:["text-orange-700 bg-orange-700/5  border border-orange-700/10 font-bold tabular-nums",'bg-outline/5']
 };
 // Rating Label
 const RATING_LABEL: Record<string, string> = {
   EXCELLENT:         'ممتاز',
   VERY_GOOD:         'جيد جداً',
   GOOD:              'جيد',
-  NEEDS_IMPROVEMENT: 'يحتاج تحسين',
+  NEEDS_IMPROVEMENT: 'متدني',
 };
 
-const RATING_COLOR: Record<string, string> = {
-    EXCELLENT:         'bg-primary/10 text-primary',
-    VERY_GOOD:         'bg-secondary/10 text-secondary',
-    GOOD:              'bg-outline/10 text-on-surface-variant',
-    NEEDS_IMPROVEMENT: 'bg-error/10 text-error',
+const RATING_COLOR: Record<string, string[]> = {
+  EXCELLENT:         ['bg-primary/5 text-primary border border-primary/10','bg-primary','bg-outline/5'],
+  VERY_GOOD:         ['bg-secondary/5 text-secondary border border-secondary/10','bg-secondary','bg-outline/5'],
+  GOOD:              ['bg-orange-500/5 text-on-surface-variant border border-orange-500/10','bg-orange-500','bg-orange-500/5'],
+  NEEDS_IMPROVEMENT: ['bg-error/5 text-error border border-error/10','bg-error','bg-outline/5'],
 };
 
 function AvatarCell({ name, avatar }: { name: string; avatar: string }) {
@@ -246,7 +236,7 @@ export function StatisticEmployeeCard() {
                       <td><AvatarCell name={employee?.name} avatar={employee?.avatar} /></td>
                     
                     {/* المنصب */}
-                      <td className="text-on-surface-variant">{employee?.role||'-'}</td>
+                      <td className="text-on-surface-variant">{employee?.jobTitle||'-'}</td>
 
                     {/* الحالة */}
                         {statisticFilter === "DEDUCTED" ? (  
@@ -256,16 +246,25 @@ export function StatisticEmployeeCard() {
                         </span>
                         </td>):(
                         <td>
-                        <span className={`px-2.5 py-1 rounded-md text-xs font-bold font-label ${STATUS_COLOR[statisticFilter] || ''}`}>
+                      <td>
+                  <div className={`flex items-center gap-2 ${COUNT_COLOR[statisticFilter][0]} px-3 py-1.5 rounded-lg  select-none`}>
+                    <span className={`text-sm font-sans leading-5 font-medium ${COUNT_COLOR[statisticFilter][1]}`}>
                             {STATUS_LABEL[statisticFilter] || employee?.dailyBreakdown[0]?.status ||'-'}
-                        </span>
+                    </span>
+                  </div>
+                </td>
                         </td>) }
 
                     {/* التقيم */}
                       <td>
-                        <span className={`px-2.5 py-1 rounded-md text-xs font-bold font-label ${RATING_COLOR[employee?.disciplineRating] || ''}`}>
-                            {RATING_LABEL[employee?.disciplineRating]  || '---'}
-                        </span>
+                         <td>
+                  <div className={`flex items-center gap-2 ${RATING_COLOR[employee.disciplineRating][0]} px-3 py-1.5 rounded-lg  select-none`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${RATING_COLOR[employee.disciplineRating][1]} animate-pulse`} />
+                      <span className={` text-sm font-sans leading-5 font-medium ${RATING_COLOR[employee.disciplineRating][2]}`}>
+                      {RATING_LABEL[employee.disciplineRating] || employee.disciplineRating}
+                    </span>
+                  </div>
+                </td>
                       </td>
                     {/* عداد ايام التي تكرار فيها الحالة */}
                       <td>
@@ -274,9 +273,9 @@ export function StatisticEmployeeCard() {
                             statisticFilter === "ON_TIME"  ? employee?.summary.presentDays :
                             statisticFilter === "LATE"     ? employee?.summary.lateDays    :
                             statisticFilter === "ABSENT"   ? employee?.summary.absentDays  :
-                            statisticFilter === "DEDUCTED" ?(
+                            statisticFilter === "DEDUCTED" ? (
                               <span className="text-error font-bold">
-                                  {employee?.summary.totalDeductionsInPeriod.toLocaleString('ar-SA')}
+                                  {employee?.summary?.totalDeductions.toLocaleString('ar-SA')}
                                 <span className="text-on-surface-variant text-xs font-normal mr-1">ر.س</span>
                               </span>
                               ) :
@@ -296,7 +295,7 @@ export function StatisticEmployeeCard() {
                       <td className="text-on-surface-variant">{entry?.excuseNotes !== null ? entry?.excuseNotes: '—'}</td>
                       <td>{ statisticFilter !== "DEDUCTED" ?
                               <span className="text-error font-bold">
-                          {employee?.summary.totalDeductionsInPeriod.toLocaleString('ar-SA')}
+                          {employee?.summary.totalDeductions.toLocaleString('ar-SA')}
                           <span className="text-on-surface-variant text-xs font-normal mr-1">ر.س</span>
                         </span>:"-"}</td>
                     </>

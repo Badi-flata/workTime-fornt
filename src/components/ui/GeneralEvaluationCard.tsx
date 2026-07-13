@@ -53,7 +53,7 @@ export function GeneralEvaluationCard({ disciplineRate, overallRating }: General
 
   const data = [
     { name: 'الانضباط', value: currentVal },
-    { name: 'مفقود', value: 100 - currentVal },
+    { name: 'مفقود', value:  (currentVal !== 0 ? 100 - currentVal :0 ) },
   ];
   
   const COLORS = [currentColor, 'var(--color-surface-container)'];

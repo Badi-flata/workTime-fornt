@@ -72,6 +72,14 @@
 }
 
 @layer components {
+
+  .Affect{
+    @apply  hover:border-2 hover:outline-4  hover:outline-primary/10  
+             hover:border-secondary/50
+             focus:border-2 focus:outline-4  focus:outline-primary/10  
+             focus:border-secondary/50
+  }
+
   /* Table Styles: 16px padding, hairline horizontal dividers, zero vertical */
   .chronicle-table {
     @apply w-full border-collapse text-left rounded-4xl bg-surface;

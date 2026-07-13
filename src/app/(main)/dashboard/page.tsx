@@ -31,7 +31,7 @@ const STATUS_LABELS: Record<StatusFilter, string> = {
 
 const DISCIPLINE_LABELS: Record<DisciplineRating, string> = {
   ALL: 'الكل', EXCELLENT: 'ممتاز', VERY_GOOD: 'جيد جداً',
-  GOOD: 'جيد', NEEDS_IMPROVEMENT: 'يحتاج تحسين',
+  GOOD: 'جيد', NEEDS_IMPROVEMENT: 'متدني',
 };
 
 // ─────────────────────────────────────────────────────────────────
@@ -121,6 +121,9 @@ export default function DashboardPage() {
   // ── Derived data ──────────────────────────────────────────────
   const isDaily = activeTab === 'DAILY';
   const showFilterBar = !isLoading;
+
+  console.log("data filtered:",filteredRegistry)
+  console.log("data raw:",registry)
  
   const TotalPages = isDaily ? totalPagesFiltered : (meta?.pagination?.totalPages || totalPagesDash);
   console.log(TAB_LABEL[activeTab]);
@@ -186,6 +189,7 @@ export default function DashboardPage() {
               value={metrics?.totalPresent || 0}
               icon={<Users className="text-primary" size={20} />}
               variant="primary" 
+              limit={meta?.totalSubordinates || 0}
               statisticFilter='ON_TIME'
               onClick={handleCardClick}
               delay={0.1}
