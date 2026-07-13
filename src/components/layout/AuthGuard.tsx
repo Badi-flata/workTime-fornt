@@ -173,8 +173,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
  
 
   // If authenticated but has NO permission, show a beautiful access denied screen
-  if (!hasPermission) {
-    const defaultHome = user?.role === 'EMPLOYEE' ? '/employee-dashboard' : '/dashboard';
+  if (isAuthenticated&&!hasPermission  ) {
+    const defaultHome = isAuthenticated && user?.role === 'EMPLOYEE' ? '/employee-dashboard' : '/dashboard';
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#fcfdfe] p-6 text-center" dir="rtl">
         <div className="w-20 h-20 rounded-full bg-[#fce8e6] flex items-center justify-center mb-6 shadow-sm border border-[#f5c6cb]">
@@ -190,6 +190,25 @@ export function AuthGuard({ children }: AuthGuardProps) {
         >
           <Home size={18} />
           <span>العودة إلى الصفحة الرئيسية</span>
+        </button>
+      </div>
+    );
+  } else if (!isAuthenticated || (!hasPermission && !isAuthenticated) ) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#fcfdfe] p-6 text-center" dir="rtl">
+        <div className="w-20 h-20 rounded-full bg-[#fce8e6] flex items-center justify-center mb-6 shadow-sm border border-[#f5c6cb]">
+          <AlertTriangle className="text-[#c5221f]" size={40} />
+        </div>
+        <h2 className="text-2xl font-heading font-extrabold text-[#c5221f] mb-2">غير مصرح بالوصول</h2>
+        <p className="text-slate-600 font-sans max-w-sm mb-8 leading-relaxed">
+          عذراً، يرجى تسجيل الدخول اولاً للوصول إلى اي الصفح.
+        </p>
+        <button
+          onClick={() => router.replace('/login')}
+          className="flex items-center gap-2 px-6 py-3 bg-[#1b7550] hover:bg-[#165f41] text-white rounded-xl font-sans font-bold shadow-md transition-all duration-200"
+        >
+          <Home size={18} />
+          <span>الذهب الى صفحة تسجيل الدخول</span>
         </button>
       </div>
     );

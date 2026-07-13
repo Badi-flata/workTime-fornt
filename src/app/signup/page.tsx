@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { API } from '@/services/apiClient';
 import { Logo } from '@/components/ui/Logo';
 import { Role } from '@/types/dashboard-registry.types';
+import clsx from 'clsx';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -43,6 +44,49 @@ export default function SignUpPage() {
   }, [isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    if(!name && name ===''){
+      e.preventDefault();
+      setLoading(false)
+      setError('يرجى إدخال الاسم');
+
+      return;
+    }
+    if(!isAgree ){
+     e.preventDefault();
+      setLoading(false)
+      setError('يرجى الموافقة على الشروط والاحكام');
+      return;
+    }
+    if(!department && department === ''){ 
+      e.preventDefault();
+      setLoading(false)
+      setError('يرجى اختيار القسم');
+      return;
+    }
+    if( !jobTitle && jobTitle ===''){ 
+      e.preventDefault();
+      setLoading(false)
+      setError('يرجى اختيار المسمى الوظيفي');
+      return;
+    }
+    if( !email && email === ''){ 
+      e.preventDefault();
+      setLoading(false)
+      setError('يرجى إدخال البريد الإلكتروني');
+      return;
+    }
+    if( !phone && phone === ''){ 
+      e.preventDefault();
+      setLoading(false)
+      setError('يرجى إدخال رقم الهاتف');
+      return;
+    }
+    if( !password && password === ''){ 
+      e.preventDefault();
+      setLoading(false)
+      setError('يرجى إدخال كلمة المرور');
+      return;
+    }
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -181,25 +225,27 @@ export default function SignUpPage() {
              </div>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} noValidate className="space-y-6">
              
             <div className="flex lg:scale-[1.2] my-8  mx-5 justify-around items-center w-[min(58%,180px)] bg-surface-container-low border
              border-outline-variant/80 rounded-xl p-1 shadow text-on-surface font-sans text-base outline-none ">
                      {(Object.keys(mapRole) as Role[]).map((tab) => (
                        <button
                          key={tab}
+                         disabled={role == mapRole.MANAGER}
                          onClick={() => setRole(tab)}
-                         className={`px-4 py-2 rounded-md font-label font-bold text-sm  focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all  shadow-sm ${
+                         className={clsx(`px-4 py-2 rounded-md font-label font-bold text-sm  focus:ring-2
+                           focus:ring-primary/20 focus:border-primary transition-all  shadow-sm ${
                            role === tab
                              ? 'bg-white text-primary shadow-sm'
                              : 'text-on-surface-variant hover:bg-surface-container-highest'
-                         }`}
+                         }`)}
                        >
                          {mapRole[tab]}
                        </button>
                      ))}
                    </div>
+          {/* Form */}
+          <form onSubmit={handleSubmit} noValidate className="space-y-6">
 
             {/* full Name & Deparmtnt */}
            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'> 
@@ -398,7 +444,7 @@ export default function SignUpPage() {
                   موافقة على الشروط
                 </label>
               </div>
-              <button type="button" className="text-sm font-label font-bold text-primary hover:text-primary-container transition-colors hover:underline">
+              <button  type="button" className="text-sm font-label font-bold text-primary hover:text-primary-container transition-colors hover:underline">
                 الشروط والاحكام
               </button>
               </div>
@@ -442,7 +488,11 @@ export default function SignUpPage() {
                 id="login-submit-btn"
                 type="submit"
                 disabled={loading || isAgree === false} 
-                className="w-full flex justify-center items-center gap-2 py-4 px-4 border border-transparent rounded-lg shadow-sm font-heading text-lg font-bold text-on-primary bg-primary hover:bg-primary-container focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full flex justify-center items-center gap-2 py-4 px-4 border border-transparent
+                 rounded-lg shadow-sm font-heading text-lg font-bold text-on-primary bg-primary
+                 hover:bg-primary-container focus:outline-none focus:ring-2
+                  focus:ring-offset-2 focus:ring-primary transition-all duration-300 
+                  tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
@@ -470,7 +520,7 @@ export default function SignUpPage() {
               <label htmlFor="agreement" className="text-[18px] font-medium text-on-surface-variant cursor-pointer select-none">
                    هل لديك حساب؟ 
                 </label>
-            <button onClick={() => router.push('/login')} type="button" className="text-sm  font-medium  text-primary hover:text-primary-container transition-colors hover:underline">
+            <button onClick={() => router.push('/login')} type="button" className="text-sm  font-medium  text-secondary hover:text-primary-container transition-colors hover:underline">
                  تسجيل الدخول
               </button>
               </div>

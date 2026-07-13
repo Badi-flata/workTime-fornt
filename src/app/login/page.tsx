@@ -320,17 +320,17 @@ export default function LoginPage() {
            <div className="mx-2 my-2 flex-wrap flex justify-around items-center gap-2">
              <div className='space-y-1'> 
               <label htmlFor="agreement" className="text-[18px] font-medium text-on-surface-variant cursor-pointer select-none">
-                   هل لديك حساب؟ 
+                   هل تحتاج حساب جديد؟ 
                 </label>
-            <button onClick={() => router.push('/login')} type="button" className="text-[15px]  font-medium  text-primary hover:text-primary-container transition-colors hover:underline">
-                 تسجيل الدخول
+            <button onClick={() => router.push('/signup')} type="button" className="text-[15px]  font-medium  text-secondary hover:text-secondary-container transition-colors hover:underline">
+                 سجل حساب جديد
               </button>
               </div>
               <div className='space-y-2'>
               <label htmlFor="agreement" className="text-[18px] font-medium text-on-surface-variant cursor-pointer select-none">
                    هل نسيت كلمة المرور؟ 
                 </label>
-            <button onClick={() => router.push('/login')} type="button" className="text-[15px]  font-medium  text-secondary hover:text-primary-container transition-colors hover:underline">
+            <button onClick={() => setError('لا يمكن استخدام هذه الخاصية بعد|no function yet!')} type="button" className="text-[15px]  font-medium  text-secondary hover:text-primary-container transition-colors hover:underline">
                  إعادة تعيين كلمة المرور
               </button>
               </div>
