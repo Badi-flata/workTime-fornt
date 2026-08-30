@@ -88,7 +88,7 @@ export function GeneralEvaluationCard({ disciplineRate, overallRating }: General
         </ResponsiveContainer>
         <div className="absolute inset-0 flex items-center justify-center flex-col">
           <span 
-            className="text-2xl font-heading font-extrabold transition-colors duration-300 animate-pulse"
+            className="text-2xl md:text-3xl font-mono font-bold tracking-tight transition-colors duration-300"
             style={{ color: currentColor }}
           >
             {currentVal}%
@@ -96,12 +96,12 @@ export function GeneralEvaluationCard({ disciplineRate, overallRating }: General
         </div>
       </div>
       
-      <div className="flex-1 space-y-2">
-        <h3 className="text-lg font-heading font-semibold text-on-surface">التقييم العام للمنشأة</h3>
-        <p className="text-sm font-sans text-on-surface-variant">معدل الانضباط التراكمي يعكس مستوى التزام الموظفين بأوقات الحضور والانصراف.</p>
-        <div className="pt-2">
+      <div className="flex-1 space-y-1.5">
+        <h3 className="text-base md:text-lg font-heading font-bold text-on-surface">التقييم العام للمنشأة</h3>
+        <p className="text-xs md:text-sm font-sans text-on-surface-variant leading-relaxed">معدل الانضباط التراكمي يعكس مستوى التزام الموظفين بأوقات الحضور والانصراف.</p>
+        <div className="pt-1">
           <span 
-            className="inline-block px-3 py-1 rounded-full text-sm font-bold font-label transition-colors duration-300 animate-pulse"
+            className="inline-block px-3 py-1 rounded-full text-xs font-bold font-label transition-colors duration-300"
             style={{
               backgroundColor: `${currentColor}1A`, // 10% opacity in hex
               color: currentColor
