@@ -1,6 +1,6 @@
 "use client";
 
-import { RegistryEntry } from '@/types/dashboard-registry.types';
+import { RegistryEntryOutput as RegistryEntry } from '@/types';
 import { DailyEmployeeRow } from '@/store/useRegistryFilterStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import  Image from 'next/image';
@@ -175,9 +175,9 @@ export function ChronicleTable({
 
                 {/* التقييم */}
                 <td className='w-[140px]'>
-                  <div className={`flex  w-[min(80%,140px)] items-center gap-2 ${RATING_COLOR[row.disciplineRating][0]} px-3 py-1.5 rounded-lg  select-none`}>
+                  <div className={`flex w-[min(90%,140px)] items-center gap-2 ${RATING_COLOR[row.disciplineRating][0]} px-2.5 py-1 rounded-lg select-none`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${RATING_COLOR[row.disciplineRating][1]} animate-pulse`} />
-                    <span className={` font-sans leading-5 font-medium ${RATING_COLOR[row.disciplineRating][2]}`}>
+                    <span className={`font-label text-xs font-semibold leading-none ${RATING_COLOR[row.disciplineRating][2]}`}>
                       {RATING_LABEL[row.disciplineRating] || row.disciplineRating} 
                     </span>
                   </div>
@@ -186,14 +186,14 @@ export function ChronicleTable({
                 {/* ── View 1: Summary ── */}
                 {turnColumnsDash === 1 && (
                   <>
-                    <td className="text-primary font-bold tabular-nums">{row.summary.presentDays}</td>
-                    <td className="text-error font-bold tabular-nums">{row.summary.absentDays}</td>
-                    <td className="text-secondary font-bold tabular-nums">{row.summary.lateDays}</td>
-                    <td className="tabular-nums whitespace-nowrap">
+                    <td className="text-primary font-mono font-bold tabular-nums text-sm">{row.summary.presentDays}</td>
+                    <td className="text-error font-mono font-bold tabular-nums text-sm">{row.summary.absentDays}</td>
+                    <td className="text-secondary font-mono font-bold tabular-nums text-sm">{row.summary.lateDays}</td>
+                    <td className="font-mono tabular-nums whitespace-nowrap">
                       {row.summary.totalDeductions > 0 ? (
-                        <span className="text-error font-bold">
+                        <span className="text-error font-bold text-sm">
                           {row.summary.totalDeductions.toLocaleString('ar-SA')}
-                          <span className="text-on-surface-variant text-xs font-normal mr-1">ر.س</span>
+                          <span className="text-on-surface-variant text-xs font-normal mr-1 font-sans">ر.س</span>
                         </span>
                       ) : (
                         <span className="text-primary/60 text-xs font-label">لا خصومات</span>
@@ -207,10 +207,10 @@ export function ChronicleTable({
                   const entry = row.dailyBreakdown?.[0];
                   return (
                     <>
-                      <td className="tabular-nums text-on-surface-variant">{entry?.checkIn ? entry.checkIn : '—'}</td>
-                      <td className="tabular-nums text-on-surface-variant">{entry?.checkOut ? entry.checkOut : '—'}</td>
-                      <td className="text-on-surface-variant">{entry?.shift ?? '—'}</td>
-                      <td className="tabular-nums text-on-surface-variant whitespace-nowrap">{entry?.date ?? '—'}</td>
+                      <td className="font-mono tabular-nums text-on-surface-variant text-sm">{entry?.checkIn ? entry.checkIn : '—'}</td>
+                      <td className="font-mono tabular-nums text-on-surface-variant text-sm">{entry?.checkOut ? entry.checkOut : '—'}</td>
+                      <td className="text-on-surface-variant text-sm">{entry?.shift ?? '—'}</td>
+                      <td className="font-mono tabular-nums text-on-surface-variant whitespace-nowrap text-xs">{entry?.date ?? '—'}</td>
                     </>
                   );
                 })()}

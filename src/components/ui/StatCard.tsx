@@ -66,29 +66,29 @@ export function StatCard({numberSize  , title, value, icon, trend, variant = 'su
           variantStyles[variant]
         )}
       >
-        <div className="flex justify-between items-center mb-4">
-          <h3 className={`text-3xl  ${colors_text[variant]} font-light font-sans`}>{title}</h3>
-          {icon && <div className={`p-2 rounded-full bg-white/70 ${color[variant]}`}>{icon}</div>}
+        <div className="flex justify-between items-center mb-3">
+          <h3 className={`text-base md:text-lg font-bold font-heading ${colors_text[variant]}`}>{title}</h3>
+          {icon && <div className={`p-2 rounded-full bg-white/80 ${color[variant]}`}>{icon}</div>}
         </div>
 
         {text && (
-          <div className="justify-self-center text-right text-2xl font-medium text-on-surface self-start py-2">
-            <p className="leading-tight">{text}</p>
+          <div className="justify-self-center text-right text-sm md:text-base font-medium text-on-surface self-start py-1">
+            <p className="leading-snug">{text}</p>
           </div>
         )}
 
-        <div className="flex justify-between items-end gap-3 mt-auto">
+        <div className="flex justify-between items-end gap-3 mt-auto pt-2">
           <div>
             {limit ? (
-              <div className="flex items-baseline gap-1 font-heading font-extrabold" dir="ltr">
-                <span className="text-sm font-medium text-slate-400"> {limit}/</span>
-                <span style={numberSize ? { fontSize: numberSize } : undefined} className={`text-3xl ${colors_text[variant]}`}>
+              <div className="flex items-baseline gap-1 font-mono font-bold" dir="ltr">
+                <span className="text-xs md:text-sm font-medium text-slate-400">/{limit}</span>
+                <span style={numberSize ? { fontSize: numberSize } : undefined} className={`text-2xl md:text-3xl ${colors_text[variant]}`}>
                   {value}
                 </span>
               </div>
             ) : (
               value !== undefined && (
-                <span className={`text-4xl font-heading font-extrabold ${colors_text[variant]}`}>
+                <span className={`text-3xl md:text-4xl font-mono font-bold tracking-tight ${colors_text[variant]}`}>
                   {value}
                 </span>
               )
