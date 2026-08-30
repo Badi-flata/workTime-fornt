@@ -45,6 +45,7 @@ export default function LoginPage() {
           id: user.id,
           name: (user as { fullName?: string; name?: string }).fullName || user.name,
           role: user.role,
+          avatar: user.imageProfile,
         },
         token
       );

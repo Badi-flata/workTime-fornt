@@ -27,8 +27,9 @@ export default function SignUpPage() {
 
   // ── Label maps ────────────────────────────────────────────────────
   const mapRole: Record<Role, string> = {
-   EMPLOYEE : 'موظف', 
-   MANAGER : 'مدير', 
+    [Role.EMPLOYEE]: 'موظف', 
+    [Role.MANAGER]: 'مدير', 
+    [Role.SUPER_ADMIN]: 'مدير عام',
   };
 
   useEffect(() => {
