@@ -1,41 +1,41 @@
 "use client";
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar as CalendarIcon, Clock, ArrowRightLeft  , ChevronRight , ChevronLeft} from 'lucide-react';
+import { X, Calendar as CalendarIcon, Clock, ArrowRightLeft, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useCardUIStore } from '@/store/useCardUIStore';
 import { useState } from 'react';
+import { DailyBreakdownOutput } from '@/types';
 import '../../app/globals.css';
 
 export function DetailedAttendanceModal() {
-  const { isDetailedAttendanceModalOpen, selectedEmployee , closeModals, openEmployeeModal } = useCardUIStore();
+  const { isDetailedAttendanceModalOpen, selectedEmployee, closeModals, openEmployeeModal } = useCardUIStore();
   const [currentPage, setCurrentPage] = useState(1);
-  // Mock data for the detailed breakdown
-  const dailyBreakdown  = selectedEmployee?.dailyBreakdown || [];
+  const dailyBreakdown = selectedEmployee?.dailyBreakdown || [];
   
   if (!isDetailedAttendanceModalOpen) return null;
   
   // Pagination 
   const totalItems = dailyBreakdown.length;
-  const limit = 5
+  const limit = 5;
 
   const totalPages = Math.ceil(totalItems / limit);
   const paginatedData = dailyBreakdown.slice((currentPage - 1) * limit, currentPage * limit);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage((prev:number)=>prev + 1)
+      setCurrentPage((prev: number) => prev + 1);
     }
   };
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage((prev:number)=>prev - 1)
+      setCurrentPage((prev: number) => prev - 1);
     }
   };
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50  flex items-center justify-center p-4 bg-on-surface/20 backdrop-blur-sm" dir="rtl">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-surface/20 backdrop-blur-sm" dir="rtl">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -58,31 +58,33 @@ export function DetailedAttendanceModal() {
               </div> 
               {/* Pagination Controls */}
               {totalPages > 1 && (
-                <div className="flex justify-baseline items-center gap-4">
+                <div className="flex items-center gap-2 mr-6">
                   <button
                     onClick={handlePreviousPage}
-                    disabled={currentPage <= 1}
-                    className="p-2.5 rounded-lg bg-surface-container-lowest border border-outline/10 hover:bg-surface-container hover:border-outline transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    disabled={currentPage === 1}
+                    className="p-1.5 rounded-md bg-surface-container-low border border-outline/10
+                               hover:bg-surface-container transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     aria-label="الصفحة السابقة"
                   >
-                    <ChevronRight size={18} />
+                    <ChevronRight size={16} />
                   </button>
-                  <span className="text-sm font-heading font-medium text-on-surface-variant">
-                    صفحة <strong className="text-primary">{currentPage}</strong> من <strong>{totalPages}</strong>
+                  <span className="text-sm font-bold font-label text-primary min-w-[20px] text-center">
+                    {currentPage + ' / ' + totalPages}
                   </span>
                   <button
                     onClick={handleNextPage}
-                    disabled={currentPage >= totalPages}
-                    className="p-2.5 rounded-lg bg-surface-container-lowest border border-outline/10 hover:bg-surface-container hover:border-outline transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    disabled={currentPage === totalPages}
+                    className="p-1.5 rounded-md bg-surface-container-low border border-outline/10
+                               hover:bg-surface-container transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     aria-label="الصفحة التالية"
                   >
-                    <ChevronLeft size={18} />
+                    <ChevronLeft size={16} />
                   </button>
                 </div>
               )}
             </div>
             <button 
-            onClick={()=>{ closeModals() ; setCurrentPage(1)}}
+              onClick={() => { closeModals(); setCurrentPage(1); }}
               className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors"
             >
               <X size={20} />
@@ -103,7 +105,7 @@ export function DetailedAttendanceModal() {
                 </tr>
               </thead>
               <tbody>
-                {paginatedData.map((day, idx) => (
+                {paginatedData.map((day: DailyBreakdownOutput, idx: number) => (
                   <tr key={idx} className="hover:bg-surface-container-lowest transition-colors">
                     <td className="whitespace-nowrap">
                       <div className="flex items-center gap-2">
@@ -138,13 +140,15 @@ export function DetailedAttendanceModal() {
                       </div>
                     </td>
                     <td className="text-on-surface-variant text-sm">
-                      {day.excuseNotes || '---'}
+                      {day.excuseNotes || day.adminNotes || '---'}
                     </td>
-                    <td className="font-bold font-sans">
-                      {day.deduction > 0 ? (
-                        <span className="text-error">{day.deduction}</span>
+                    <td>
+                      {(day.deduction ?? 0) > 0 ? (
+                        <span className="text-error font-bold font-sans">
+                          {day.deduction}
+                        </span>
                       ) : (
-                        <span className="text-outline">0</span>
+                        <span className="text-outline">---</span>
                       )}
                     </td>
                   </tr>

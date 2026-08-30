@@ -22,10 +22,11 @@ import { arSA } from 'date-fns/locale';
 interface DatePickerProps {
   value: string; // yyyy-MM-dd
   onChange: (date: string) => void;
+  className?:string;
   placeholder?: string;
 }
 
-export function DatePicker({ value, onChange, placeholder = 'بحث بتاريخ معين' }: DatePickerProps) {
+export function DatePicker({ value, className ="", onChange,  placeholder = 'بحث بتاريخ معين' }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(value ? parseISO(value) : new Date());
   
@@ -100,7 +101,7 @@ export function DatePicker({ value, onChange, placeholder = 'بحث بتاريخ
           <div
             onClick={clearDate}
             className="absolute left-2 p-1 rounded-full bg-surface-container-highest text-on-surface-variant 
-                       hover:bg-error/10 hover:text-error transition-colors cursor-pointer z-10"
+           hover:bg-error/10 hover:text-error transition-colors cursor-pointer z-10"
             title="مسح التاريخ"
           >
             <X size={14} />
@@ -116,8 +117,8 @@ export function DatePicker({ value, onChange, placeholder = 'بحث بتاريخ
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 5, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full mt-2 right-0 z-50 w-72 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] 
-                       border border-outline/10 p-4 font-sans origin-top-right"
+            className={`absolute top-full mt-2 right-0 ${className} z-50 w-72 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] 
+                       border border-outline/10 p-4 font-sans origin-top-right`}
           >
             {/* Header: Month & Navigation */}
             <div className="flex justify-between items-center mb-4">

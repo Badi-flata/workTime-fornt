@@ -1,67 +1,179 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Bell, Search, ChevronDown, Menu, X, Settings, LogOut, ChevronUp } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { Bell, Search, ChevronDown, Menu, X, Settings, LogOut, ChevronUp, ArrowLeft } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useDirectoryStore } from '@/store/useDirectoryStore';
+import { EmployeeInfoCardModal } from '@/components/ui/EmployeeInfoCardModal';
 import { navSections } from './Sidebar';
-import {Logo } from '@/components/ui/Logo'
+import { Logo } from '@/components/ui/Logo';
+import { UserAvatar } from '@/components/ui/UserAvatar';
+
 export function Topbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout, initializeAuth } = useAuthStore();
+  const { quickResults, isQuickLoading,setSearchQuery, quickSearchTopBar, openEmployeeCard } = useDirectoryStore();
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-    initializeAuth();
-  }
+      initializeAuth();
+    }
   }, [initializeAuth]);
 
-  // Close mobile menu when pathname changes
+  // Close mobile menu & search popover when pathname changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setIsSearchOpen(false);
   }, [pathname]);
 
+  // Close search popover when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setIsSearchOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSearchTerm(val);
+    setSearchQuery(val);
+    if (val.trim()) {
+      setIsSearchOpen(true);
+      quickSearchTopBar(val);
+    } else {
+      setIsSearchOpen(false);
+    }
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchTerm.trim()) {
+      setIsSearchOpen(false);
+      router.push(`/searsh?q=${encodeURIComponent(searchTerm.trim())}`);
+    }
+  };
+
+  const handleNavigateToDirectory = () => {
+    setIsSearchOpen(false);
+    router.push(`/searsh?q=${encodeURIComponent(searchTerm.trim())}`);
+  };
+
   return (
-    <header className="h-16 bg-white border-b shadow  border-outline/15 flex items-center justify-between px-6 font-sans shrink-0 relative z-30">
+    <header className="h-16 bg-white border-b shadow border-outline/15 flex items-center justify-between px-6 font-sans shrink-0 relative z-30">
       {/* ── BREADCRUMB / MOBILE MENU TOGGLE ── */}
-      <motion.div
-      
-      className="flex items-center shrink gap-3">
+      <motion.div className="flex items-center shrink gap-3">
         {/* Burger menu button visible only on mobile */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 -mr-2 z-60 rounded-lg text-on-surface-variant right-[40%] shadow shadow-slate-400  hover:bg-slate-400/40 hover:text-white  transition-colors md:hidden"
+          className="p-2 -mr-2 z-60 rounded-lg text-on-surface-variant right-[40%] shadow shadow-slate-400 hover:bg-slate-400/40 hover:text-white transition-colors md:hidden"
           aria-label="قائمة التنقل الجوالة"
         >
           {isMobileMenuOpen ? <X size={25} /> : <Menu size={25} />}
         </button>
-        
       </motion.div>
+
       {/* ── LOGO ── */}
-      <div 
-        className={clsx(
-          "h-16 flex items-center  md:absolute right-0 px-4 shrink-0 transition-all duration-300",
-          
-        )}
-      >
+      <div className={clsx("h-16 flex items-center md:absolute right-0 px-4 shrink-0 transition-all duration-300")}>
         <Logo size={56} showText={true} orientation="horizontal" className="justify-start pr-1" />
-        
       </div>
+
       {/* ── RIGHT SIDE: SEARCH + NOTIFICATIONS + PROFILE ── */}
       <div className="flex items-center gap-4">
-        {/* Search */}
-        <div className="relative hidden md:block">
+        {/* Instant Search Bar */}
+        <div ref={searchContainerRef} className="relative hidden md:block">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-outline" size={16} />
           <input 
             type="text" 
-            placeholder="ابحث عن موظف..." 
-            className="w-64 bg-surface-container-low border border-outline/20 rounded-full py-2 pr-9 pl-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            onFocus={() => searchTerm.trim() && setIsSearchOpen(true)}
+            onKeyDown={handleSearchKeyDown}
+            placeholder="ابحث عن موظف أو مدير..." 
+            className="w-72 bg-surface-container-low border border-outline/20 rounded-full py-2 pr-9 pl-4 text-sm font-sans focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
           />
+
+          {/* Quick Search Results Popover */}
+          <AnimatePresence>
+            {isSearchOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                transition={{ duration: 0.2 }}
+                className="absolute top-full mt-2 right-0 w-80 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-outline/15 p-2 z-50 overflow-hidden"
+              >
+                <div className="p-2 border-b border-outline/10 text-xs font-label font-bold text-on-surface-variant flex justify-between items-center">
+                  <span>نتائج البحث السريع</span>
+                  {isQuickLoading && <span className="text-[10px] text-primary animate-pulse">جاري البحث...</span>}
+                </div>
+
+                <div className="max-h-64 overflow-y-auto py-1 divide-y divide-outline/5">
+                  {quickResults.length > 0 ? (
+                    quickResults.map((u) => {
+                      const isEmployee = u.role === 'EMPLOYEE';
+                      return (
+                        <div
+                          key={u.id}
+                          onClick={() => {
+                            setIsSearchOpen(false);
+                            openEmployeeCard(u);
+                          }}
+                          className="flex items-center gap-3 p-2 rounded-xl hover:bg-surface-container-low cursor-pointer transition-colors group"
+                        >
+                          <UserAvatar
+                            src={u.imageProfile}
+                            name={u.fullName}
+                            size={36}
+                          />
+                          <div className="flex-1 min-w-0 text-right">
+                            <p className="text-xs font-bold text-on-surface truncate group-hover:text-primary transition-colors">
+                              {u.fullName}
+                            </p>
+                            <p className="text-[11px] text-on-surface-variant truncate">
+                              {u.jobTitle || (isEmployee ? 'موظف' : 'مدير')}
+                            </p>
+                          </div>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-label font-semibold ${
+                            isEmployee ? 'bg-emerald-100 text-emerald-800' : 'bg-primary text-white'
+                          }`}>
+                            {isEmployee ? 'موظف' : 'مدير'}
+                          </span>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="p-4 text-center text-xs text-on-surface-variant/70">
+                      {isQuickLoading ? 'جاري استرجاع النتائج...' : 'لا توجد نتائج مطابقة.'}
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-1 pt-2 border-t border-outline/10">
+                  <button
+                    onClick={handleNavigateToDirectory}
+                    className="w-full py-2 px-3 rounded-xl bg-surface-container hover:bg-primary hover:text-white text-xs font-label font-bold text-primary transition-all flex items-center justify-center gap-2"
+                  >
+                    <span>عرض كافة النتائج في الدليل الشامل</span>
+                    <ArrowLeft size={14} />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Notifications */}
@@ -72,22 +184,28 @@ export function Topbar() {
 
         {/* Profile */}
         <div className="flex items-center gap-3 border-r max-[400px]:hidden border-outline/20 pr-4 mr-2">
-          <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm select-none">
-            {user?.avatar || 'أ'}
-          </div>
+          <UserAvatar
+            src={user?.avatar}
+            name={user?.name}
+            size={36}
+          />
           <div className="text-right hidden lg:block select-none">
             <p className="text-sm font-semibold text-on-surface leading-tight">{user?.name || 'مستخدم'}</p>
             <p className="text-xs text-on-surface-variant">{user?.role || '---'}</p>
           </div>
-          {isProfileOpen?(<ChevronUp
-          onClick={() => setIsProfileOpen((prev) => !prev)} 
-          size={20} 
-          className="text-on-surface-variant relative hover:bg-on-surface-variant  rounded-full
-           hover:text-surface transition-all cursor-pointer" />):(<ChevronDown
-          onClick={() => setIsProfileOpen((prev) => !prev)} 
-          size={20} 
-          className="text-on-surface-variant relative hover:bg-on-surface-variant  rounded-full
-           hover:text-surface transition-all cursor-pointer" />)}
+          {isProfileOpen ? (
+            <ChevronUp
+              onClick={() => setIsProfileOpen((prev) => !prev)} 
+              size={20} 
+              className="text-on-surface-variant relative hover:bg-on-surface-variant rounded-full hover:text-surface transition-all cursor-pointer"
+            />
+          ) : (
+            <ChevronDown
+              onClick={() => setIsProfileOpen((prev) => !prev)} 
+              size={20} 
+              className="text-on-surface-variant relative hover:bg-on-surface-variant rounded-full hover:text-surface transition-all cursor-pointer"
+            />
+          )}
           <AnimatePresence>
             {isProfileOpen && (
               <motion.div
@@ -95,13 +213,13 @@ export function Topbar() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.25, ease: 'easeOut' }}
-                className="absolute top-full  left-10 mt-2 z-50  w-auto  bg-white/95 dark:bg-surface-container-lowest/95 
-                       backdrop-blur-md rounded-2xl shadow-xl border border-outline/15 p-4  overflow-y-auto max-md:max-h-[calc(100vh-80px)] flex-1 flex-col space-y-4"
+                className="absolute top-full left-10 mt-2 z-50 w-auto bg-white/95 dark:bg-surface-container-lowest/95 
+                       backdrop-blur-md rounded-2xl shadow-xl border border-outline/15 p-4 overflow-y-auto max-md:max-h-[calc(100vh-80px)] flex-1 flex-col space-y-4"
               >
                 {/* logOut */}
-                <button onClick={() =>{  setIsProfileOpen(false); logout()}} className="pt-2   border-outline/10 flex items-center gap-2">
-                  <div className="px-3 text-surface-container-high  bg-red-700 rounded-2xl py-3">
-                  <LogOut size={20} className="shrink-0 " />
+                <button onClick={() => { setIsProfileOpen(false); logout(); }} className="pt-2 border-outline/10 flex items-center gap-2">
+                  <div className="px-3 text-surface-container-high bg-red-700 rounded-2xl py-3">
+                    <LogOut size={20} className="shrink-0" />
                   </div>
                   <span>تسجيل الخروج</span>
                 </button>  
@@ -168,6 +286,9 @@ export function Topbar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Integrated Modal Mount */}
+      <EmployeeInfoCardModal />
     </header>
   );
 }

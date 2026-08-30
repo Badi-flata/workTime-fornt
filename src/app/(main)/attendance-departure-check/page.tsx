@@ -109,7 +109,6 @@ export default function AttendanceReportsPage() {
   useEffect(() => {
     if (role && targetEmployeeId) {
       fetchSourceData(targetEmployeeId, dateAnchor);
-      console.log('role is SUPER_ADMIN on fetchSourceData for employee:', targetEmployeeId);
     } else if (!role) {
       fetchSourceData(undefined, dateAnchor);
     }
@@ -132,7 +131,7 @@ export default function AttendanceReportsPage() {
     if (!mainSourceData?.shiftdata?.shiftId) return;
     CheckIn({
         employeeId:targetEmployeeId,
-        shifId: mainSourceData.shiftdata.shiftId,
+        shiftId: mainSourceData.shiftdata?.shiftId,
         checkIn: dateAnchor,
         notes: notes,
       });
@@ -146,7 +145,7 @@ export default function AttendanceReportsPage() {
       await CheckOut({
         attendId: checkValue?.attendanceId || "",
         employeeId:targetEmployeeId,
-        shifId: mainSourceData.shiftdata.shiftId,
+        shiftId: mainSourceData.shiftdata.shiftId,
         checkOut: new Date(),
         notes: notes,
       });
@@ -174,10 +173,11 @@ export default function AttendanceReportsPage() {
  }, [hasMessage ,message]);
 
  const handlerApply= (id:string)=>{
-  if(days && days.length >=1){
+  if(!days || days.length === 0)return;
     const day = days?.find((dat)=> dat?.attendanceId === id)
-    if(day) applyDay(day);
-  }else{
+    if(day) {
+      applyDay(day);}
+  else{
     return;
   }
 }

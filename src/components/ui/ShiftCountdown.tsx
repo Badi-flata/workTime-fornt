@@ -43,8 +43,6 @@ export function ShiftCountdown({
   const [time, setTime] = useState<Date | null>(null);
   const [phaseDetail, setPhaseDetail] = useState<PhaseDetail | null>(null);
 
-  console.log("time start",format(d,"HH:mm"));
-  console.log("time end",format(t,"HH:mm"));
   
   const pastReport = periodOfTime !== format((time || new Date()), "yyyy-MM-dd");
 

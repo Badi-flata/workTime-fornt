@@ -1,28 +1,9 @@
 import { parseISO } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import {motion} from 'framer-motion'
+import { motion } from 'framer-motion';
+import { DailyBreakdownOutput } from '@/types';
 
-interface AttendanceDay {
-  attendanceId: string;
-  date: string;
-  name?: string;
-  managerName?: string;
-  departmentName?: string;
-  shiftId?: string;
-  shiftName?: string;
-  shiftStart?: string;
-  shiftEnd?: string;
-  graceIn?: number;
-  graceOut?: number;
-  checkIn?: string | null;
-  checkOut?: string | null;
-  notes?: string | null;
-  status?: string;
-  excuses?: { type: string; reason: string }[];
-  totalWorkedHours?: number;
-  earlyLeaveMinutes?: number;
-  lateMinutes?: number;
-}
+export type AttendanceDay = DailyBreakdownOutput;
 
 const SUMMARY_LABEL: Record<string, string> = {
   WEEKLY: 'ملخص الأسبوع',
@@ -196,7 +177,7 @@ export function SummaryAttendances({
                   </div>
                   <button
                  
-                  onClick={()=> onClickTob?.(attendanceId)}
+                  onClick={()=> onClickTob?.(String(attendanceId))}
                   className="flex-1 transition-all duration-300 
                   focus:border-2 focus:outline-4  focus:outline-primary/10  
                   focus:border-secondary/50 focus:scale-[0.9]

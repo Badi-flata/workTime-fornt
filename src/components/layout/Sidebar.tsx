@@ -7,8 +7,6 @@ import {
   Users, 
   ClipboardList,
   UserCircle,
-  Clock,
-  Activity,
   Building2,
   Settings,
   X,
@@ -29,65 +27,50 @@ export const navSections = [
         screen: 'Manager_Dashboard_Main' 
       },
       { 
+        href: '/employee-dashboard', 
+        label: 'لوحة التحكم', 
+        icon: LayoutDashboard,
+        screen: 'Employee_Personal_Dashboard' 
+      },
+      { 
         href: '/attendance-departure-check', 
         label: 'سجلات الحضور والانصراف', 
         icon: ClipboardList,
         screen: 'Attendance_Departure_Check' 
       },
       { 
-        href: '/live-pulse', 
-        label: 'نبض الحضور الحي', 
-        icon: Activity,
-        screen: 'Live_Attendance_Pulse' 
-      },
-    ]
-  },
-  {
-    label: 'الموظفين',
-    items: [
-      { 
-        href: '/employees', 
-        label: 'دليل الموظفين', 
+        href: '/searsh', 
+        label: 'البحث الشامل', 
         icon: Users,
         screen: 'Employees_Directory' 
       },
-      { 
-        href: '/employee-profile', 
-        label: 'الملف الشخصي', 
-        icon: UserCircle,
-        screen: 'Employee_Profile' 
-      },
-      { 
-        href: '/employee-dashboard', 
-        label: 'لوحة تحكم الموظف', 
-        icon: LayoutDashboard,
-        screen: 'Employee_Personal_Dashboard' 
-      },
-      {
-        href: '/attendance-log',
-        label: 'سجل الحضور التفصيلي',
-        icon: ClipboardList,
-        screen: 'Detailed_Attendance_Log'
-      },
     ]
   },
+
   {
     label: 'العمليات',
     items: [
-      { 
-        href: '/clock', 
-        label: 'تسجيل الحضور والانصراف', 
-        icon: Clock,
-        screen: 'Clock_In_Out_Screen' 
-      },
       { 
         href: '/departments', 
         label: 'الأقسام والورديات', 
         icon: Building2,
         screen: 'Departments_Shifts_Management' 
       },
+      {
+        href: '/my-employees-detailes',
+        label: 'تفاصيل الموظفين',
+        icon: Users,
+        screen: 'My_Employees'
+      },
+      { 
+        href: '/my-profile', 
+        label: 'الملف الشخصي', 
+        icon: UserCircle,
+        screen: 'Employee_Profile' 
+      },
     ]
   },
+
 ];
 
 export function Sidebar() {

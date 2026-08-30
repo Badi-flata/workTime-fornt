@@ -3,14 +3,11 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Briefcase, Calendar as CalendarIcon, Clock, AlertCircle, CalendarX } from 'lucide-react';
 import { useCardUIStore } from '@/store/useCardUIStore';
-import Image from 'next/image';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 
 export function EmployeeInfoModal() {
   const { isEmployeeInfoModalOpen, selectedEmployee, closeModals, openDetailedAttendanceModal } = useCardUIStore();
 
-  // In a real app, we would fetch the specific employee details based on selectedEmployeeId.
-  // For now, we use a placeholder or derived data.
-  
   if (!isEmployeeInfoModalOpen) return null;
 
   return (
@@ -38,14 +35,11 @@ export function EmployeeInfoModal() {
           <div className="p-6 overflow-y-auto">
             {/* Profile Header */}
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-               {selectedEmployee?.avatar ? (
-                    <Image src={selectedEmployee?.avatar} alt={selectedEmployee?.name} 
-                    width={32} height={32} className="rounded-full object-cover" />
-                ) : (
-               selectedEmployee?.name.charAt(0)
-                )}
-              </div>
+              <UserAvatar
+                src={selectedEmployee?.avatar}
+                name={selectedEmployee?.name}
+                size={64}
+              />
               <div>
                 <h3 className="text-lg font-bold font-sans text-on-surface">موظف #{selectedEmployee?.name}</h3>
                 <div className="flex items-center gap-2 text-on-surface-variant text-sm mt-1">

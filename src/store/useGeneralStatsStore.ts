@@ -8,8 +8,14 @@ interface GeneralStatsState {
 
   fetchGeneralStats: () => Promise<void>;
   updateRating: (rating: 'EXCELLENT' | 'VERY_GOOD' | 'GOOD' | 'NEEDS_IMPROVEMENT') => void;
+  reset: () => void;
 }
 
+/**
+ * useGeneralStatsStore — Store خام لإحصائيات الانضباط العامة
+ * يمكن استخدامه مستقبلاً لعمليات Discipline مفصولة
+ * مثل: تقييم قسم كامل أو تقييم المؤسسة ككل
+ */
 export const useGeneralStatsStore = create<GeneralStatsState>((set) => ({
   disciplineRate: 0,
   overallRating: null,
@@ -17,23 +23,16 @@ export const useGeneralStatsStore = create<GeneralStatsState>((set) => ({
   error: null,
 
   fetchGeneralStats: async () => {
-    set({ isLoading: true, error: null });
-    try {
-      // TODO: Replace with real API call when backend provides general discipline endpoint
-      // const response = await API.managing.getEmployeeDisciplineRate(employeeProfileId);
-      
-      // Temporary simulated response until backend is connected
-      const simulatedRate = 92; 
-      const simulatedRating = 'EXCELLENT' as const;
-
-      set({ disciplineRate: simulatedRate, overallRating: simulatedRating, isLoading: false });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch general stats';
-      set({ error: message, isLoading: false });
-    }
+    // TODO: ربط بـ API عند توفر endpoint مخصص للإحصائيات العامة
+    // مثل: GET /managing/organization-discipline?mode=MONTHLY
+    set({ isLoading: false, error: null });
   },
 
   updateRating: (rating) => {
     set({ overallRating: rating });
-  }
+  },
+
+  reset: () => {
+    set({ disciplineRate: 0, overallRating: null, isLoading: false, error: null });
+  },
 }));

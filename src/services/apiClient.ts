@@ -1,22 +1,45 @@
 import axios from 'axios';
-import { OptimizedDashboardResponse ,Modes } from '../types/dashboard-registry.types';
+import {
+  OptimizedDashboardResponse,
+  Modes,
+  LoginInput,
+  SignUpInput,
+  ProfileUpdateInput,
+  CheckInInput,
+  CheckOutInput,
+  SubmitExcuseInput,
+  AttendanceSourceParams,
+  AddEmployeeInput,
+  AuditEmployeeInput,
+  ShiftCreateInput,
+  ShiftUpdateInput,
+  DepartmentCreateInput,
+  DepartmentUpdateInput,
+  BoundedPeriodReportOutput,
+  PaginationParams,
+  FullProfileResponse,
+  ShiftOutput,
+  DepartmentOutput,
+  DepartmentListItemOutput,
+  SearchDirectoryParams,
+  DirectorySearchResponse,
+  AssignEmployeeInput,
+  ApiSuccessResponse,
+  EmployeeDashboardMeta
+} from '../types';
 import { useAuthStore } from '../store/useAuthStore';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ||"http://localhost:3030"
+const API_URL = "http://localhost:3030";
   
 export const apiClient = axios.create({
   baseURL: API_URL,
 });
 
-  //  window.localStorage.clear()
-
 // Temporary dev token for seamless frontend testing
- const DEV_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ij8_Pz8gPz8_Pz8_PyIsInVzZXJJZCI6IjcxYzA2NThhLTk5NWMtNDA0My05N2I1LWJlMWY5Yzc0NjRkOCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc4MDU4OTAyMiwiZXhwIjoxNzgzMTgxMDIyfQ.uMTHLvZWJqIeDj32YldQBS5_-Rw-dqPriaIC_rQH-hw";
+const DEV_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ij8_Pz8gPz8_Pz8_PyIsInVzZXJJZCI6IjcxYzA2NThhLTk5NWMtNDA0My05N2I1LWJlMWY5Yzc0NjRkOCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc4MDU4OTAyMiwiZXhwIjoxNzgzMTgxMDIyfQ.uMTHLvZWJqIeDj32YldQBS5_-Rw-dqPriaIC_rQH-hw";
 
 // Request Interceptor for Auth Token
 apiClient.interceptors.request.use((config) => {
-  // Attempt to get token from Zustand auth store first, fallback to DEV_TOKEN
-
   const storeToken = typeof window !== 'undefined' ? useAuthStore.getState().token : null;
   const token = storeToken || DEV_TOKEN;
   
@@ -26,90 +49,124 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Shared payload/param types
-interface LoginPayload { password: string ; email: string }
-interface SignUpPayload { name: string; phone: string; password: string; role: string; department: string; email: string; jobTitle?: string }
-interface ProfileUpdatePayload { name?: string; phone?: string; imageProfile?: string }
-interface ShiftPayload { name: string; startTime: string; endTime: string; gracePeriodMinIn?: number; gracePeriodMinOut?: number; departmentId: string }
-interface AuditPayload { employeeProfileId: string; shiftId: string; departmentId: string; salary?: number }
-interface ExcusePayload { type: 'IN' | 'OUT'; notes: string }
-interface DepartmentPayload { name: string; description?: string }
-interface EmployeeAddPayload { shiftId: string; departmentId: string; salary?: number }
-interface DeductionPayload { periodStart: string; periodEnd: string }
-interface CheckInPayload { shifId: string; employeeId?:string ,checkIn: string; notes?:string; excused?:{type:"LATE"|"ABSENT",reason:string} }
-interface CheckOutPayload { attendId: string; shifId: string; employeeId?:string , checkOut: Date;notes?:string; excused?:{type:"EARLY_DEPARTURE"|"ABSENT",reason:string}|null }
+// Response Interceptor — معالجة 401 تلقائياً
+apiClient.interceptors.response.use(
+  (response) => (response.data.timestamp ? response.data : response),
+  (error) => {
+    if (error.response?.status === 401) {
+      // تنظيف حالة المصادقة وإعادة التوجيه لتسجيل الدخول
+      if (typeof window !== 'undefined') {
+        useAuthStore.getState().logout();
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
-// Centralized API Endpoints mapped directly from Backend README
+// Centralized API Endpoints mapped cleanly to Backend routes
 export const API = {
   // 🔓 Public Route APIs
   public: {
-    logUp: (data: SignUpPayload) => apiClient.post('/users/logUp', data),
-    loginIn: (data: LoginPayload) => apiClient.post('/users/loginIn', data),
+    logUp: (data: SignUpInput) => apiClient.post('/users/logUp', data),
+    loginIn: (data: LoginInput) => apiClient.post('/users/loginIn', data),
   },
   
   // 👥 Authenticated User APIs
   users: {
-    search: (word: string) => apiClient.get(`/users/search_Word?word=${word}`),
-    updateMyProfile: (data: ProfileUpdatePayload) => apiClient.patch('/users/updateMyProfile', data),
-    deleteMyProfile: () => apiClient.delete('/users/deleteMyProfile'),
+    search: (params?: SearchDirectoryParams | string) => {
+      if (typeof params === 'string') {
+        return apiClient.get<DirectorySearchResponse>('/users/search_Word', { params: { search_Word: params } });
+      }
+      return apiClient.get<DirectorySearchResponse>('/users/search_Word', { params });
+    },
+    updateMyProfile: (data: ProfileUpdateInput) => apiClient.patch('/users/update-my-profile', data),
+    uploadAvatar: (formData: FormData) =>
+      apiClient.post<{ statusCode: number; message: string; data: { imageProfile: string; user: any } }>(
+        '/users/upload-avatar',
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      ),
+    updateAvatar: (imageProfile: string) =>
+      apiClient.patch<{ statusCode: number; message: string; data: { imageProfile: string; user: any } }>(
+        '/users/update-avatar',
+        { imageProfile }
+      ),
+    deleteMyProfile: () => apiClient.delete('/users/delete-my-profile'),
+    getProfile: () => apiClient.get<FullProfileResponse>('/users/profile'),
   },
 
   // 👷 Employee Exclusive APIs
   employee: {
-    getProfile: () => apiClient.get('/employee/profile'),
     setManager: (data: { managerId: string }) => apiClient.post('/employee/set-manager', data),
-    updateProfile: (data: ProfileUpdatePayload) => apiClient.patch('/employee/update-profile', data),
+    updateProfile: (data: ProfileUpdateInput) => apiClient.patch('/employee/update-profile', data),
     getTodayStatus: () => apiClient.get('/employee/today-status'),
-    getWeeklyReport: () => apiClient.get('/employee/weekly-report'),
-    getMonthlyReport: () => apiClient.get('/employee/monthly-report'),
-    getMyDashboard: () => apiClient.get('/employee/my-dashboard'),
-    getDisciplineRate: () => apiClient.get('/employee/discipline-rate'),
+    getMyDashboard: (mode:Modes,dateAnchor:string,employeeId?:string) => apiClient.get<EmployeeDashboardMeta>('/employee/my-dashboard',{ params: { mode, dateAnchor, employeeId } }),
+    getDisciplineRate: (days?:number) => apiClient.get('/employee/discipline-rate', { params: { days } }),
   },
 
   // 👷 Employee Attendance APIs
   attendance: {
-    checkIn: (querys:CheckInPayload) => apiClient.post('/attendance/check-in',querys),
-    checkOut: (querys:CheckOutPayload) => apiClient.post('/attendance/check-out',querys),
-    fetchSourceData: (params?: { employeeId?: string ,date?:string}) => apiClient.get('/attendance/shift', { params }),
-    getPeriodReport: (data:{dateAnchor?:string,mode:Modes,employeeId?:string}) => apiClient.get('/attendance/bounded-period-report', { params: data }),
-    submitExcuse: (data: ExcusePayload) => apiClient.post('/attendance/submit-excuse', data),
+    checkIn: (payload: CheckInInput) => apiClient.post('/attendance/check-in', payload),
+    checkOut: (payload: CheckOutInput) => apiClient.post('/attendance/check-out', payload),
+    fetchSourceData: (params?: AttendanceSourceParams) => apiClient.get('/attendance/shift', { params }),
+    submitExcuse: (data: SubmitExcuseInput) => apiClient.post('/attendance/submit-excuse', data),
+    getPeriodReport: (params: { dateAnchor?: string; mode: Modes; employeeId?: string }) => 
+      apiClient.get<BoundedPeriodReportOutput>('/attendance/bounded-period-report', { params }),
   },
-
+  
   // 👑 Manager Exclusive APIs
   managing: {
-    getDashboard: () => apiClient.get('/managing/dashboard'),
-    getDashboardRegistry: (params?: { mode?: string; page?: string; limit?: string; dateAnchor?: string; startDate?: string; endDate?: string }) => 
+    getDashboardRegistry: (params?: { 
+      mode?: Modes; 
+      page?: number | string; 
+      limit?: number | string; 
+      dateAnchor?: string; 
+      startDate?: string; 
+      endDate?: string;
+      status?: string;
+      excludeBreakdown?: boolean | string;
+    }) => 
       apiClient.get<OptimizedDashboardResponse>('/managing/dashboard-registry', { params }),
-    addEmployee: (id: string, data: EmployeeAddPayload) => apiClient.post(`/managing/add-employee/${id}`, data),
-    deleteEmployee: (id: string) => apiClient.delete(`/managing/delete-employee/${id}`),
-    getMyEmployees: () => apiClient.get('/managing/my-employees'),
     
-    // Shifts Management
-    makeAShift: (data: ShiftPayload) => apiClient.post('/managing/make-a-shift', data),
-    getShifts: () => apiClient.get('/managing/shifts'),
-    updateShift: (id: string, data: Partial<ShiftPayload>) => apiClient.patch(`/managing/shifts/${id}`, data),
-    deleteShift: (id: string) => apiClient.delete(`/managing/shifts/${id}`),
+    getPeriodReport: (data: { dateAnchor?: string; mode: Modes; employeeId?: string; startDate?: string }) => 
+      apiClient.get<BoundedPeriodReportOutput>(`/managing/employee-bounded-report/${data.employeeId || ''}`, { 
+        params: { startDate: data.dateAnchor || data.startDate, mode: data.mode } 
+      }),
+
+    addEmployee: (id?: string, data?: Partial<AssignEmployeeInput> | Partial<AddEmployeeInput>) => 
+      apiClient.post(`/managing/add-employee/${id}`, data),
+    truneToDepartmentEmployee: (id: string, data?:Partial<AddEmployeeInput>) => 
+      apiClient.post(`/managing/trune-to-department/${id}`, data),
+
+    firedEmployee: (id: string) => apiClient.delete(`/managing/fired-employee/${id}`),
+    getMyEmployees: (params?: PaginationParams) => apiClient.get('/managing/my-employees', { params }),
     
     // Employee Management & Reports
-    auditEmployee: (data: AuditPayload) => apiClient.patch('/managing/audit-employee', data),
-    getEmployeeWeeklyReport: (id: string) => apiClient.get(`/managing/employee-weekly-report/${id}`),
-    getEmployeeMonthlyReport: (id: string) => apiClient.get(`/managing/employee-monthly-report/${id}`),
-    getEmployeeDisciplineRate: (employeeProfileId: string) => apiClient.get(`/managing/discipline-rate/${employeeProfileId}`),
+    auditEmployee: (params: { email?: string; employeeId?: string }, data: AuditEmployeeInput) => 
+      apiClient.patch('/managing/audit-employee', data, { params }),
+    getEmployeeDisciplineRate: (employeeProfileId: string, days?: number) => 
+      apiClient.get(`/managing/discipline-rate/${employeeProfileId}`, { params: { days } }),
     
     // Excuses & Deductions
     getPendingExcuses: () => apiClient.get('/managing/pending-excuses'),
     approveExcuse: (id: string) => apiClient.post(`/managing/approve-excuse/${id}`),
-    autoCheckout: () => apiClient.post('/managing/auto-checkout'),
-    salaryDeduction: (employeeId: string, data: DeductionPayload) => apiClient.post(`/managing/salary-deduction/${employeeId}`, data),
+    autoCheckout: () => apiClient.post('/managing/auto-check'),
+    salaryDeduction: (employeeId: string) => apiClient.post(`/managing/salary-deduction/${employeeId}`),
   },
 
-  // 🏢 Department APIs
+  // 🏢 Department & Shifts APIs (Unified)
   department: {
-    create: (data: DepartmentPayload) => apiClient.post('/department', data),
-    getAll: () => apiClient.get('/department'),
-    getById: (id: string) => apiClient.get(`/department/${id}`),
-    update: (id: string, data: Partial<DepartmentPayload>) => apiClient.patch(`/department/${id}`, data),
+    create: (data: DepartmentCreateInput) => apiClient.post('/department', data),
+    getAll: () => apiClient.get<DepartmentOutput[]>('/department'),
+    getById: (id: string) => apiClient.get<DepartmentOutput>(`/department/${id}`),
+    update: (id: string, data: DepartmentUpdateInput) => apiClient.patch(`/department/${id}`, data),
     delete: (id: string) => apiClient.delete(`/department/${id}`),
-    getListNames: () => apiClient.get('/department/list/names'),
+    getListNames: () => apiClient.get<DepartmentListItemOutput[]>('/department/list/names'),
+    
+    // Shifts APIs within Department scope
+    createShift: (data: ShiftCreateInput) => apiClient.post('/department/shifts', data),
+    getShifts: () => apiClient.get<ShiftOutput[]>('/department/shifts'),
+    updateShift: (id: string, data: ShiftUpdateInput) => apiClient.patch(`/department/shifts/${id}`, data),
+    deleteShift: (id: string) => apiClient.delete(`/department/shifts/${id}`),
   }
 };

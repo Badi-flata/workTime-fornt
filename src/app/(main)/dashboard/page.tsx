@@ -27,6 +27,7 @@ const TAB_LABEL: Record<string, string> = {
 const STATUS_LABELS: Record<StatusFilter, string> = {
   ALL: 'الكل', ON_TIME: 'حاضر', LATE: 'متأخر',
   ABSENT: 'غياب', EXCUSED: 'معذور', ESCAPY: 'هروب',
+  DEDUCTED: 'مخصوم', EARLY_LEAVE: 'خروج مبكر',
 };
 
 const DISCIPLINE_LABELS: Record<DisciplineRating, string> = {
@@ -120,11 +121,9 @@ export default function DashboardPage() {
   }, [openStatisticEmployeesCard, meta?.periodScope]);
   // ── Derived data ──────────────────────────────────────────────
   const isDaily = activeTab === 'DAILY';
-  const showFilterBar = !isLoading;
+const showFilterBar = !isLoading;
 
-  console.log("data filtered:",filteredRegistry)
-  console.log("data raw:",registry)
- 
+ const activeWorkers = registry.filter(r => r.isWorking=== true).length;
   const TotalPages = isDaily ? totalPagesFiltered : (meta?.pagination?.totalPages || totalPagesDash);
   console.log(TAB_LABEL[activeTab]);
   // ── source code ───────────────────────────────────────────────────
@@ -173,7 +172,7 @@ export default function DashboardPage() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) =>(
-              <div key={i} className="h-[180px] bg-surface-container-lowest border border-outline/10 rounded-2xl p-5 flex flex-col justify-between animate-pulse">
+              <div key={i} className=" h-[180px] bg-surface-container-lowest border border-outline/10 rounded-2xl p-5 flex flex-col justify-between animate-pulse">
                 <div className="flex justify-between items-start">
                   <div className="h-5 w-28 bg-surface-container-highest rounded" />
                   <div className="w-8 h-8 rounded-full bg-surface-container-highest" />
@@ -305,7 +304,9 @@ export default function DashboardPage() {
           <div className="w-4 h-4 bg-error rounded-full mb-4 animate-pulse shadow-[0_0_15px_rgba(186,26,26,0.6)]" />
           <h3 className="text-lg font-heading font-semibold mb-2">نبض الحضور الحي</h3>
           <p className="text-3xl font-bold font-sans mb-1">
-            {metrics?.totalPresent || 0} / {meta?.totalSubordinates || 0}
+          {meta?.totalSubordinates || 0} /
+           {activeWorkers   || 0} 
+            
           </p>
           <p className="text-white/70 text-sm font-label">موظف متواجد الآن</p>
         </motion.div>
@@ -430,8 +431,8 @@ export default function DashboardPage() {
                   <div className="h-4 w-24 bg-surface-container-highest rounded" />
                 </div>
                 <div className="h-4 w-20 bg-surface-container-highest rounded" />
-                <div className="h-6 w-16 bg-surface-container-highest rounded-full" />
-                <div className="h-4 w-12 bg-surface-container-highest rounded" />
+                  <div className="h-6 w-16 bg-surface-container-highest rounded-full" />
+                  <div className="h-4 w-12 bg-surface-container-highest rounded" />
                 <div className="h-4 w-8 bg-surface-container-highest rounded" />
               </div>
             ))}
