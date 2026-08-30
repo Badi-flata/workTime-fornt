@@ -3,19 +3,15 @@
  * ──────────────────────
  * متجر مستقل ومعاد الاستخدام لفلترة بيانات السجل.
  * يمكن استيراده في أي صفحة أو مكون بدون أن يتداخل مع حالة الـ UI.
- *
- * المنطق:
- *  - ALL / WEEKLY / MONTHLY → فلترة حسب تقييم الانضباط (disciplineFilter)
- *  - DAILY                  → فلترة حسب حالة الحضور (statusFilter) + تاريخ (searchDate)
  */
 
 import { create } from 'zustand';
 import {
   DisciplineRating,
   Modes,
-  RegistryEntry,
+  RegistryEntryOutput,
   StatusFilter,
-} from '@/types/dashboard-registry.types';
+} from '@/types';
 
 // ─── شكل موظف يومي مُبسَّط للعرض السريع في وضع DAILY ───
 export interface DailyEmployeeRow {
@@ -42,18 +38,14 @@ export interface DailyEmployeeRow {
 
 interface RegistryFilterState {
   // ── عوامل الفلترة ──────────────────────────────────────────────
-  /** تاريخ البحث (يُستخدم في DAILY لعرض يوم معين) yyyy-MM-dd */
   searchDate: string;
-  /** فلتر الحالة — يعمل في وضع DAILY فقط */
   statusFilter: StatusFilter;
-  /** فلتر الانضباط — يعمل في ALL / WEEKLY / MONTHLY */
   disciplineFilter: DisciplineRating;
   totalPagesFiltered: number;
   dailyPage: number;
+  
   // ── البيانات المفلترة ───────────────────────────────────────────
-  /** نتيجة الفلترة في وضع ALL / WEEKLY / MONTHLY */
-  filteredRegistry: RegistryEntry[];
-  /** نتيجة الفلترة المُبسّطة في وضع DAILY */
+  filteredRegistry: RegistryEntryOutput[];
   filteredDailyRows: DailyEmployeeRow[];
 
   // ── Actions ──────────────────────────────────────────────────────
@@ -63,28 +55,23 @@ interface RegistryFilterState {
   setDailyPage: (action: 'next' | 'prev' | 'reset' | number, max?: number) => void;
   resetFilters: () => void;
 
-  /**
-   * الدالة الرئيسية — تأخذ البيانات الخام والوضع الحالي
-   * وتُنتج filteredRegistry أو filteredDailyRows حسب الوضع.
-   */
-  applyFilters: (data: RegistryEntry[], mode: Modes, pagination?: { pageDash: number; limitDash?: number }) => void;
+  applyFilters: (
+    data: RegistryEntryOutput[],
+    mode: Modes,
+    pagination?: { pageDash: number; limitDash?: number }
+  ) => void;
 }
-
-
 
 /** استخراج أسطر اليوم اليومية لموظف واحد مع الفلتر */
 function extractDailyRows(
-  entry: RegistryEntry,
+  entry: RegistryEntryOutput,
   statusFilter: StatusFilter,
-  searchDate: string,
+  searchDate: string
 ): DailyEmployeeRow[] {
   const rows: DailyEmployeeRow[] = [];
 
   for (const day of entry.dailyBreakdown) {
-    // فلتر التاريخ — إذا تم تحديده يعرض فقط السجلات المطابقة
     if (searchDate && day.date !== searchDate) continue;
-
-    // فلتر الحالة — ALL يعرض الكل
     if (statusFilter !== 'ALL' && day.status !== statusFilter) continue;
 
     rows.push({
@@ -96,9 +83,9 @@ function extractDailyRows(
       checkIn: day.checkIn,
       checkOut: day.checkOut,
       status: day.status,
-      shift: day.shift,
-      dayDeduction: day.deduction,
-      excuseNotes: day.excuseNotes,
+      shift: day.shift || day.shiftName || null,
+      dayDeduction: day.deduction || 0,
+      excuseNotes: day.excuseNotes || day.adminNotes || null,
       date: day.date,
     });
   }
@@ -106,10 +93,7 @@ function extractDailyRows(
   return rows;
 }
 
-// ─── إنشاء المتجر ────────────────────────────────────────────────
-
 export const useRegistryFilterStore = create<RegistryFilterState>((set, get) => ({
-  // ── Initial State ──────────────────────────────────────────────
   searchDate: '',
   statusFilter: 'ALL',
   disciplineFilter: 'ALL',
@@ -118,14 +102,8 @@ export const useRegistryFilterStore = create<RegistryFilterState>((set, get) => 
   filteredRegistry: [],
   filteredDailyRows: [],
 
-  // ── Actions ──────────────────────────────────────────────────
-
-  setSearchDate: (date) => {
-    set({ searchDate: date });
-  },
-
+  setSearchDate: (date) => set({ searchDate: date }),
   setStatusFilter: (status) => set({ statusFilter: status }),
-
   setDisciplineFilter: (rating) => set({ disciplineFilter: rating, dailyPage: 1 }),
 
   setDailyPage: (action, max) =>
@@ -156,42 +134,31 @@ export const useRegistryFilterStore = create<RegistryFilterState>((set, get) => 
     const { statusFilter, disciplineFilter, searchDate, dailyPage } = get();
 
     if (mode === 'DAILY') {
-      // ── وضع DAILY: أسطر مُبسَّطة لكل يوم مع فلتر الحالة ──────
       const rows: DailyEmployeeRow[] = [];
-      let result :DailyEmployeeRow[] = [];
       for (const entry of data) {
         rows.push(...extractDailyRows(entry, statusFilter, searchDate));
       }
-      
-      const totalItems = rows.length;
-      const limit = pagination?.limitDash||5;
-      const totalPagesFiltered = Math.ceil(totalItems / limit) || 1;
-      
-      // Ensure dailyPage doesn't exceed new max
-      const validPage = Math.min(dailyPage, totalPagesFiltered);
-       if (validPage !== dailyPage) {
-        set({ dailyPage: validPage });
-         }
-     
-       result = rows.slice((validPage - 1) * limit, validPage * limit);
 
-      // فلتر التاريخ (اختياري) — نُبقي فقط الموظفين الذين لهم سجل في ذلك التاريخ
+      const totalItems = rows.length;
+      const limit = pagination?.limitDash || 5;
+      const totalPagesFiltered = Math.ceil(totalItems / limit) || 1;
+
+      const validPage = Math.min(dailyPage, totalPagesFiltered);
+      if (validPage !== dailyPage) {
+        set({ dailyPage: validPage });
+      }
+
+      let result = rows.slice((validPage - 1) * limit, validPage * limit);
 
       if (searchDate) {
-        result = result.filter((e) =>
-          e.date === searchDate);
+        result = result.filter((e) => e.date === searchDate);
       }
       set({ filteredDailyRows: result, totalPagesFiltered, filteredRegistry: [] });
     } else {
-      // ── وضع ALL / WEEKLY / MONTHLY: فلترة حسب الانضباط ─────────
       let result = [...data];
-
-      // فلتر الانضباط
       if (disciplineFilter !== 'ALL') {
         result = result.filter((e) => e.disciplineRating === disciplineFilter);
       }
-
-
       set({ filteredRegistry: result, filteredDailyRows: [], totalPagesFiltered: 1 });
     }
   },

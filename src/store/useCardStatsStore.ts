@@ -1,12 +1,18 @@
 import { create } from 'zustand';
 import { API } from '../services/apiClient';
-import { AggregatedMetrics, DashboardMeta, RegistryEntry } from '../types/dashboard-registry.types';
-import { AxiosError } from 'axios';
+import { 
+  AggregatedMetricsOutput, 
+  DashboardMetaOutput, 
+  RegistryEntryOutput, 
+  Modes 
+} from '../types';
+import { ManagingErrorCatch } from '../services/errorHandler';
+import { globalCache, createSecureCacheKey } from '../utils/cacheManager';
 
 interface FetchParams {
-  mode: string;
-  page?: string;
-  limit?: string;
+  mode: Modes;
+  page?: string | number;
+  limit?: string | number;
   dateAnchor?: string;
   startDate?: string;
   endDate?: string;
@@ -15,17 +21,17 @@ interface FetchParams {
 }
 
 interface CardStatsState {
-  meta: DashboardMeta | null;
-  metrics: AggregatedMetrics | null;
-  registry: RegistryEntry[];
+  meta: DashboardMetaOutput | null;
+  metrics: AggregatedMetricsOutput | null;
+  registry: RegistryEntryOutput[];
   isLoading: boolean;
   error: string | null;
-  modalRegistry: RegistryEntry[];
+  modalRegistry: RegistryEntryOutput[];
   modalIsLoading: boolean;
 
   fetchCardMetrics: (params: FetchParams) => Promise<void>;
   fetchModalRegistry: (params: FetchParams) => Promise<void>;
-  setLivePulseData: (data: Partial<AggregatedMetrics>) => void;
+  setLivePulseData: (data: Partial<AggregatedMetricsOutput>) => void;
 }
 
 export const useCardStatsStore = create<CardStatsState>((set) => ({
@@ -38,55 +44,98 @@ export const useCardStatsStore = create<CardStatsState>((set) => ({
   modalIsLoading: false,
 
   fetchCardMetrics: async (params) => {
+    const cacheKey = createSecureCacheKey('card_stats_metrics', {
+      mode: params.mode,
+      dateAnchor: params.dateAnchor,
+      page: params.page,
+      status: params.status,
+    });
+
+    const cached = globalCache.get<{
+      meta: DashboardMetaOutput;
+      metrics: AggregatedMetricsOutput;
+      registry: RegistryEntryOutput[];
+    }>(cacheKey);
+
+    if (cached) {
+      set({
+        meta: cached.meta,
+        metrics: cached.metrics,
+        registry: cached.registry,
+        isLoading: false,
+      });
+      return;
+    }
+
     set({ isLoading: true, error: null });
     try {
-      const response = await API.managing.getDashboardRegistry(params);
+      const response = await API.managing.getDashboardRegistry(params as any);
       const { meta, aggregatedMetrics, registry } = response.data;
       
-      set({ 
+      const payload = {
         meta: meta ?? null,
-        metrics: aggregatedMetrics ?? null, 
+        metrics: aggregatedMetrics ?? null,
         registry: registry ?? [],
+      };
+
+      globalCache.set(cacheKey, payload, 'managing', 5);
+
+      set({ 
+        ...payload,
         isLoading: false 
       });
     } catch (err: unknown) {
-      let message = 'فشل في جلب بيانات لوحة التحكم';
-      
-      if (err instanceof AxiosError) {
-        if (err.response?.status === 401) {
-          message = 'غير مصرّح: يجب تسجيل الدخول أولاً بحساب مدير (SUPER_ADMIN)';
-        } else if (err.response?.status === 403) {
-          message = 'ممنوع: لا تملك صلاحية الوصول لهذه البيانات';
-        } else if (err.code === 'ERR_NETWORK') {
-          message = 'لا يمكن الاتصال بالخادم — تأكد من تشغيل الباك-إند على المنفذ 3030';
-        } else {
-          message = err.response?.data?.message || err.message;
-        }
-      } else if (err instanceof Error) {
-        message = err.message;
-      }
-      
-      set({ error: message, isLoading: false });
+      const formattedError = ManagingErrorCatch.dashboard(err);
+      const stale = globalCache.getStale<{
+        meta: DashboardMetaOutput;
+        metrics: AggregatedMetricsOutput;
+        registry: RegistryEntryOutput[];
+      }>(cacheKey);
+
+      set({ 
+        meta: stale?.meta || null,
+        metrics: stale?.metrics || null,
+        registry: stale?.registry || [],
+        error: formattedError.userFriendlyMessage, 
+        isLoading: false 
+      });
     }
   },
 
   fetchModalRegistry: async (params) => {
+    const cacheKey = createSecureCacheKey('card_stats_modal', {
+      mode: params.mode,
+      dateAnchor: params.dateAnchor,
+      status: params.status,
+      limit: params.limit,
+    });
+
+    const cached = globalCache.get<RegistryEntryOutput[]>(cacheKey);
+    if (cached) {
+      set({ modalRegistry: cached, modalIsLoading: false });
+      return;
+    }
+
     set({ modalIsLoading: true, error: null });
     try {
-      const response = await API.managing.getDashboardRegistry(params);
+      const response = await API.managing.getDashboardRegistry(params as any);
       const { registry } = response.data;
+      const list = registry ?? [];
+
+      globalCache.set(cacheKey, list, 'managing', 5);
+
       set({ 
-        modalRegistry: registry ?? [],
+        modalRegistry: list,
         modalIsLoading: false 
       });
     } catch (err: unknown) {
-      let message = 'فشل في جلب سجلات الموظفين للبطاقة';
-      if (err instanceof AxiosError) {
-        message = err.response?.data?.message || err.message;
-      } else if (err instanceof Error) {
-        message = err.message;
-      }
-      set({ error: message, modalIsLoading: false });
+      const formattedError = ManagingErrorCatch.dashboard(err);
+      const stale = globalCache.getStale<RegistryEntryOutput[]>(cacheKey);
+      set({ 
+        modalRegistry: stale || [],
+        error: formattedError.userFriendlyMessage, 
+        modalIsLoading: false 
+      });
     }
   },
 
