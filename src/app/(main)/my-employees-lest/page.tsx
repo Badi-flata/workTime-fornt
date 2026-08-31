@@ -8,7 +8,9 @@ import {
   Search, 
   Download,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  AlertCircle,
+  X
 } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { API } from '@/services/apiClient';
@@ -33,6 +35,7 @@ export default function EmployeesDirectoryPage() {
     errorMessage ,successMessage,
     // filter actions
      setSearchDate,setPeriodMode,setSearchQuery,
+     closeMessage,
     // data actions
     fetchMyEmployee  , applyEmployee , fetchEmployeeAttendanceReport
    } = useEmployeeRecordStore();
@@ -71,6 +74,16 @@ export default function EmployeesDirectoryPage() {
 
     setTablePage(1); // Reset table page to 1 on filter/employee change
   }, [selectedEmployee, periodMode, searchDate]);
+
+   // Auto clear message after 5 seconds
+    useEffect(() => {
+      if (successMessage || errorMessage) {
+        const timer = setTimeout(() => {
+          closeMessage();
+        }, 5000);
+        return () => clearTimeout(timer);
+      }
+    }, [successMessage, errorMessage, closeMessage]);
 
   // Sidebar Filter logic
   const filteredEmployees = useMemo(() => {
@@ -204,6 +217,32 @@ const handlerApply= (userId:string)=>{
   return (
     <div className="max-w-container-max mx-auto mb-11 pb-3 space-y-6" dir="rtl">
       
+        {/* Notifications Banner */}
+                <AnimatePresence>
+                  {(errorMessage || errorMessage ) && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className={`"mb-6 p-4 rounded-xl z-99 mx-[8%]  max-md:mx-[18%]  absolute w-[50%] ${errorMessage  ? 'bg-red-50 border border-red-200 text-red-800' :
+                         'bg-emerald-50 border border-emerald-200 text-emerald-800'} flex items-center justify-between shadow-sm`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full ${errorMessage ? 'bg-red-500' : 'bg-emerald-500'} text-white flex items-center justify-center shrink-0`}>
+                          <AlertCircle className="w-5 h-5" />
+                        </div>
+                        <span className="font-semibold text-sm">{successMessage || errorMessage }</span>
+                      </div>
+                      <button
+                        onClick={() => { closeMessage(); }}
+                        className={`text-${errorMessage  ? 'text-red-600' : 'text-emerald-600'} hover:${errorMessage  ? 'text-red-600' : 'text-emerald-600'} transition-colors p-1 cursor-pointer`}
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
       {/* Page Header (Lined breadcrumb style) */}
       <div className="border-b border-outline-variant/20 pb-4">
         <h2 className="font-heading text-[32px] font-bold text-primary tracking-tight">سجل الحضور للموظفين</h2>
