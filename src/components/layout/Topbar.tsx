@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { Bell, Search, ChevronDown, Menu, X, Settings, LogOut, ChevronUp, ArrowLeft } from 'lucide-react';
+import { Bell, Search, ChevronDown, Menu, X, Settings, LogOut, ChevronUp, ArrowLeft, User } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import clsx from 'clsx';
@@ -18,12 +18,15 @@ export function Topbar() {
   const router = useRouter();
   const { user, logout, initializeAuth } = useAuthStore();
   const { quickResults, isQuickLoading,setSearchQuery, quickSearchTopBar, openEmployeeCard } = useDirectoryStore();
-
+  
+  
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const profileContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -37,11 +40,14 @@ export function Topbar() {
     setIsSearchOpen(false);
   }, [pathname]);
 
-  // Close search popover when clicking outside
+  // Close search and profile popovers when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
         setIsSearchOpen(false);
+      }
+      if (profileContainerRef.current && !profileContainerRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -71,6 +77,10 @@ export function Topbar() {
     setIsSearchOpen(false);
     router.push(`/searsh?q=${encodeURIComponent(searchTerm.trim())}`);
   };
+
+
+  const userRole = user?.role ? user?.role : "EMPLOYEE"
+  const navItem = navSections.find((section) => section.role === userRole)?.screens;
 
   return (
     <header className="h-16 bg-white border-b shadow border-outline/15 flex items-center justify-between px-6 font-sans shrink-0 relative z-30">
@@ -176,22 +186,23 @@ export function Topbar() {
           </AnimatePresence>
         </div>
 
-        {/* Notifications */}
-        <button className="relative p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">
-          <Bell size={20} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
-        </button>
+       
 
         {/* Profile */}
-        <div className="flex items-center gap-3 border-r max-[400px]:hidden border-outline/20 pr-4 mr-2">
-          <UserAvatar
-            src={user?.avatar}
-            name={user?.name}
-            size={36}
-          />
-          <div className="text-right hidden lg:block select-none">
-            <p className="text-sm font-semibold text-on-surface leading-tight">{user?.name || 'مستخدم'}</p>
-            <p className="text-xs text-on-surface-variant">{user?.role || '---'}</p>
+        <div ref={profileContainerRef} className="relative flex items-center gap-3 border-r max-[400px]:hidden border-outline/20 pr-4 mr-2">
+          <div 
+            onClick={() => setIsProfileOpen((prev) => !prev)}
+            className="flex items-center gap-2 cursor-pointer select-none"
+          >
+            <UserAvatar
+              src={user?.avatar}
+              name={user?.name}
+              size={36}
+            />
+            <div className="text-right hidden lg:block select-none">
+              <p className="text-sm font-semibold text-on-surface leading-tight">{user?.name || 'مستخدم'}</p>
+              <p className="text-[10px] text-primary font-bold mt-0.5">{user?.role === 'SUPER_ADMIN' ? 'مسؤول النظام' : user?.role === 'MANAGER' ? 'مدير' : 'موظف'}</p>
+            </div>
           </div>
           {isProfileOpen ? (
             <ChevronUp
@@ -206,23 +217,68 @@ export function Topbar() {
               className="text-on-surface-variant relative hover:bg-on-surface-variant rounded-full hover:text-surface transition-all cursor-pointer"
             />
           )}
+
+          {/* Profile Dropdown Popover Card */}
           <AnimatePresence>
             {isProfileOpen && (
               <motion.div
-                initial={{ opacity: 0, y: -12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
-                className="absolute top-full left-10 mt-2 z-50 w-auto bg-white/95 dark:bg-surface-container-lowest/95 
-                       backdrop-blur-md rounded-2xl shadow-xl border border-outline/15 p-4 overflow-y-auto max-md:max-h-[calc(100vh-80px)] flex-1 flex-col space-y-4"
+                initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                transition={{ duration: 0.2 }}
+                className="absolute left-0 top-full mt-2 w-72 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-outline-variant/30 p-4 z-50 text-right overflow-hidden flex flex-col gap-4 animate-none"
               >
-                {/* logOut */}
-                <button onClick={() => { setIsProfileOpen(false); logout(); }} className="pt-2 border-outline/10 flex items-center gap-2">
-                  <div className="px-3 text-surface-container-high bg-red-700 rounded-2xl py-3">
-                    <LogOut size={20} className="shrink-0" />
+                {/* User Card Info */}
+                <div className="flex items-center gap-3.5 pb-3 border-b border-outline-variant/15">
+                  <UserAvatar
+                    src={user?.avatar}
+                    name={user?.name}
+                    size={48}
+                    className="border border-primary/10 shadow-sm"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-on-surface truncate leading-snug">{user?.name || 'مستخدم النظام'}</p>
+                    <span className="inline-flex items-center px-2 py-0.5 mt-1 rounded text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">
+                      {user?.role === 'SUPER_ADMIN' ? 'مسؤول نظام' : user?.role === 'MANAGER' ? 'مدير' : 'موظف'}
+                    </span>
                   </div>
-                  <span>تسجيل الخروج</span>
-                </button>  
+                </div>
+
+                {/* Quick Links */}
+                <div className="flex flex-col gap-1 text-xs">
+                  <Link
+                    href="/my-profile"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all font-medium"
+                  >
+                    <User size={15} className="text-primary" />
+                    <span>عرض الملف الشخصي</span>
+                  </Link>
+                  
+                  <Link
+                    href="/settings"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all font-medium"
+                  >
+                    <Settings size={15} className="text-primary" />
+                    <span>إعدادات الحساب</span>
+                  </Link>
+                </div>
+
+                {/* Danger zone actions */}
+                <div className="pt-2 border-t border-outline-variant/15 flex flex-col">
+                  <button
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      logout();
+                      router.push('/login');
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-error hover:bg-error/5 transition-all text-xs font-bold cursor-pointer"
+                  >
+                    <LogOut size={15} />
+                    <span>تسجيل الخروج</span>
+                  </button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -240,7 +296,7 @@ export function Topbar() {
             className="absolute top-full right-4 left-4 mt-2 z-50 bg-white/95 dark:bg-surface-container-lowest/95 
                        backdrop-blur-md rounded-2xl shadow-xl border border-outline/15 p-4 md:hidden overflow-y-auto max-h-[calc(100vh-80px)] flex flex-col space-y-4"
           >
-            {navSections.map((section) => (
+            {navItem?.map((section) => (
               <div key={section.label} className="space-y-1.5">
                 <p className="px-3 text-[10px] font-label font-bold text-on-surface-variant/50 uppercase tracking-wider select-none">
                   {section.label}
