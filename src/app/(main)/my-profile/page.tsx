@@ -277,28 +277,6 @@ export default function EmployeeProfilePage() {
         <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin-desktop px-3 md:px-5 pb-8 md:pb-10">
           {/* Notifications Banner */}
           <AnimatePresence>
-            {updateSuccessMessage && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-between shadow-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
-                    <Check className="w-5 h-5" />
-                  </div>
-                  <span className="font-semibold text-sm">{updateSuccessMessage}</span>
-                </div>
-                <button
-                  onClick={() => clearMessages()}
-                  className="text-emerald-600 hover:text-emerald-900 transition-colors p-1 cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </motion.div>
-            )}
-
             {(error || formError || updateSuccessMessage) && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}

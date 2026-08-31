@@ -4,7 +4,7 @@ import { UserAvatar } from '@/components/ui/UserAvatar';
 import { useEmployeeRecordStore } from '@/store/useEmployeeRecordStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Download, LayoutDashboard } from 'lucide-react';
+import { AlertCircle, ChevronLeft, ChevronRight, Download, LayoutDashboard, X } from 'lucide-react';
 import { useEmployeeDashboardStore } from '@/store/useEmployeeDashboardStore';
 import { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
@@ -103,6 +103,17 @@ export default function EmployeeDashboardPage() {
    // setTotalDays(filt.length)
    return filt;
  }, [daysLog, searchQueryDate ]);
+
+  // Auto clear message after 5 seconds
+  useEffect(() => {
+    if (messageSuccessd || error  ) {
+      const timer = setTimeout(() => {
+        clearMessages();
+       
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [messageSuccessd, error, clearMessages ]);
 
  // Table Filtering logic based on searchDate & statusFilter
  const filteredRecords = useMemo(() => {
@@ -218,6 +229,32 @@ export default function EmployeeDashboardPage() {
       className="space-y-8 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
     >
       
+  {/* Notifications Banner */}
+          <AnimatePresence>
+            {(error  ||  messageSuccessd) && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className={`"mb-6 p-4 rounded-xl z-99 mx-[8%]  max-md:mx-[18%]  absolute w-[50%] ${error  ? 'bg-red-50 border border-red-200 text-red-800' :
+                   'bg-emerald-50 border border-emerald-200 text-emerald-800'} flex items-center justify-between shadow-sm`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full ${error  ? 'bg-red-500' : 'bg-emerald-500'} text-white flex items-center justify-center shrink-0`}>
+                    <AlertCircle className="w-5 h-5" />
+                  </div>
+                  <span className="font-semibold text-sm">{error ||  messageSuccessd}</span>
+                </div>
+                <button
+                  onClick={() => {  clearMessages(); }}
+                  className={`text-${error  ? 'text-red-600' : 'text-emerald-600'} hover:${error  ? 'text-red-600' : 'text-emerald-600'} transition-colors p-1 cursor-pointer`}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
       {/* Header Section */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-outline-variant/20 pb-6">
         <div>

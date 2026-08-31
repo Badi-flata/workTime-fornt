@@ -13,18 +13,19 @@ interface AuthGuardProps {
 const ROLE_ROUTES: Record<string, string[]> = {
   // Routes restricted to admins/managers only
   ADMIN_ONLY: [
-    '/dashboard',
-    '/employees',
+   
+    '/my-employee-lest',
     '/departments',
-    '/live-pulse'
+    '/manager-dashboard'
   ],
   // Routes restricted to employees only
   EMPLOYEE_ONLY: [
-    '/employee-dashboard'
+    '/employee-dashboard',
+    "/attendance-departuer-check",
   ]
 };
 
-const PUBLIC_ROUTES = ['/login', '/signup'];
+const PUBLIC_ROUTES = ['/login', '/signup',"/my-profile","/searsh"];
 
 export function AuthGuard({ children }: AuthGuardProps) {
   const { isAuthenticated, user, initializeAuth } = useAuthStore();
@@ -61,7 +62,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     // If visiting login/signup or the root page, redirect to their home page
     if (isAuthenticated && (isPublicRoute || pathname === '/')) {
       if (role === 'SUPER_ADMIN' || role === 'MANAGER') {
-        router.replace('/dashboard');
+        router.replace('/manager-dashboard');
       } else if (role === 'EMPLOYEE') {
         router.replace('/employee-dashboard');
       }

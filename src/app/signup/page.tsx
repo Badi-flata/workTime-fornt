@@ -38,11 +38,7 @@ export default function SignUpPage() {
  
   }, [initializeAuth]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/dashboard');
-    }
-  }, [isAuthenticated, router]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     if(!name && name ===''){
@@ -118,7 +114,11 @@ export default function SignUpPage() {
         token
       );
 
-      router.replace('/dashboard');
+      if(user.role === "MANAGER" || user.role === "SUPER_ADMIN"){
+        router.replace('/manager-dashboard');
+      }else{
+        router.replace('/employee-dashboard');
+      }
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string } } };
       setError(

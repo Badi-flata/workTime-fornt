@@ -42,6 +42,7 @@ export interface EmployeeRecordStore {
 
   // Data actions
   fetchMyEmployee: () => Promise<void>;
+  closeMessage :()=> void
   fetchEmployeeAttendanceReport: (dateAnchor: string, mode: 'WEEKLY' | 'MONTHLY', employeeId: string) => Promise<void>;
   applyEmployee: (emplo: EmployeeProfileOutput) => void;
 }
@@ -66,6 +67,7 @@ export const useEmployeeRecordStore = create<EmployeeRecordStore>((set, get) => 
   setSearchDate: (date) => set({ searchDate: date }),
   setPeriodMode: (mode) => set({ periodMode: mode }),
   setSearchQuery: (query) => set({ searchQuery: query }),
+  closeMessage: () => set({ successMessage: null, errorMessage: null }),
 
   fetchMyEmployee: async () => {
     const cacheKey = createSecureCacheKey('managing_subordinates', {});

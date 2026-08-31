@@ -104,7 +104,7 @@ export default function AttendanceReportsPage() {
     
  // ── get employees Ids to select  for SUPER_ADMIN ───────────────────────────────────────────────────────────
     
-    const targetEmployeeId =  role && employeeIds && employeeIds.length > 0 ? employeeIds[2] : (user?.id || "") ;
+    const targetEmployeeId =  role && employeeIds && employeeIds.length > 0 ? employeeIds[0] : (user?.id || "") ;
    
   useEffect(() => {
     if (role && targetEmployeeId) {

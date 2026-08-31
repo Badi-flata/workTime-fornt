@@ -22,11 +22,7 @@ export default function LoginPage() {
     initializeAuth();
   }, [initializeAuth]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/dashboard');
-    }
-  }, [isAuthenticated, router]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,8 +45,11 @@ export default function LoginPage() {
         },
         token
       );
-
-      router.replace('/dashboard');
+      if(user.role === "MANAGER" || user.role === "SUPER_ADMIN"){
+        router.replace('/manager-dashboard');
+      }else{
+        router.replace('/employee-dashboard');
+      }
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string } } };
       setError(
