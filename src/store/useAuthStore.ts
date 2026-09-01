@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { globalCache } from '@/utils/cacheManager';
 
 interface AuthUser {
   id: string;
@@ -38,10 +39,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: () => {
     if (typeof window !== 'undefined') {
-      // localStorage.removeItem('token');
-      // localStorage.removeItem('user');
-      localStorage.clear()
+      localStorage.clear();
     }
+    globalCache.clear();
     set({ user: null, token: null, isAuthenticated: false });
   },
 
@@ -52,12 +52,26 @@ export const useAuthStore = create<AuthState>((set) => ({
       
       if (token && userStr) {
         try {
+          // التحقق من صلاحية الـ Token وعدم انتهائه
+          const payloadBase64 = token.split('.')[1];
+          if (payloadBase64) {
+            const payload = JSON.parse(atob(payloadBase64));
+            if (payload.exp && payload.exp * 1000 < Date.now()) {
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              globalCache.clear();
+              set({ user: null, token: null, isAuthenticated: false });
+              return;
+            }
+          }
+
           const user = JSON.parse(userStr) as AuthUser;
           set({ user, token, isAuthenticated: true });
         } catch {
           // بيانات تالفة في localStorage - تنظيف وإعادة التوجيه لتسجيل الدخول
           localStorage.removeItem('token');
           localStorage.removeItem('user');
+          globalCache.clear();
           set({ user: null, token: null, isAuthenticated: false });
         }
       } else {

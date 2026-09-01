@@ -110,7 +110,7 @@ export default function AttendanceReportsPage() {
     if (role && targetEmployeeId) {
       fetchSourceData(targetEmployeeId, dateAnchor);
     } else if (!role) {
-      fetchSourceData(undefined, dateAnchor);
+      fetchSourceData(dateAnchor);
     }
    
   }, [fetchSourceData, setDateAnchor, role, targetEmployeeId, dateAnchor]);

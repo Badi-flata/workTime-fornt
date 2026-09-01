@@ -255,22 +255,9 @@ export function Sidebar() {
           <Settings size={18} className="shrink-0" />
           {!isSidebarCollapsed && <span>الإعدادات</span>}
         </Link>
-        {/* logout */}
+
           
-            {!isSidebarCollapsed  && (
-              <div
-                className={`${ isSidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'} top-full left-10 mt-2 z-50 w-auto bg-white/95 dark:bg-surface-container-lowest/95 
-                       backdrop-blur-md rounded-2xl shadow-xl border border-outline/15 p-4 overflow-y-auto max-md:max-h-[calc(100vh-80px)] flex-1 flex-col space-y-4`}
-              >
-                {/* logOut */}
-                <button onClick={() => {logout(); }} className="pt-2 border-outline/10 flex items-center gap-2">
-                  <div className="px-3 text-surface-container-high bg-red-700 rounded-2xl py-3">
-                    <LogOut size={20} className="shrink-0" />
-                  </div>
-                  <span>تسجيل الخروج</span>
-                </button>  
-              </div>
-            )}
+           
          
       </div>
     </aside>

@@ -156,8 +156,8 @@ export const useCheckAttendStore = create<CheckAttendState>((set, get) => ({
     }
   },
 
-  fetchSourceData: async (employeeId?: string, date?: string) => {
-    const cacheKey = createSecureCacheKey('attendance_source', { employeeId, date });
+  fetchSourceData: async ( date?: string,employeeId?: string) => {
+    const cacheKey = createSecureCacheKey('attendance_source', {  date,employeeId });
     const cached = globalCache.get<MainSourceData>(cacheKey);
     if (cached) {
       set({ mainSourceData: cached });
@@ -166,7 +166,7 @@ export const useCheckAttendStore = create<CheckAttendState>((set, get) => ({
 
     set({ isLoading: true, error: null });
     try {
-      const res = await API.attendance.fetchSourceData({ employeeId, date });
+      const res = await API.attendance.fetchSourceData({ date, employeeId });
       const data = res.data;
       if (data) {
         globalCache.set(cacheKey, data, 'attendance', 5);

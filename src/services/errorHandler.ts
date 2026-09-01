@@ -187,7 +187,7 @@ export const DepartmentErrorCatch = {
     return handleApiError(err, 'تعذر جلب قائمة أسماء الأقسام.');
   },
   addWorker: (err: unknown): FormattedApiError => {
-    return handleApiError(err, ' تعذر إضاقة الموظف في الأقسام. ');
+    return handleApiError(err, 'تعذر إضافة الموظف في الأقسام.');
   },
   truneToDepartment: (err: unknown): FormattedApiError => {
     return handleApiError(err, 'تعذر نقل الموظف من الأقسام.');

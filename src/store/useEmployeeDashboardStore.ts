@@ -71,17 +71,18 @@ setFiltersMode: (mode) => {
   },
 
   fetchDashboardEmployee: async (mode ,dateAnchor,employeeId) => {
-
     set({ isLoading: true, error: '' });
 
-    const cacheKey = createSecureCacheKey('emp_dash', {});
+    const cacheKey = createSecureCacheKey('emp_dash', {
+      mode: mode || 'DEFAULT',
+      dateAnchor: dateAnchor || 'DEFAULT',
+      employeeId: employeeId || 'self'
+    });
     
-    if ( !mode && !dateAnchor && !employeeId) {
-      const cached = globalCache.get<any>(cacheKey);
-      if (cached) {
-        set({ ...cached, isLoading: false });
-        return;
-      }
+    const cached = globalCache.get<any>(cacheKey);
+    if (cached) {
+      set({ ...cached, isLoading: false });
+      return;
     }
 
     try {

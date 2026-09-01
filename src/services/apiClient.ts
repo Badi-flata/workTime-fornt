@@ -29,22 +29,19 @@ import {
 } from '../types';
 import { useAuthStore } from '../store/useAuthStore';
 
-const API_URL = "http://localhost:3030";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3030";
   
 export const apiClient = axios.create({
   baseURL: API_URL,
 });
 
-// Temporary dev token for seamless frontend testing
-const DEV_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ij8_Pz8gPz8_Pz8_PyIsInVzZXJJZCI6IjcxYzA2NThhLTk5NWMtNDA0My05N2I1LWJlMWY5Yzc0NjRkOCIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc4MDU4OTAyMiwiZXhwIjoxNzgzMTgxMDIyfQ.uMTHLvZWJqIeDj32YldQBS5_-Rw-dqPriaIC_rQH-hw";
-
 // Request Interceptor for Auth Token
 apiClient.interceptors.request.use((config) => {
-  const storeToken = typeof window !== 'undefined' ? useAuthStore.getState().token : null;
-  const token = storeToken || DEV_TOKEN;
-  
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (typeof window !== 'undefined') {
+    const token = useAuthStore.getState().token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 });

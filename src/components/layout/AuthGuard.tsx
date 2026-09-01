@@ -25,7 +25,7 @@ const ROLE_ROUTES: Record<string, string[]> = {
   ]
 };
 
-const PUBLIC_ROUTES = ['/login', '/signup',"/my-profile","/searsh"];
+const PUBLIC_ROUTES = ['/login', '/signup', "/my-profile", "/search"];
 
 export function AuthGuard({ children }: AuthGuardProps) {
   const { isAuthenticated, user, initializeAuth } = useAuthStore();
@@ -40,7 +40,6 @@ export function AuthGuard({ children }: AuthGuardProps) {
     setLoading(false);
   }, [initializeAuth]);
 
- console.log("isAuth",isAuthenticated)
   useEffect(() => {
     if (loading) return;
 
@@ -202,14 +201,14 @@ export function AuthGuard({ children }: AuthGuardProps) {
         </div>
         <h2 className="text-2xl font-heading font-extrabold text-[#c5221f] mb-2">غير مصرح بالوصول</h2>
         <p className="text-slate-600 font-sans max-w-sm mb-8 leading-relaxed">
-          عذراً، يرجى تسجيل الدخول اولاً للوصول إلى اي الصفح.
+          عذراً، يرجى تسجيل الدخول أولاً للوصول إلى أي صفحة.
         </p>
         <button
           onClick={() => router.replace('/login')}
           className="flex items-center gap-2 px-6 py-3 bg-[#1b7550] hover:bg-[#165f41] text-white rounded-xl font-sans font-bold shadow-md transition-all duration-200"
         >
           <Home size={18} />
-          <span>الذهب الى صفحة تسجيل الدخول</span>
+          <span>الذهاب إلى صفحة تسجيل الدخول</span>
         </button>
       </div>
     );

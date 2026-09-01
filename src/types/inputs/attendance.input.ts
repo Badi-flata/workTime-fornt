@@ -35,6 +35,6 @@ export interface SubmitExcuseInput {
 }
 
 export interface AttendanceSourceParams {
-  employeeId?: string;
   date?: string;
+   employeeId?: string;
 }

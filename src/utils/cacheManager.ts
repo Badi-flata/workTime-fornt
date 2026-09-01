@@ -37,15 +37,23 @@ export function createSecureCacheKey(
 
 class CacheManager {
   private cache = new Map<string, CacheEntry<unknown>>();
+  private readonly MAX_SIZE = 250;
 
   /**
-   * Store data in cache.
+   * Store data in cache with memory safety limit and LRU eviction.
    * @param key Generated cache key
    * @param data Payload to store
    * @param tag Category tag for batch invalidation (e.g. 'attendance', 'managing', 'profile')
    * @param ttlMinutes Duration in minutes before expiry (default 5 min)
    */
   set<T>(key: string, data: T, tag = 'general', ttlMinutes = 5): void {
+    if (this.cache.size >= this.MAX_SIZE && !this.cache.has(key)) {
+      const oldestKey = this.cache.keys().next().value;
+      if (oldestKey) {
+        this.cache.delete(oldestKey);
+      }
+    }
+
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
