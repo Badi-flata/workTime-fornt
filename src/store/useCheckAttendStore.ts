@@ -45,6 +45,11 @@ interface AttendanceMetrics {
     lateMinutes?: number;
     earlyLeaveMinutes?: number;
   };
+  dailyMetrics?: {
+    totalWorkHours: number;
+    lateMinutes?: number;
+    earlyLeaveMinutes?: number;
+  };
   periodSummary?: AttendanceSummaryOutput;
   days?: DailyBreakdownOutput[];
 }
@@ -53,6 +58,7 @@ export interface CheckAttendState {
   mainSourceData: MainSourceData | null;
   checkValue: CheckValue | null;
   matercis: AttendanceMetrics | null;
+  metrics?: AttendanceMetrics | null;
   message?: string;
   activeTab: Modes;
   dateAnchor: string;

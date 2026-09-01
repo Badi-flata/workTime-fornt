@@ -46,16 +46,81 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Response Interceptor — معالجة 401 تلقائياً
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (token: string) => void;
+  reject: (error: any) => void;
+}> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else if (token) {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+// Response Interceptor — معالجة 401 والتجديد الصامت للتوكن مع تحرير الطلبات (Request Queue)
 apiClient.interceptors.response.use(
   (response) => (response.data.timestamp ? response.data : response),
-  (error) => {
-    if (error.response?.status === 401) {
-      // تنظيف حالة المصادقة وإعادة التوجيه لتسجيل الدخول
-      if (typeof window !== 'undefined') {
-        useAuthStore.getState().logout();
+  async (error) => {
+    const originalRequest = error.config;
+
+    // إذا كان الخطأ 401 والطلب لم تتم محاولة تجديده مسبقاً
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/users/loginIn') && !originalRequest.url?.includes('/users/refresh-token')) {
+      if (isRefreshing) {
+        // تعليق الطلب في الطابور لحين انتهاء عملية التجديد
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return apiClient(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
+
+      if (!refreshToken) {
+        if (typeof window !== 'undefined') useAuthStore.getState().logout();
+        isRefreshing = false;
+        return Promise.reject(error);
+      }
+
+      try {
+        const res = await axios.post(`${API_URL}/users/refresh-token`, { refresh_token: refreshToken });
+        const data = res.data?.data || res.data;
+        const newAccessToken = data.access_token;
+        const newRefreshToken = data.refresh_token;
+
+        if (typeof window !== 'undefined') {
+          useAuthStore.getState().setTokens(newAccessToken, newRefreshToken);
+        }
+
+        apiClient.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+        processQueue(null, newAccessToken);
+        isRefreshing = false;
+
+        return apiClient(originalRequest);
+      } catch (refreshErr) {
+        processQueue(refreshErr, null);
+        isRefreshing = false;
+        if (typeof window !== 'undefined') {
+          useAuthStore.getState().logout();
+        }
+        return Promise.reject(refreshErr);
       }
     }
+
     return Promise.reject(error);
   }
 );
@@ -149,6 +214,14 @@ export const API = {
     approveExcuse: (id: string) => apiClient.post(`/managing/approve-excuse/${id}`),
     autoCheckout: () => apiClient.post('/managing/auto-check'),
     salaryDeduction: (employeeId: string) => apiClient.post(`/managing/salary-deduction/${employeeId}`),
+    getSettings: () => apiClient.get('/managing/settings'),
+    updateSettings: (data: {
+      autoCheckoutEnabled?: boolean;
+      dailyDeductionEnabled?: boolean;
+      delayDeductionEnabled?: boolean;
+      earlyLeaveDeductionEnabled?: boolean;
+      deductDelayImmediately?: boolean;
+    }) => apiClient.patch('/managing/settings', data),
   },
 
   // 🏢 Department & Shifts APIs (Unified)

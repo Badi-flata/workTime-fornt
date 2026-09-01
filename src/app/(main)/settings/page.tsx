@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Settings, 
@@ -38,11 +38,55 @@ export default function SettingsPage() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Mockup settings state
+  // Manager automation settings state
   const [dailyAutoCheck, setDailyAutoCheck] = useState(true);
   const [dailyDeduction, setDailyDeduction] = useState(true);
+  const [delayDeduction, setDelayDeduction] = useState(true);
+  const [earlyLeaveDeduction, setEarlyLeaveDeduction] = useState(true);
+  const [isLoadingSettings, setIsLoadingSettings] = useState(false);
 
   const isManagerOrAdmin = user?.role === 'MANAGER' || user?.role === 'SUPER_ADMIN';
+
+  // Fetch Manager Settings on Mount
+  useEffect(() => {
+    if (isManagerOrAdmin) {
+      setIsLoadingSettings(true);
+      API.managing.getSettings()
+        .then((res: any) => {
+          const settings = res.data?.data || res.data;
+          if (settings) {
+            setDailyAutoCheck(settings.autoCheckoutEnabled !== false);
+            setDailyDeduction(settings.dailyDeductionEnabled !== false);
+            setDelayDeduction(settings.delayDeductionEnabled !== false);
+            setEarlyLeaveDeduction(settings.earlyLeaveDeductionEnabled !== false);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setIsLoadingSettings(false));
+    }
+  }, [isManagerOrAdmin]);
+
+  // Handle Switch Toggle & Auto Save
+  const handleToggleSetting = async (key: string, value: boolean) => {
+    if (key === 'autoCheckout') setDailyAutoCheck(value);
+    if (key === 'dailyDeduction') setDailyDeduction(value);
+    if (key === 'delayDeduction') setDelayDeduction(value);
+    if (key === 'earlyLeaveDeduction') setEarlyLeaveDeduction(value);
+
+    try {
+      await API.managing.updateSettings({
+        autoCheckoutEnabled: key === 'autoCheckout' ? value : dailyAutoCheck,
+        dailyDeductionEnabled: key === 'dailyDeduction' ? value : dailyDeduction,
+        delayDeductionEnabled: key === 'delayDeduction' ? value : delayDeduction,
+        earlyLeaveDeductionEnabled: key === 'earlyLeaveDeduction' ? value : earlyLeaveDeduction,
+      });
+      setSuccessMsg('تم حفظ تفضيلات الأتمتة والخصم بنجاح');
+      setTimeout(() => setSuccessMsg(null), 3000);
+    } catch {
+      setErrorMsg('تعذر حفظ الإعدادات، يرجى المحاولة لاحقاً');
+      setTimeout(() => setErrorMsg(null), 4000);
+    }
+  };
 
   // Copy User ID helper
   const handleCopyId = () => {
@@ -301,10 +345,12 @@ export default function SettingsPage() {
                   <div className="flex justify-between items-start">
                     <h5 className="font-heading text-[15px] font-bold text-primary">دورة الانصراف التلقائي (Automatic Check)</h5>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">نشط تلقائياً</span>
+                      <span className="text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                        {dailyAutoCheck ? 'نشط تلقائياً' : 'معطل'}
+                      </span>
                       {/* Active switch to toggle schedule */}
                       <button 
-                        onClick={() => setDailyAutoCheck(!dailyAutoCheck)}
+                        onClick={() => handleToggleSetting('autoCheckout', !dailyAutoCheck)}
                         className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-200 focus:outline-none cursor-pointer ${
                           dailyAutoCheck ? 'bg-primary flex justify-end' : 'bg-outline-variant/70 flex justify-start'
                         }`}
@@ -314,13 +360,13 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <p className="text-xs text-on-surface-variant mt-2 leading-relaxed">
-                    تقوم هذه الدورة بفحص كافة الموظفين الذين انتهت فترات عملهم مع انتهاء فترة السماح ولم يسجلوا خروجهم، وتقوم بتسجيل انصرافهم تلقائياً لضبط حسابات الساعات.
+                    تقوم هذه الدورة بفحص كافة الموظفين الذين انتهت فترات عملهم مع انتهاء فترة السماح ولم يسجلوا خروجهم، وتحديث حالتهم والانصراف تلقائياً.
                   </p>
                 </div>
                 
                 <div className="pt-2 border-t border-outline-variant/10 flex justify-between items-center gap-3">
                   <span className="text-[10px] text-outline font-label">
-                    مجدولة يومياً: 3:00 ص بتوقيت الرياض
+                    مجدولة فور انتهاء فترة السماح لكل وردية
                   </span>
                   
                   <button
@@ -349,10 +395,12 @@ export default function SettingsPage() {
                   <div className="flex justify-between items-start">
                     <h5 className="font-heading text-[15px] font-bold text-secondary">الخصومات والاحتساب اليومي (Salary Deductions)</h5>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-semibold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full">نشط تلقائياً</span>
+                      <span className="text-[10px] font-semibold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full">
+                        {dailyDeduction ? 'نشط تلقائياً' : 'معطل'}
+                      </span>
                       {/* Active switch to toggle schedule */}
                       <button 
-                        onClick={() => setDailyDeduction(!dailyDeduction)}
+                        onClick={() => handleToggleSetting('dailyDeduction', !dailyDeduction)}
                         className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-200 focus:outline-none cursor-pointer ${
                           dailyDeduction ? 'bg-secondary flex justify-end' : 'bg-outline-variant/70 flex justify-start'
                         }`}
@@ -362,19 +410,41 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <p className="text-xs text-on-surface-variant mt-2 leading-relaxed">
-                    تقوم بحساب وتطبيق الخصومات اليومية على رواتب الموظفين المتأخرين أو الذين غادروا مبكراً، وتجميع المبالغ التراكمية في حساب الخصومات الشهري تلقائياً.
+                    تطبيق وتخصيص الخصومات اليومية على رواتب الموظفين (تأخير الحضور أو الخروج المبكر دون إذن).
                   </p>
+
+                  {/* Granular deduction controls */}
+                  <div className="mt-3 pt-3 border-t border-outline-variant/10 space-y-2 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="text-on-surface-variant font-medium">خصم التأخير عن الحضور (Late Deduction)</span>
+                      <button
+                        onClick={() => handleToggleSetting('delayDeduction', !delayDeduction)}
+                        className={`w-7 h-4 rounded-full p-0.5 transition-colors ${delayDeduction ? 'bg-primary flex justify-end' : 'bg-outline-variant/70 flex justify-start'}`}
+                      >
+                        <div className="bg-white w-3 h-3 rounded-full shadow-xs" />
+                      </button>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-on-surface-variant font-medium">خصم الانصراف المبكر والهروب (Early/Escapy)</span>
+                      <button
+                        onClick={() => handleToggleSetting('earlyLeaveDeduction', !earlyLeaveDeduction)}
+                        className={`w-7 h-4 rounded-full p-0.5 transition-colors ${earlyLeaveDeduction ? 'bg-primary flex justify-end' : 'bg-outline-variant/70 flex justify-start'}`}
+                      >
+                        <div className="bg-white w-3 h-3 rounded-full shadow-xs" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="pt-2 border-t border-outline-variant/10 flex justify-between items-center gap-3">
                   <span className="text-[10px] text-outline font-label">
-                    مجدولة يومياً: 11:30 م بتوقيت الرياض
+                    مجدولة يومياً: نهاية اليوم
                   </span>
                   
                   {/* Status Indicator */}
                   <span className="text-xs font-semibold text-secondary flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
-                    المجدول نشط
+                    {dailyDeduction ? 'المجدول نشط' : 'المجدول متوقف'}
                   </span>
                 </div>
               </div>

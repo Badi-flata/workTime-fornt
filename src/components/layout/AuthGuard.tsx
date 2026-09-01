@@ -28,28 +28,26 @@ const ROLE_ROUTES: Record<string, string[]> = {
 const PUBLIC_ROUTES = ['/login', '/signup', "/my-profile", "/search"];
 
 export function AuthGuard({ children }: AuthGuardProps) {
-  const { isAuthenticated, user, initializeAuth } = useAuthStore();
+  const { isAuthenticated, isInitialized, user, initializeAuth } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
-  const [loading, setLoading] = useState(true);
   const [hasPermission, setHasPermission] = useState(true);
 
   useEffect(() => {
-    // 1. Initialize auth status from localStorage
+    // 1. Initialize auth status from localStorage on mount
     initializeAuth();
-    setLoading(false);
   }, [initializeAuth]);
 
   useEffect(() => {
-    if (loading) return;
+    if (!isInitialized) return;
 
     const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
 
     // 2. Redirect to login if not authenticated and trying to access a protected route
     if (!isAuthenticated) {
-      if(pathname.startsWith("/signup")){
+      if (pathname.startsWith("/signup")) {
         router.replace(pathname);
-      } else {
+      } else if (!isPublicRoute && pathname !== '/') {
         router.replace('/login');
       }
       return;
@@ -79,10 +77,10 @@ export function AuthGuard({ children }: AuthGuardProps) {
       }
     }
     setHasPermission(permission);
-  }, [isAuthenticated, user, pathname, loading, router]);
+  }, [isAuthenticated, isInitialized, user, pathname, router]);
 
   // Show a premium loading screen during initial loading
-   if (loading) {
+   if (!isInitialized) {
      return (
        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-surface-container-lowest" dir="rtl">
       <div className="relative flex flex-col items-center space-y-4">
