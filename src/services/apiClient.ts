@@ -29,7 +29,29 @@ import {
 } from '../types';
 import { useAuthStore } from '../store/useAuthStore';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3030";
+// استخراج رابط الـ Backend ديناميكياً حسب وضع التشغيل (Production/Publishing vs Local Development)
+const getApiBaseUrl = (): string => {
+  const isProd =
+    process.env.NODE_ENV === 'production' ||
+    (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1');
+
+  if (isProd) {
+    return (
+      process.env.NEXT_PUBLIC_API_PUBLISH_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      'https://api.example.com'
+    );
+  }
+
+  // في وضع التطوير المحلي:
+  return (
+    process.env.NEXT_PUBLIC_API_DEV_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    'http://localhost:3030'
+  );
+};
+
+const API_URL = getApiBaseUrl();
   
 export const apiClient = axios.create({
   baseURL: API_URL,
