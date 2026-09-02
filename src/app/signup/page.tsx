@@ -10,34 +10,41 @@ import clsx from 'clsx';
 
 export default function SignUpPage() {
   const router = useRouter();
-  const { isAuthenticated, logUp, initializeAuth } = useAuthStore();
+  const {  logUp, initializeAuth } = useAuthStore();
 
   const [name, setName] = useState('');
-  const [department, setDepartment] = useState('الإدارة العامة');
+
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [role, setRole] = useState<Role>(Role.MANAGER);
+  const [role, setRole] = useState<"EMPLOYEE" | "MANAGER">("MANAGER");
   const [password, setPassword] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isAgree, setIsAgree] = useState(false);
 
   // ── Label maps ────────────────────────────────────────────────────
-  const mapRole: Record<Role, string> = {
-    [Role.EMPLOYEE]: 'موظف', 
-    [Role.MANAGER]: 'مدير', 
-    [Role.SUPER_ADMIN]: 'مدير عام',
+  const mapRole: Record<"EMPLOYEE" | "MANAGER", string> = {
+    ["EMPLOYEE"]: 'موظف', 
+    ["MANAGER"]: 'مدير', 
   };
 
   useEffect(() => {
    
     initializeAuth();
- 
   }, [initializeAuth]);
 
+  useEffect(()=> {
+  if(!message||message==='')return;
+ const time= setTimeout(()=> {
+    setMessage('');
+  },3000);
+  
+return ()=> clearTimeout(time);
+},[message]);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,31 +55,27 @@ export default function SignUpPage() {
 
       return;
     }
+
     if(!isAgree ){
      e.preventDefault();
       setLoading(false)
       setError('يرجى الموافقة على الشروط والاحكام');
       return;
     }
-    if(!department && department === ''){ 
-      e.preventDefault();
-      setLoading(false)
-      setError('يرجى اختيار القسم');
-      return;
-    }
-    if( !jobTitle && jobTitle ===''){ 
+  
+    if( !jobTitle || jobTitle ===''){ 
       e.preventDefault();
       setLoading(false)
       setError('يرجى اختيار المسمى الوظيفي');
       return;
     }
-    if( !email && email === ''){ 
+    if( !email || email === ''){ 
       e.preventDefault();
       setLoading(false)
       setError('يرجى إدخال البريد الإلكتروني');
       return;
     }
-    if( !phone && phone === ''){ 
+    if( !phone || phone === ''){ 
       e.preventDefault();
       setLoading(false)
       setError('يرجى إدخال رقم الهاتف');
@@ -92,7 +95,6 @@ export default function SignUpPage() {
       const res = await API.public.logUp(
         {
           name,
-          department,
           email,
           phone,
           role,
@@ -100,8 +102,11 @@ export default function SignUpPage() {
           jobTitle,
         }
       );
-      const { token, user } = res.data as {
+      const mess = res.data.message;
+      setMessage(mess!)
+      const { token ,refresh_token, user } = res.data as {
         token: string;
+        refresh_token: string;
         user: { id: string; name: string; role: string;};
       };
 
@@ -111,7 +116,8 @@ export default function SignUpPage() {
           name: (user as { fullName?: string; name?: string }).fullName || user.name,
           role: user.role,
         },
-        token
+        token,
+        refresh_token
       );
 
       if(user.role === "MANAGER" || user.role === "SUPER_ADMIN"){
@@ -229,7 +235,7 @@ export default function SignUpPage() {
              
             <div className="flex lg:scale-[1.2] my-8  mx-5 justify-around items-center w-[min(58%,180px)] bg-surface-container-low border
              border-outline-variant/80 rounded-xl p-1 shadow text-on-surface font-sans text-base outline-none ">
-                     {(Object.keys(mapRole) as Role[]).map((tab) => (
+                     {(Object.keys(mapRole) as ["EMPLOYEE" | "MANAGER"]).map((tab) => (
                        <button
                          key={tab}
                          disabled={role == mapRole.MANAGER}
@@ -275,30 +281,7 @@ export default function SignUpPage() {
                 />
               </div>
             </div>
-           {/* department Name */}
-            <div className='space-y-1'> 
-              <label htmlFor="login-deparmnet" className="block font-label text-sm font-semibold text-on-surface tracking-wide">
-              اسم المنشأة / القسم
-              </label>
-              <div className="relative flex items-center">
-                {/* Icon */}
-                <span className="absolute right-4 text-outline pointer-events-none" aria-hidden="true">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="9" y1="22" x2="9" y2="16"/><line x1="15" y1="22" x2="15" y2="16"/><path d="M9 16h6"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/>
-                  </svg>
-                </span>
-                <input
-                  id="logUp-department"
-                  type="text"
-                  autoComplete="department"
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  placeholder="القسام"
-                  dir="rtl"
-                  className="w-full bg-surface-container-low border border-outline-variant/40 rounded-xl py-3.5 pr-12 pl-4  font-sans text-on-surface text-base outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-left placeholder:text-outline/50 shadow-sm"
-                />
-              </div>
-            </div>
+         
          </div>
 
          {/* Email */}

@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('admin@worktime.sa');
   const [password, setPassword] = useState('Admin@2026');
   const [error, setError] = useState('');
+  const [mess, setMess] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -22,17 +23,44 @@ export default function LoginPage() {
     initializeAuth();
   }, [initializeAuth]);
 
-
+useEffect(()=> {
+  if(!mess||mess==='')return;
+ const time= setTimeout(()=> {
+    setMess('');
+  },3000);
+  
+return ()=> clearTimeout(time);
+},[mess]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
+    if (!isAgree) {
+      setError('يجب الموافقة على الشروط والاحكام');
+      setLoading(false);
+      return;
+    }
+    if(!email || email === ''){
+      setError('يرجى إدخال البريد الاكوني');
+      setLoading(false);
+      return;
+    }
+    if(!password || password === ''){
+      setError('يرجى إدخال كلمة المرور');
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await API.public.loginIn({ password,  email});
-      const { token, user } = res.data as {
+      const mess =res.data.message;
+      console.log("mess",mess)
+      setMess(mess!);
+      const { token ,refresh_token, user } = res.data as {
         token: string;
+        refresh_token: string;
         user: { id: string; name: string; role: string; imageProfile?: string };
       };
 
@@ -43,7 +71,9 @@ export default function LoginPage() {
           role: user.role,
           avatar: user.imageProfile,
         },
-        token
+        token,
+        refresh_token
+
       );
       if(user.role === "MANAGER" || user.role === "SUPER_ADMIN"){
         router.replace('/manager-dashboard');

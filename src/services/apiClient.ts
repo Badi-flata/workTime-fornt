@@ -29,13 +29,14 @@ import {
 } from '../types';
 import { useAuthStore } from '../store/useAuthStore';
 
-// استخراج رابط الـ Backend ديناميكياً حسب وضع التشغيل (Production/Publishing vs Local Development)
-const getApiBaseUrl = (): string => {
-  const isProd =
-    process.env.NODE_ENV === 'production' ||
-    (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1');
-
-  if (isProd) {
+// استخراج رابط الـ Backend ديناميكياً ودقيقاً حسب البيئة الحالية للمتصفح أو السيرفر
+export const getApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    // إذا كان المتصفح يتصفح من localhost أو 127.0.0.1 بأي منفذ: استخدام سيرفر التطوير المحلي
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return process.env.NEXT_PUBLIC_API_DEV_URL || 'http://localhost:3030';
+    }
+    // في بيئة النشر السحابي (Railway أو Vercel أو النطاقات الحية):
     return (
       process.env.NEXT_PUBLIC_API_PUBLISH_URL ||
       process.env.NEXT_PUBLIC_API_URL ||
@@ -43,22 +44,29 @@ const getApiBaseUrl = (): string => {
     );
   }
 
-  // في وضع التطوير المحلي:
+  // في جهة السيرفر / وقت البناء (SSR / Build time):
+  if (process.env.RAILWAY_ENVIRONMENT || process.env.VERCEL) {
+    return (
+      process.env.NEXT_PUBLIC_API_PUBLISH_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      'https://api.example.com'
+    );
+  }
+
   return (
     process.env.NEXT_PUBLIC_API_DEV_URL ||
     process.env.NEXT_PUBLIC_API_URL ||
     'http://localhost:3030'
   );
 };
-
-const API_URL = getApiBaseUrl();
   
 export const apiClient = axios.create({
-  baseURL: API_URL,
+  baseURL: getApiBaseUrl(),
 });
 
-// Request Interceptor for Auth Token
+// Request Interceptor for Dynamic BaseURL & Auth Token
 apiClient.interceptors.request.use((config) => {
+  config.baseURL = getApiBaseUrl();
   if (typeof window !== 'undefined') {
     const token = useAuthStore.getState().token;
     if (token) {
@@ -117,7 +125,8 @@ apiClient.interceptors.response.use(
       }
 
       try {
-        const res = await axios.post(`${API_URL}/users/refresh-token`, { refresh_token: refreshToken });
+        const currentBaseUrl = getApiBaseUrl();
+        const res = await axios.post(`${currentBaseUrl}/users/refresh-token`, { refresh_token: refreshToken });
         const data = res.data?.data || res.data;
         const newAccessToken = data.access_token;
         const newRefreshToken = data.refresh_token;

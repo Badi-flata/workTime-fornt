@@ -76,9 +76,7 @@ function SearchDirectoryContent() {
   };
   
 
-const paginationSlice = searchResults.slice((currentPage - 1) * itemsPerPage,  itemsPerPage * currentPage );
-
-
+const paginationSlice = searchResults;
 
   return (
     <motion.div

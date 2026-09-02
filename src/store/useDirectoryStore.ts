@@ -148,7 +148,7 @@ export const useDirectoryStore = create<DirectoryState>((set, get) => ({
       const meta = res.data?.meta || { total: data.length, page: queryParams.page, limit: queryParams.limit, totalPages: 1 };
 
       globalCache.set(cacheKey, { data, meta }, 'directory', 5);
-
+  
       set({
         searchResults: data,
         totalPages: meta.totalPages || 1,

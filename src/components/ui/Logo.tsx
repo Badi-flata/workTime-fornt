@@ -107,11 +107,11 @@ export function Logo({
 
       {/* ── LOGO TEXTS (Vertical/Horizontal adaptive) ── */}
       {showText && (
-        <div className="flex flex-col select-none text-right">
+        <div className="flex justify-center pt-2 flex-col select-none  text-right">
           {/* WORKTIME */}
-          <div className="flex items-center font-heading font-extrabold tracking-wide" style={{ fontSize: size * 0.42 }}>
-            <span className="text-[#1b7550]">WORK</span>
+          <div className="flex items-center h-5  font-label font-black tracking-wide" style={{ fontSize: size * 0.42 }}>
             <span className="text-[#1e1e1e] ">TIME</span>
+            <span className="text-[#1b7550]">WORK</span>
           </div>
           {/* Subtext: إدارة الحضور الذكية */}
           <span 

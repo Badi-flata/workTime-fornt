@@ -95,7 +95,6 @@ export default function AttendanceReportsPage() {
      if(role && typeof window !== 'undefined'){
        const data = window.localStorage.getItem("employeeId")
        const id = data && data !== "" ? JSON.parse(data as string) : [];
-       console.log("ids:",id)
        setEmployeeIds(id)
      }
    },[role])
@@ -104,25 +103,30 @@ export default function AttendanceReportsPage() {
     
  // ── get employees Ids to select  for SUPER_ADMIN ───────────────────────────────────────────────────────────
     
-    const targetEmployeeId =  role && employeeIds && employeeIds.length > 0 ? employeeIds[0] : (user?.id || "") ;
-   
+    const targetEmployeeId =  role && employeeIds && employeeIds.length > 0 ? employeeIds[0] : "" ;
+    //  console.log("targetEmployeeId:",targetEmployeeId)
   useEffect(() => {
-    if (role && targetEmployeeId) {
-      fetchSourceData(targetEmployeeId, dateAnchor);
+    if(!role || targetEmployeeId ==='')return;
+    if (role && targetEmployeeId!) {
+      fetchSourceData( dateAnchor,targetEmployeeId!);
+      console.log("dateAnchor:",dateAnchor)
+      console.log("targetEmployeeId:",targetEmployeeId)
     } else if (!role) {
       fetchSourceData(dateAnchor);
     }
    
-  }, [fetchSourceData, setDateAnchor, role, targetEmployeeId, dateAnchor]);
+  }, [fetchSourceData, setDateAnchor, role, targetEmployeeId!, dateAnchor]);
 
   useEffect(() => {
+    if(!role || targetEmployeeId ==='')return;
     if (role && targetEmployeeId) {
       PeriodSummary({ dateAnchor, mode: activeTab, employeeId: targetEmployeeId });
-      console.log('role is SUPER_ADMIN on periodSummary for employee:', targetEmployeeId);
+
     } else if (!role) {
       PeriodSummary({ dateAnchor, mode: activeTab });
     };
-  }, [dateAnchor,setActiveTab, activeTab, role, targetEmployeeId, PeriodSummary]);
+  }, [dateAnchor,setActiveTab, activeTab, 
+    role, targetEmployeeId, PeriodSummary]);
 
 
 

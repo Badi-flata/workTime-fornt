@@ -53,11 +53,9 @@ export default function EmployeeDashboardPage() {
  const [searchQueryDate , setSearchQueryDate] = useState<string>("")
  const [statusFilter, setStatusFilter] = useState<'ALL' | 'PRESENT' | 'LATE' | 'EXCUSED' | 'DEDUCTED'>('ALL');
  const [EmplsIds, setEmplsIds] = useState<string[]>([]);
-//  const [totalDays, setTotalDays] = useState<number>(1);
 
  const roleAdmin = user?.role === "SUPER_ADMIN"
  const days = summary?.totalDays||0
-//  setTotalDays(days)
  useEffect(()=>{
     
      
@@ -71,9 +69,6 @@ export default function EmployeeDashboardPage() {
    
    const targetEmployeeId =  roleAdmin && EmplsIds && EmplsIds.length > 0 ? EmplsIds[0] : (user?.id || "") ;
    
-  //  console.log("summary:",summary)
-  //  console.log("days rpoter:",daysLog)
-  //  console.log("message :",messageSuccessd)
   
 
     
@@ -146,7 +141,7 @@ export default function EmployeeDashboardPage() {
  }, [filteredAttendanceReports, searchQueryDate, statusFilter ]);
 
   
- console.log("filteredRecords:",filteredRecords.length)   
+
     const itemsPerPage = 5;
     const totalPages = Math.ceil( filteredRecords?.length  / itemsPerPage );
 

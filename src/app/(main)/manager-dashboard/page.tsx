@@ -185,7 +185,7 @@ const showFilterBar = !isLoading;
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <StatCard
               title="إجمالي الحضور" 
-              value={metrics?.totalPresent || 0}
+              value={activeWorkers || 0}
               icon={<Users className="text-primary" size={20} />}
               variant="primary" 
               limit={meta?.totalSubordinates || 0}

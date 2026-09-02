@@ -173,10 +173,16 @@ export const useCheckAttendStore = create<CheckAttendState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const res = await API.attendance.fetchSourceData({ date, employeeId });
-      const data = res.data;
+      const {data , message }= res.data;
+  
+     console.log('res:',res)
       if (data) {
         globalCache.set(cacheKey, data, 'attendance', 5);
-        set({ mainSourceData: data, isLoading: false });
+        set({ 
+          mainSourceData: data, 
+          message,
+          isLoading: false 
+        });
       } else {
         set({ mainSourceData: null, isLoading: false });
       }
