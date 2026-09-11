@@ -61,12 +61,18 @@ return ()=> clearTimeout(time);
       const { token ,refresh_token, user } = res.data as {
         token: string;
         refresh_token: string;
-        user: { id: string; name: string; role: string; imageProfile?: string };
+    user: { id: string; name: string; role: string; imageProfile?: string , employeeProfile?: { id: string } , adminProfile?: { id: string } };
       };
+
+   // توليد زوج الرموز (Access Token + Refresh Token) باستخدام profileId
+    const profileId = user.role === 'EMPLOYEE' 
+      ? (user.employeeProfile?.id || user.id) 
+      : (user.adminProfile?.id || user.id);
 
       login(
         {
           id: user.id,
+          profileId:profileId,
           name: (user as { fullName?: string; name?: string }).fullName || user.name,
           role: user.role,
           avatar: user.imageProfile,
