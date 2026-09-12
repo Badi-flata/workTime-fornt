@@ -52,6 +52,7 @@ export default function EmployeeProfilePage() {
     fetchProfile,
     updateProfile,
     uploadProfileImage,
+    updateAvatarUrl,
     clearMessages,
   } = useProfileStore();
 

@@ -311,7 +311,7 @@ export function Topbar() {
                         className={clsx(
                           'flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 select-none',
                           isActive
-                            ? 'bg-primary/10 text-primary border-r-[3px] border-primary font-bold'
+                            ? 'bg-primary/10 text-primary border-r-[3px] shadow-lg border-primary font-bold'
                             : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface'
                         )}
                       >
@@ -331,7 +331,7 @@ export function Topbar() {
                 className={clsx(
                   'flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 select-none',
                   pathname?.startsWith('/my-profile')
-                    ? 'bg-primary/10 text-primary border-r-[3px] border-primary font-bold'
+                    ? 'bg-primary/10 text-primary border-r-[3px] shadow-lg border-primary font-bold'
                     : 'text-on-surface-variant hover:bg-surface-container-low'
                 )}
               >
@@ -344,7 +344,7 @@ export function Topbar() {
                 className={clsx(
                   'flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 select-none',
                   pathname?.startsWith('/settings')
-                    ? 'bg-primary/10 text-primary border-r-[3px] border-primary font-bold'
+                    ? 'bg-primary/10 text-primary border-r-[3px] shadow-lg border-primary font-bold'
                     : 'text-on-surface-variant hover:bg-surface-container-low'
                 )}
               >

@@ -76,7 +76,7 @@ function SearchDirectoryContent() {
     searchDirectory({ role, page: 1 });
   };
   
-console.log("search Query:", searchQuery)
+
 const paginationSlice = searchResults;
 
   return (
