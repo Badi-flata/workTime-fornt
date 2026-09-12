@@ -199,7 +199,7 @@ const paginationSlice = searchResults;
         {
          paginationSlice.map((user: DirectoryUserOutput) => {
             const isEmployee = user.role === 'EMPLOYEE';
-            const isManager = user.role === 'MANAGER' || user.role === 'SUPER_ADMIN';
+            const isManager = (user.role === 'MANAGER' || user.role === 'SUPER_ADMIN');
             const isUnassigned = isEmployee && !user.employeeProfile?.managerId;
             const disciplineRateEmp  =  user?.employeeProfile?.disciplineRate?.rate  
             const organizationDisciplineRate  =  user?.adminProfile?.organizationDiscipline?.rate  

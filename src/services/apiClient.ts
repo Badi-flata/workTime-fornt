@@ -34,9 +34,7 @@ import { useAuthStore } from '../store/useAuthStore';
 export const getApiBaseUrl = (): string => {
   if (typeof window !== 'undefined') {
     // إذا كان المتصفح يتصفح من localhost أو 127.0.0.1 بأي منفذ: استخدام سيرفر التطوير المحلي
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      return process.env.NEXT_PUBLIC_API_DEV_URL || 'http://localhost:3030';
-    }
+
     // في بيئة النشر السحابي (Railway أو Vercel أو النطاقات الحية):
     return (
       process.env.NEXT_PUBLIC_API_PUBLISH_URL ||

@@ -23,7 +23,7 @@ export function getAvatarUrl(url?: string | null): string | undefined {
 
   // Determine backend base URL (defaulting to http://localhost:3030 in development)
   const backendBase =
-    process.env.NEXT_PUBLIC_API_URL ||
+    process.env.NEXT_PUBLIC_API_PUBLISH_URL ||
     process.env.NEXT_DEV_API_URL ||
     'http://localhost:3030';
 
