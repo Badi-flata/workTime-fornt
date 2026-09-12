@@ -101,6 +101,12 @@ export const useDeptShiftStore = create<DeptShiftState>((set, get) => ({
         id: d.id,
         name: d.name,
         description: d.description || '',
+        monthlyWorkingDays: d.monthlyWorkingDays,
+        weekendDays: d.weekendDays,
+        monthlyHolidays: d.monthlyHolidays,
+        latePenaltyAmount: d.latePenaltyAmount,
+        earlyLeavePenaltyAmount: d.earlyLeavePenaltyAmount,
+        absentPenaltyAmount: d.absentPenaltyAmount,
         shifts: (d.shift || []).map((s) => ({
           id: s.id,
           name: s.name,
@@ -182,6 +188,7 @@ export const useDeptShiftStore = create<DeptShiftState>((set, get) => ({
     try {
       const res = await API.department.create(data);
       globalCache.invalidateTag('department');
+      globalCache.invalidateTag('managing');
 
       set({
         successMessage: res.data?.message || 'تم إنشاء القسم بنجاح',
@@ -203,6 +210,7 @@ export const useDeptShiftStore = create<DeptShiftState>((set, get) => ({
     try {
       const res = await API.department.update(id, data);
       globalCache.invalidateTag('department');
+      globalCache.invalidateTag('managing');
 
       set({
         successMessage: res.data?.message || 'تم تحديث القسم بنجاح',
@@ -235,6 +243,7 @@ export const useDeptShiftStore = create<DeptShiftState>((set, get) => ({
 
       globalCache.invalidateTag('shift');
       globalCache.invalidateTag('department');
+      globalCache.invalidateTag('managing');
 
       const message = res.data?.message || 'تمت إضافة الموظف إلى فريقك بنجاح';
       set({ successMessage: message, isSubmitting: false });
@@ -262,6 +271,8 @@ export const useDeptShiftStore = create<DeptShiftState>((set, get) => ({
   
       globalCache.invalidateTag('shift');
       globalCache.invalidateTag('department');
+      globalCache.invalidateTag('managing');
+      globalCache.invalidateTag('attendance_source');
   
         const message = res.data?.message || 'تمت نقل الموظف إلى قسم: و الوردية: بنجاح';
         set({ successMessage: message, isSubmitting: false });
@@ -284,6 +295,7 @@ export const useDeptShiftStore = create<DeptShiftState>((set, get) => ({
     try {
       const res = await API.department.delete(id);
       globalCache.invalidateTag('department');
+      globalCache.invalidateTag('managing');
 
       set({
         successMessage: res.data?.message || 'تم حذف القسم بنجاح',

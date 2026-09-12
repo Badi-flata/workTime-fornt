@@ -20,6 +20,7 @@ import {
   Copy
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useSettingStore } from '@/store/useSettingStore';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { API } from '@/services/apiClient';
 import { useRouter } from 'next/navigation';
@@ -27,6 +28,22 @@ import { useRouter } from 'next/navigation';
 export default function SettingsPage() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
+  const {messageSuccessd, eventsSetting,tirggrAutomaticProcess , error, isLoading
+    , fetchEventsSettting ,updateEventsSetting , applyEventsSettings }= useSettingStore()
+    const isManagerOrAdmin = user?.role === 'MANAGER' || user?.role === 'SUPER_ADMIN';
+   
+   
+    // Fetch Manager Settings on Mount
+  useEffect(() => {
+    if (isManagerOrAdmin) {
+      fetchEventsSettting();
+    }
+  }, [isManagerOrAdmin, fetchEventsSettting]);
+  
+
+
+  
+  
   
   // Local states
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -39,48 +56,57 @@ export default function SettingsPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Manager automation settings state
-  const [dailyAutoCheck, setDailyAutoCheck] = useState(true);
-  const [dailyDeduction, setDailyDeduction] = useState(true);
-  const [delayDeduction, setDelayDeduction] = useState(true);
-  const [earlyLeaveDeduction, setEarlyLeaveDeduction] = useState(true);
-  const [isLoadingSettings, setIsLoadingSettings] = useState(false);
-
-  const isManagerOrAdmin = user?.role === 'MANAGER' || user?.role === 'SUPER_ADMIN';
-
-  // Fetch Manager Settings on Mount
+  // active actions
+  const [dailyAutoCheck, setDailyAutoCheck] = useState<boolean>(true);
+  const [isActiveDeduction, setActiveDeduction] = useState<boolean>(true);
+  // deductions actions configuration
+  const [combineDeductionsOnEndShift, setCombineDeductionsOnEndShift] = useState<boolean>(false);
+  const [delayDeduction, setDelayDeduction] = useState<boolean>(true);
+  const [earlyLeaveDeduction, setEarlyLeaveDeduction] = useState<boolean>(true);
+  const [absentDeduction, setAbsentDeduction] = useState<boolean>(true);
+  
+  
+  
   useEffect(() => {
-    if (isManagerOrAdmin) {
-      setIsLoadingSettings(true);
-      API.managing.getSettings()
-        .then((res: any) => {
-          const settings = res.data?.data || res.data;
-          if (settings) {
-            setDailyAutoCheck(settings.autoCheckoutEnabled !== false);
-            setDailyDeduction(settings.dailyDeductionEnabled !== false);
-            setDelayDeduction(settings.delayDeductionEnabled !== false);
-            setEarlyLeaveDeduction(settings.earlyLeaveDeductionEnabled !== false);
-          }
-        })
-        .catch(() => {})
-        .finally(() => setIsLoadingSettings(false));
-    }
-  }, [isManagerOrAdmin]);
+     if (!eventsSetting) return;
+ 
+       // active actions
+       setDailyAutoCheck(eventsSetting.autoCheckoutEnabled !== false );
+       setActiveDeduction(eventsSetting.isActiveDeduction !==false);
+       // deductions actions configuration
+       setCombineDeductionsOnEndShift(eventsSetting.combineDeductionsOnEndShift !==false);
+       setDelayDeduction(eventsSetting.delayDeductionEnabled!==false);
+       setEarlyLeaveDeduction(eventsSetting.earlyLeaveDeductionEnabled!==false);
+       setAbsentDeduction(eventsSetting.absentDeductionEnabled!==false);
+     
+   }, [eventsSetting]);
+ 
 
   // Handle Switch Toggle & Auto Save
   const handleToggleSetting = async (key: string, value: boolean) => {
+      // active actions
     if (key === 'autoCheckout') setDailyAutoCheck(value);
-    if (key === 'dailyDeduction') setDailyDeduction(value);
+    if (key === 'activeDeduction') setActiveDeduction(value);
+    // deductions actions configuration
+    if (key === 'combineDeductionsOnEndShift') setCombineDeductionsOnEndShift(value);
     if (key === 'delayDeduction') setDelayDeduction(value);
     if (key === 'earlyLeaveDeduction') setEarlyLeaveDeduction(value);
+    if (key === 'absentDeduction') setAbsentDeduction(value);
 
     try {
-      await API.managing.updateSettings({
+   updateEventsSetting({
+        // active actions
         autoCheckoutEnabled: key === 'autoCheckout' ? value : dailyAutoCheck,
-        dailyDeductionEnabled: key === 'dailyDeduction' ? value : dailyDeduction,
+        isActiveDeduction: key === 'activeDeduction' ? value : isActiveDeduction,
+        // deductions actions configuration
+        combineDeductionsOnEndShift: key === 'combineDeductionsOnEndShift' ? value : combineDeductionsOnEndShift,
         delayDeductionEnabled: key === 'delayDeduction' ? value : delayDeduction,
         earlyLeaveDeductionEnabled: key === 'earlyLeaveDeduction' ? value : earlyLeaveDeduction,
+        absentDeductionEnabled: key === 'absentDeduction' ? value : absentDeduction,
       });
-      setSuccessMsg('تم حفظ تفضيلات الأتمتة والخصم بنجاح');
+      
+      
+      setSuccessMsg("تم حفظ الإعدادات الاتمتة التلقائية بنجاح");
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch {
       setErrorMsg('تعذر حفظ الإعدادات، يرجى المحاولة لاحقاً');
@@ -125,8 +151,10 @@ export default function SettingsPage() {
     setSuccessMsg(null);
     setErrorMsg(null);
     try {
-      const res = (await API.managing.autoCheckout()) as any;
-      setSuccessMsg(res?.message || res?.data?.message || 'تم تشغيل دورة الانصراف التلقائي بنجاح وجاري فحص وتحديث سجلات الموظفين.');
+      const res = (await API.managing.autoCheckout(true)) as any;
+      const data = res?.data || res;
+      const message = res?.message || data?.message || 'تم تشغيل دورة الانصراف التلقائي بنجاح وجاري فحص وتحديث سجلات الموظفين.';
+      setSuccessMsg(message);
       setTimeout(() => setSuccessMsg(null), 6000);
     } catch (err: any) {
       setErrorMsg(err.response?.data?.message || 'فشل تشغيل دورة الانصراف التلقائي. تأكد من صلاحيات حسابك.');
@@ -135,6 +163,8 @@ export default function SettingsPage() {
       setIsAutoChecking(false);
     }
   };
+
+
 
   // Role translation helper
   const getRoleLabel = (role?: string) => {
@@ -253,7 +283,7 @@ export default function SettingsPage() {
             <h4 className="font-heading text-lg font-bold text-on-surface">التفضيلات العامة</h4>
           </div>
 
-          <div className="space-y-5 flex-1 flex flex-col justify-center opacity-65">
+          <div aria-disabled="true" className="space-y-5 flex-1 flex flex-col justify-center opacity-65">
             {/* Language Selector */}
             <div className="flex items-center justify-between py-1.5 border-b border-outline-variant/10">
               <div className="flex items-center gap-2.5">
@@ -396,13 +426,17 @@ export default function SettingsPage() {
                     <h5 className="font-heading text-[15px] font-bold text-secondary">الخصومات والاحتساب اليومي (Salary Deductions)</h5>
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-semibold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full">
-                        {dailyDeduction ? 'نشط تلقائياً' : 'معطل'}
+                        {isActiveDeduction ? 'نشط تلقائياً' : 'معطل'}
                       </span>
                       {/* Active switch to toggle schedule */}
                       <button 
-                        onClick={() => handleToggleSetting('dailyDeduction', !dailyDeduction)}
+                        onClick={() =>{
+                          
+                           handleToggleSetting('activeDeduction', !isActiveDeduction)
+                           console.log('isActiveDeduction', isActiveDeduction)
+                          }}
                         className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-200 focus:outline-none cursor-pointer ${
-                          dailyDeduction ? 'bg-secondary flex justify-end' : 'bg-outline-variant/70 flex justify-start'
+                          isActiveDeduction ? 'bg-secondary flex justify-end' : 'bg-outline-variant/70 flex justify-start'
                         }`}
                       >
                         <div className="bg-white w-4 h-4 rounded-full shadow-sm" />
@@ -414,21 +448,46 @@ export default function SettingsPage() {
                   </p>
 
                   {/* Granular deduction controls */}
-                  <div className="mt-3 pt-3 border-t border-outline-variant/10 space-y-2 text-xs">
+                  <div className="mt-3 pt-3 border-t border-outline-variant/10 space-y-2.5 text-xs">
+                    {/* Late deduction */}
                     <div className="flex justify-between items-center">
                       <span className="text-on-surface-variant font-medium">خصم التأخير عن الحضور (Late Deduction)</span>
                       <button
                         onClick={() => handleToggleSetting('delayDeduction', !delayDeduction)}
-                        className={`w-7 h-4 rounded-full p-0.5 transition-colors ${delayDeduction ? 'bg-primary flex justify-end' : 'bg-outline-variant/70 flex justify-start'}`}
+                        className={`w-7 h-4 rounded-full p-0.5 transition-colors cursor-pointer ${delayDeduction ? 'bg-primary flex justify-end' : 'bg-outline-variant/70 flex justify-start'}`}
                       >
                         <div className="bg-white w-3 h-3 rounded-full shadow-xs" />
                       </button>
                     </div>
+
+                    {/* Early leave deduction */}
                     <div className="flex justify-between items-center">
                       <span className="text-on-surface-variant font-medium">خصم الانصراف المبكر والهروب (Early/Escapy)</span>
                       <button
                         onClick={() => handleToggleSetting('earlyLeaveDeduction', !earlyLeaveDeduction)}
-                        className={`w-7 h-4 rounded-full p-0.5 transition-colors ${earlyLeaveDeduction ? 'bg-primary flex justify-end' : 'bg-outline-variant/70 flex justify-start'}`}
+                        className={`w-7 h-4 rounded-full p-0.5 transition-colors cursor-pointer ${earlyLeaveDeduction ? 'bg-primary flex justify-end' : 'bg-outline-variant/70 flex justify-start'}`}
+                      >
+                        <div className="bg-white w-3 h-3 rounded-full shadow-xs" />
+                      </button>
+                    </div>
+
+                    {/* Absent deduction */}
+                    <div className="flex justify-between items-center">
+                      <span className="text-on-surface-variant font-medium">خصم الغياب لليوم غير المسجل (Absent Deduction)</span>
+                      <button
+                        onClick={() => handleToggleSetting('absentDeduction', !absentDeduction)}
+                        className={`w-7 h-4 rounded-full p-0.5 transition-colors cursor-pointer ${absentDeduction ? 'bg-primary flex justify-end' : 'bg-outline-variant/70 flex justify-start'}`}
+                      >
+                        <div className="bg-white w-3 h-3 rounded-full shadow-xs" />
+                      </button>
+                    </div>
+
+                    {/* Combine deductions at end of shift */}
+                    <div className="flex justify-between items-center pt-1 border-t border-outline-variant/10">
+                      <span className="text-on-surface-variant font-medium">دمج الخصومات معاً بنهاية الوردية (Combine Deductions)</span>
+                      <button
+                        onClick={() => handleToggleSetting('combineDeductionsOnEndShift', !combineDeductionsOnEndShift)}
+                        className={`w-7 h-4 rounded-full p-0.5 transition-colors cursor-pointer ${combineDeductionsOnEndShift ? 'bg-secondary flex justify-end' : 'bg-outline-variant/70 flex justify-start'}`}
                       >
                         <div className="bg-white w-3 h-3 rounded-full shadow-xs" />
                       </button>
@@ -444,7 +503,7 @@ export default function SettingsPage() {
                   {/* Status Indicator */}
                   <span className="text-xs font-semibold text-secondary flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
-                    {dailyDeduction ? 'المجدول نشط' : 'المجدول متوقف'}
+                    {isActiveDeduction ? 'المجدول نشط' : 'المجدول متوقف'}
                   </span>
                 </div>
               </div>

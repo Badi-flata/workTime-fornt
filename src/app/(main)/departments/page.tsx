@@ -57,6 +57,12 @@ export default function DepartmentsShiftsPage() {
   // ── Form States ──────────────────────────────────────────────────
   const [deptName, setDeptName] = useState('');
   const [deptDescription, setDeptDescription] = useState('');
+  const [deptMonthlyWorkingDays, setDeptMonthlyWorkingDays] = useState<number>(22);
+  const [deptWeekendDays, setDeptWeekendDays] = useState<number[]>([5, 6]);
+  const [deptMonthlyHolidays, setDeptMonthlyHolidays] = useState<number>(0);
+  const [deptLatePenalty, setDeptLatePenalty] = useState<number>(50);
+  const [deptEarlyLeavePenalty, setDeptEarlyLeavePenalty] = useState<number>(50);
+  const [deptAbsentPenalty, setDeptAbsentPenalty] = useState<number>(100);
 
   // ── Form Shift States ──────────────────────────────────────────────────
   const [shiftName, setShiftName] = useState('');
@@ -86,6 +92,12 @@ export default function DepartmentsShiftsPage() {
   // ── custom message to proess submit  update or create  ──────────────────────────────
   const [customMessage,setCustomMessage]=useState('')
 
+  // useEffect(()=>{
+  //   console.log("seletc department employee",editingEmpDepart)
+  //   console.log("seletc department shift employee",editingEmpShift)
+  //   console.log("department employees",departments)
+  // },[editingEmpDepart,editingEmpShift,departments])
+
   const [deleteConfirm, setDeleteConfirm] = useState<{
     type: 'department' | 'shift';
     id: string;
@@ -105,9 +117,21 @@ export default function DepartmentsShiftsPage() {
     if (editingDepartment) {
       setDeptName(editingDepartment.name);
       setDeptDescription(editingDepartment.description || '');
+      setDeptMonthlyWorkingDays(editingDepartment.monthlyWorkingDays ?? 22);
+      setDeptWeekendDays(editingDepartment.weekendDays && editingDepartment.weekendDays.length > 0 ? editingDepartment.weekendDays : [5, 6]);
+      setDeptMonthlyHolidays(editingDepartment.monthlyHolidays ?? 0);
+      setDeptLatePenalty(editingDepartment.latePenaltyAmount ?? 50);
+      setDeptEarlyLeavePenalty(editingDepartment.earlyLeavePenaltyAmount ?? 50);
+      setDeptAbsentPenalty(editingDepartment.absentPenaltyAmount ?? 100);
     } else {
       setDeptName('');
       setDeptDescription('');
+      setDeptMonthlyWorkingDays(22);
+      setDeptWeekendDays([5, 6]);
+      setDeptMonthlyHolidays(0);
+      setDeptLatePenalty(50);
+      setDeptEarlyLeavePenalty(50);
+      setDeptAbsentPenalty(100);
     }
   }, [editingDepartment]);
 
@@ -175,15 +199,33 @@ export default function DepartmentsShiftsPage() {
       await updateDepartment(editingDepartment.id, {
         name: deptName.trim(),
         description: deptDescription.trim() || undefined,
+        monthlyWorkingDays: Number(deptMonthlyWorkingDays) || 22,
+        weekendDays: deptWeekendDays,
+        monthlyHolidays: Number(deptMonthlyHolidays) || 0,
+        latePenaltyAmount: Number(deptLatePenalty) || 50,
+        earlyLeavePenaltyAmount: Number(deptEarlyLeavePenalty) || 50,
+        absentPenaltyAmount: Number(deptAbsentPenalty) || 100,
       });
     } else if (shiftOrDeprt ==="DEPARTMENT") {
       const ok = await createDepartment({
         name: deptName.trim(),
         description: deptDescription.trim() || undefined,
+        monthlyWorkingDays: Number(deptMonthlyWorkingDays) || 22,
+        weekendDays: deptWeekendDays,
+        monthlyHolidays: Number(deptMonthlyHolidays) || 0,
+        latePenaltyAmount: Number(deptLatePenalty) || 50,
+        earlyLeavePenaltyAmount: Number(deptEarlyLeavePenalty) || 50,
+        absentPenaltyAmount: Number(deptAbsentPenalty) || 100,
       });
       if (ok) {
         setDeptName('');
         setDeptDescription('');
+        setDeptMonthlyWorkingDays(22);
+        setDeptWeekendDays([5, 6]);
+        setDeptMonthlyHolidays(0);
+        setDeptLatePenalty(50);
+        setDeptEarlyLeavePenalty(50);
+        setDeptAbsentPenalty(100);
       }
     }
   };
@@ -296,15 +338,16 @@ const handleAddEmpSubmit = async (e: React.FormEvent) => {
           `)
       return;
      }
-    if (editingShift && editingEmpDepart && !isFound && statusEmpHandler ==="ADDING") {
+     console.log("is Found :",!!isFound)
+    if (editingEmpShift && editingEmpDepart && !isFound && statusEmpHandler ==="ADDING") {
       await assignEmployeeToManager({ 
         email: empEmail.trim(),
         shiftId: editingEmpShift.id,
         departmentId: editingEmpDepart.id,
       });
-    } else if(statusEmpHandler === "TRUNNING" && (editingShift || shift?.id) && (editingEmpDepart|| isFound?.id) ) {
+    } else if(statusEmpHandler === "TRUNNING" && (editingEmpShift || shift?.id) && isFound && editingEmpDepart?.id ) {
       const ok = await truneToDepartmentEmployee(empId,{
-         shiftId:editingEmpShift.id  ,
+         shiftId:editingEmpShift.id ,
         departmentId: editingEmpDepart.id,
       });
       if (ok) {
@@ -328,8 +371,10 @@ const handleAddEmpSubmit = async (e: React.FormEvent) => {
 
   const selectEditDepartment = (id: string) => {
     const department = paginatedDepartments.find((d) => d.id === id);
+        const shift = department?.shifts.find((s) => s.id === id);
     setShiftDeptId(id)
     if (department) {
+ 
       setEditingDepartment(department);
     }else{
         setEditingDepartment(null);
@@ -354,8 +399,8 @@ const handleAddEmpSubmit = async (e: React.FormEvent) => {
 
   const selectEditEmplyee = (id: string) => {
     const employee = emp?.find((d) => d?.id === id);
-    const departmentShift = departments.find((d) => d.shifts.some((s) => s.employees.some(e => e.id === id || e.userId === id)));
-    const shift = departmentShift?.shifts.find((s,i) => s.id === departmentShift?.shifts[i].id);
+    const departmentShift = departments.find((d) => d.employees?.find(e => e.id === id || e.userId === id)) || departments[0];
+    const shift = departmentShift?.shifts.find((s) => s.employees?.find(e => e.id === id || e.userId === id)) || departments[0];
     const shortShift  : { id: string; name: string;}[] | [] = departmentShift?.shifts.map(e =>({ id:e.id,name:e.name})) || [];
   
     if( !employee?.user || !employee ){
@@ -388,25 +433,33 @@ const handleAddEmpSubmit = async (e: React.FormEvent) => {
 
 
   const selectEditEmpShift = (id: string) => {
-    const editShift = editingEmpDepart?.shifts.find((d) => d.id === id);
-    if(!editShift){
+    const shift = editingEmpDepart?.shifts.find((d) => d.id === id);
+    if(!shift){
       setCustomMessage("لم يتم إجاد الوردية")
       return;
     }
-      setEditEmpShift(editShift);
+    setEditEmpShift({
+      id:shift?.id,
+      name:shift?.name
+    });
   };
 
 
   const selectEditEmpDepart = (id: string) => {
     const editDepart = departments?.find((d) => d.id === id);
+        const shift = editDepart?.shifts[0];
     if(!editDepart){
       setCustomMessage("لم يتم إجاد القسم")
       return;
     }
-      setEditEmpDepart(editDepart);
+    setEditEmpShift({
+      id:shift?.id,
+      name:shift?.name
+    });
+    setEditEmpDepart(editDepart);
   };
 
-
+ 
 
   // console.log("department name:",deptName)
 
@@ -428,7 +481,7 @@ const handleAddEmpSubmit = async (e: React.FormEvent) => {
             className="bg-primary/10 border border-primary/20
              text-primary px-4 py-3 rounded-xl flex items-center
               justify-between shadow-sm"
-          >
+             >
             <div className="flex items-center gap-2 font-label text-sm">
               <CheckCircle2 size={18} />
               <span>{successMessage}</span>
@@ -658,6 +711,126 @@ const handleAddEmpSubmit = async (e: React.FormEvent) => {
                 />
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-label text-sm text-on-surface-variant mb-1">
+                    أيام العمل المستهدفة شهرياً
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={31}
+                    value={deptMonthlyWorkingDays}
+                    onChange={(e) => setDeptMonthlyWorkingDays(Number(e.target.value))}
+                    placeholder="22"
+                    className="w-full bg-transparent border-0 border-b border-outline-variant/60 focus:border-primary focus:ring-0 px-0 py-2 text-on-surface placeholder:text-outline/50 transition-colors font-sans text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block font-label text-sm text-on-surface-variant mb-1">
+                    الإجازات والعطلات الشهرية (أيام)
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={15}
+                    value={deptMonthlyHolidays}
+                    onChange={(e) => setDeptMonthlyHolidays(Number(e.target.value))}
+                    placeholder="0"
+                    className="w-full bg-transparent border-0 border-b border-outline-variant/60 focus:border-primary focus:ring-0 px-0 py-2 text-on-surface placeholder:text-outline/50 transition-colors font-sans text-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-label text-sm text-on-surface-variant mb-2">
+                  أيام عطلة نهاية الأسبوع للقسم
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { day: 5, label: 'الجمعة' },
+                    { day: 6, label: 'السبت' },
+                    { day: 0, label: 'الأحد' },
+                    { day: 1, label: 'الاثنين' },
+                    { day: 2, label: 'الثلاثاء' },
+                    { day: 3, label: 'الأربعاء' },
+                    { day: 4, label: 'الخميس' },
+                  ].map(({ day, label }) => {
+                    const isSelected = deptWeekendDays.includes(day);
+                    return (
+                      <button
+                        type="button"
+                        key={day}
+                        onClick={() => {
+                          if (isSelected) {
+                            setDeptWeekendDays(deptWeekendDays.filter((d) => d !== day));
+                          } else {
+                            setDeptWeekendDays([...deptWeekendDays, day].sort());
+                          }
+                        }}
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all border ${
+                          isSelected
+                            ? 'bg-primary text-white border-primary shadow-xs'
+                            : 'bg-surface-container text-on-surface-variant border-outline-variant/40 hover:border-primary/50'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <label className="block font-label text-sm font-semibold text-primary mb-2">
+                  قواعد الخصومات المالية للقسم (بالعملة المحلية)
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block font-label text-xs text-on-surface-variant mb-1">
+                      خصم التأخير
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={deptLatePenalty}
+                      onChange={(e) => setDeptLatePenalty(Number(e.target.value))}
+                      placeholder="50"
+                      className="w-full bg-transparent border-0 border-b border-outline-variant/60 focus:border-primary focus:ring-0 px-0 py-1.5 text-on-surface placeholder:text-outline/50 transition-colors font-sans text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-label text-xs text-on-surface-variant mb-1">
+                      خصم الخروج المبكر
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={deptEarlyLeavePenalty}
+                      onChange={(e) => setDeptEarlyLeavePenalty(Number(e.target.value))}
+                      placeholder="50"
+                      className="w-full bg-transparent border-0 border-b border-outline-variant/60 focus:border-primary focus:ring-0 px-0 py-1.5 text-on-surface placeholder:text-outline/50 transition-colors font-sans text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-label text-xs text-on-surface-variant mb-1">
+                      خصم الغياب
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={deptAbsentPenalty}
+                      onChange={(e) => setDeptAbsentPenalty(Number(e.target.value))}
+                      placeholder="100"
+                      className="w-full bg-transparent border-0 border-b border-outline-variant/60 focus:border-primary focus:ring-0 px-0 py-1.5 text-on-surface placeholder:text-outline/50 transition-colors font-sans text-sm"
+                    />
+                  </div>
+                </div>
+                <p className="text-[11px] text-outline mt-1.5">
+                  ملاحظة: إذا تُركت القيمة 0، سيتم احتساب الخصم ديناميكياً بناءً على الراتب وساعات العمل.
+                </p>
+              </div>
+
               <div className="mt-2 text-left">
                 <button
                   type="submit"
@@ -853,7 +1026,7 @@ const handleAddEmpSubmit = async (e: React.FormEvent) => {
                   <Building2 size={20} />
                 </div>
                 <h2 className="font-heading text-xl font-bold text-primary">
-                إضافة المموظق  
+                إضافة الموظق  
                 </h2>
               </div>
               
@@ -1066,7 +1239,7 @@ const handleAddEmpSubmit = async (e: React.FormEvent) => {
                   ربط بالوريدية <span className="text-error">*</span>
                 </label>
                 <select
-                  value={editingShift?.id? editingShift?.id : "اختر القسم أولاً"}
+                  value={editingEmpShift?.id? editingEmpShift?.id : "اختر القسم أولاً"}
                   onChange={(e) => {
                      selectEditEmpShift(e.target.value);
                       }}

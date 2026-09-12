@@ -9,6 +9,12 @@ export interface DepartmentOutput {
   id: string;
   name: string;
   description?: string;
+  monthlyWorkingDays?: number;
+  weekendDays?: number[];
+  monthlyHolidays?: number;
+  latePenaltyAmount?: number;
+  earlyLeavePenaltyAmount?: number;
+  absentPenaltyAmount?: number;
   managerId?: string;
   createdAt?: string;
   _count?: {
@@ -31,6 +37,12 @@ export interface DepartmentRegistryRow {
   id: string;
   name: string;
   description?: string;
+  monthlyWorkingDays?: number;
+  weekendDays?: number[];
+  monthlyHolidays?: number;
+  latePenaltyAmount?: number;
+  earlyLeavePenaltyAmount?: number;
+  absentPenaltyAmount?: number;
   shifts: ShiftOutput[];
   employees?:{
     id: string;
