@@ -37,7 +37,7 @@
   <span style="color: #1b7550;">WORK</span><span style="color: #1e1e1e;">TIME</span> — Frontend
 </h1>
 <p align="center" style="margin-top: -10px; font-weight: bold; color: #64748b;">
-  منصة إدارة الحضور الذكية
+  منصة إدارة الحضور والانضباط الذكية
 </p>
 
 <p align="center">
@@ -52,6 +52,7 @@
   <a href="#getting-started">Getting Started</a> •
   <a href="#state-management">State</a> •
   <a href="#api-integration">API</a> •
+  <a href="#release-history">Release History</a> •
   <a href="#license">License</a>
 </p>
 
@@ -59,54 +60,57 @@
 
 ## Overview
 
-**WorkTime Frontend** is the client-side application for a comprehensive employee attendance and departure tracking platform. It provides managers with a real-time interactive dashboard to monitor workforce attendance, manage departments and shifts, review employee excuses, and generate detailed periodic reports — all through a polished, Arabic RTL interface with smooth animations and modern design patterns.
+**WorkTime Frontend** is the client-side application for a comprehensive employee attendance, departure tracking, and workforce intelligence platform.
+
+It empowers organization managers with a real-time interactive dashboard to monitor team attendance, manage departments and custom shifts, review employee excuses, customize deduction rules, and run live interactive demo shifts — all through a polished, Arabic RTL interface with smooth micro-animations and robust design tokens.
 
 ---
 
 ## Features
 
-### 📊 Manager Dashboard
-- **Unified Dashboard Registry** with daily, weekly, and monthly view modes
-- Interactive stat cards with hover animations showing present, absent, late, excused, and escaped counts
-- Date navigation with custom date picker for historical data browsing
-- Real-time data refresh with optimistic UI updates
+### 📊 Manager Dashboard & Unified Registry
+- **Unified Dashboard Registry** supporting daily, weekly, and monthly view modes.
+- Interactive stat cards with animated hover depth showing present, absent, late, excused, and escaped metrics.
+- Date navigation with custom date-range selection and active shift prioritization.
+- Live workforce attendance pulse with instant optimistic UI feedback.
 
-### 🔴 Live Attendance Pulse
-- Real-time monitoring of today's attendance status across all employees
-- Live counters and visual indicators for workforce availability
+### ⏱️ Interactive 10-Minute Demo Shift Simulation
+- **Isolated Live Simulation Engine**: Experience the full attendance cycle in an accelerated 10-minute shift (1-min prep, 7-min work, and grace periods).
+- **Dynamic Countdown Timer (`ShiftCountdown`)**: Real-time visual progress ring with dynamic status messages (Shift Not Started, Normal In, Late In, Work Time, Normal Out, Grace Out).
+- **Simulation Actions & Automatic Process**: Live check-in/out triggers, auto check-out automation, and simulated excuse submission.
 
-### 📋 Attendance Reports
-- Comprehensive attendance report tables with sorting and filtering
-- Chronicle-style data tables with clean typography and hairline dividers
-- Paginated records with configurable page sizes
+### 🏢 Department & Shift Management with Operational Rules
+- Full CRUD interface for departments and shifts with manager-specific scoping.
+- **Operational Rules Configuration**: Set monthly working days (`monthlyWorkingDays`), weekend days array, and custom penalty amounts for late, early leave, and absent statuses.
+- Shift timing configuration with arrival grace period (`gracePeriodMinIn`) and departure grace period (`gracePeriodMinOut`).
 
-### 👥 Employee Directory
-- Searchable employee listing with profile cards
-- Employee info modal with detailed profile, discipline rate, and attendance history
-- Quick actions for adding/removing employees from management
+### ⚙️ Manager Automation & Deduction Controls (`/settings`)
+- Granular toggles for auto check-out, late deductions, early leave deductions, and absent deductions.
+- Option to combine multiple daily deductions into a single end-of-shift deduction or apply prioritized deductions.
 
-### 🏢 Department & Shift Management
-- Full CRUD interface for departments and shifts
-- Visual shift cards with grace period configuration
-- Department-employee relationship management
+### 👥 Team Directory & Employee Management (`/my-employees-list`)
+- Dedicated managed team list for managers with search, department filtering, and pagination.
+- **Employee Profile Card Modal**: Detailed drill-down showing discipline rate, salary, contact info, assigned shift, and full attendance history.
+- Department transfer actions for reassigning subordinates across teams and shifts.
 
-### 📈 Detailed Analytics
-- **Discipline Rate** visualization with performance tier badges
-- **General Evaluation Cards** with summarized statistics
-- **Detailed Attendance Modals** with per-employee drill-down
-- **Salary Deduction** preview with period-based calculations
+### 📈 Employee Personal Dashboard (`/employee-dashboard`)
+- Responsive bento-grid layout showing personal attendance records, monthly working days progress, and salary deductions.
+- **Discipline Rate Gauge**: Visual tier badges (Excellent ≥ 95%, Good ≥ 85%, Fair ≥ 70%).
+- Quick access to excuse submission and shift timetable.
 
-### ⏰ Clock In/Out
-- Employee self-service attendance interface
-- Today's status display with shift timing information
-- Excuse submission workflow (`IN` for late arrival, `OUT` for early departure)
+### 👤 Profile & Avatar Management (`/my-profile`)
+- Profile picture uploads and avatar synchronization with backend storage.
+- Personal information management and password change.
 
-### 🎨 Design System
-- Custom Material Design 3–inspired color palette (primary: `#003527`, secondary: `#4059aa`)
-- RTL-first layout with Arabic language support
-- Three-font typography system: **DM Sans** (body), **Oswald** (headings), **Source Sans 3** (labels)
-- Smooth micro-animations via Framer Motion
-- Card hover pseudo-element effects with cubic-bezier transitions
+### 🔒 Enterprise Security & Silent Auth
+- **Silent Refresh with Request Queueing**: Automatically refreshes expired access tokens in the background without user disruption.
+- **Role-Based Auth Guard (`AuthGuard`)**: Seamless client-side route protection for `SUPER_ADMIN`, `MANAGER`, and `EMPLOYEE`.
+
+### 🎨 RTL Design System
+- Material Design 3–inspired color system (primary: `#003527`, secondary: `#4059aa`).
+- Native RTL layout with Arabic language support.
+- Three-tier typography: **DM Sans**, **Oswald**, and **Source Sans 3**.
+- Smooth micro-animations powered by Framer Motion.
 
 ---
 
@@ -116,128 +120,105 @@
 | :----------------- | :------------------------------------------------------------------- |
 | **Framework**      | [Next.js](https://nextjs.org/) 14 (App Router)                      |
 | **Language**       | [TypeScript](https://www.typescriptlang.org/)                        |
-| **Styling**        | [Tailwind CSS](https://tailwindcss.com/) v4 + Custom CSS layers     |
+| **Styling**        | [Tailwind CSS](https://tailwindcss.com/) v4 + Custom CSS Layers    |
 | **State**          | [Zustand](https://zustand-demo.pmnd.rs/) v5                         |
-| **HTTP Client**    | [Axios](https://axios-http.com/) with interceptors                   |
-| **Charts**         | [Recharts](https://recharts.org/) v2                                 |
+| **HTTP Client**    | [Axios](https://axios-http.com/) with interceptors & request queue   |
 | **Animations**     | [Framer Motion](https://www.framer.com/motion/) v12                  |
 | **Icons**          | [Lucide React](https://lucide.dev/)                                  |
 | **Forms**          | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) |
-| **Date Handling**  | [date-fns](https://date-fns.org/) v4                                 |
+| **Date Handling**  | [date-fns](https://date-fns.org/) + `date-fns-tz`                   |
 | **Utilities**      | [clsx](https://github.com/lukeed/clsx) + [tailwind-merge](https://github.com/dcastil/tailwind-merge) |
 
 ---
 
 ## Architecture
 
-The project follows Next.js 14 App Router conventions with a clean separation between pages, components, stores, and services:
-
 ```
 src/
 ├── app/
-│   ├── (main)/                        # Authenticated route group
-│   │   ├── layout.tsx                 #   Dashboard shell + global modals
-│   │   ├── dashboard/                 #   📊 Manager Dashboard (daily/weekly/monthly)
-│   │   ├── attendance-reports/        #   📋 Attendance Reports & Tables
-│   │   ├── attendance-log/            #   📝 Detailed Attendance Logs
-│   │   ├── live-pulse/                #   🔴 Live Attendance Pulse
-│   │   ├── employees/                 #   👥 Employee Directory
-│   │   ├── employee-profile/          #   👤 Employee Profile View
-│   │   ├── employee-dashboard/        #   📈 Employee Personal Dashboard
-│   │   ├── departments/               #   🏢 Department & Shift Management
-│   │   └── clock/                     #   ⏰ Clock In/Out Interface
-│   ├── globals.css                    # Design system tokens & component styles
-│   ├── layout.tsx                     # Root layout (fonts, RTL, metadata)
-│   └── page.tsx                       # Landing / redirect
+│   ├── (main)/                               # Protected application shell
+│   │   ├── layout.tsx                        #   Dashboard shell with Topbar & Sidebar
+│   │   ├── manager-dashboard/                #   📊 Manager Dashboard (Registry, Metrics, Live Pulse)
+│   │   ├── attendance-departure-check/       #   ⏱️ Clock In/Out & 10-Minute Demo Simulation
+│   │   ├── departments/                      #   🏢 Department & Shift Management + Operational Rules
+│   │   ├── my-employees-list/                #   👥 Managed Team Directory & Profile Modals
+│   │   ├── employee-dashboard/               #   📈 Employee Personal Dashboard (Bento Grid)
+│   │   ├── my-profile/                       #   👤 User Profile & Avatar Management
+│   │   ├── search/                           #   🔍 Global Workforce Search
+│   │   └── settings/                         #   ⚙️ Manager Automation & Deduction Preferences
+│   ├── login/                                # 🔑 Authentication (Sign In)
+│   ├── signup/                               # 📝 User Registration (Sign Up)
+│   ├── globals.css                           # Design system tokens & component utility layers
+│   └── layout.tsx                            # Root HTML layout with RTL metadata & fonts
 │
 ├── components/
-│   ├── layout/                        # Structural components
-│   │   ├── DashboardLayout.tsx        #   Main app shell
-│   │   ├── Sidebar.tsx                #   Navigation sidebar
-│   │   └── Topbar.tsx                 #   Top navigation bar
-│   └── ui/                            # Reusable UI components
-│       ├── ChronicleTable.tsx         #   Data table with clean styling
-│       ├── DatePicker.tsx             #   Custom date navigation
-│       ├── DetailedAttendanceModal.tsx#   Employee attendance drill-down
-│       ├── EmployeeInfoModal.tsx      #   Employee profile modal
-│       ├── GeneralEvaluationCard.tsx  #   Summary statistics card
-│       ├── Logo.tsx                   #   Brand logo component
-│       ├── StatCard.tsx               #   Dashboard stat card
-│       └── StatisticEmployeesCard.tsx #   Employees statistics panel
+│   ├── layout/                               # Structural layouts & global shells
+│   │   ├── Sidebar.tsx                       #   Responsive navigation sidebar with role-aware links
+│   │   ├── Topbar.tsx                        #   Header bar with notifications, profile dropdown & theme
+│   │   ├── AuthGuard.tsx                     #   Role-based route protection & auth state hydration
+│   │   └── AutomaticProcess.tsx              #   Background simulation controller
+│   └── ui/                                   # Reusable UI components
+│       ├── ChronicleTable.tsx                #   Data table with clean typography & hairline dividers
+│       ├── ShiftCountdown.tsx                #   Real-time shift simulation ring & countdown
+│       ├── EmployeeInfoCardModal.tsx         #   Detailed employee drill-down modal
+│       ├── StatistcEmployeesCard.tsx         #   Employee statistics card panel
+│       ├── EmployeesLest.tsx                 #   Subordinate selection list component
+│       └── UserAvatar.tsx                    #   Image avatar with fallback initial monogram
 │
-├── store/                             # Zustand state stores
-│   ├── useAuthStore.ts                #   Authentication state & JWT
-│   ├── useCardStatsStore.ts           #   Card statistics data
-│   ├── useCardUIStore.ts              #   Card/modal UI state
-│   ├── useDashboardUIStore.ts         #   Dashboard view mode & navigation
-│   ├── useGeneralStatsStore.ts        #   General statistics data
-│   └── useRegistryFilterStore.ts      #   Registry filtering & pagination
+├── store/                                    # Zustand state stores
+│   ├── useAuthStore.ts                       #   Authentication tokens, user info & refresh lifecycle
+│   ├── useCheckAttendStore.ts                #   Clock in/out state & interactive demo shift engine
+│   ├── useDeptShiftStore.ts                  #   Departments, shifts & operational rules state
+│   ├── useDirectoryStore.ts                  #   Global employee search & directory listings
+│   ├── useEmployeeRecordStore.ts             #   Employee detailed attendance records
+│   ├── useProfileStore.ts                    #   Profile editing & avatar upload state
+│   ├── useSettingStore.ts                    #   Manager automation toggles & deduction controls
+│   └── useCardUIStore.ts                     #   Card & modal view states
 │
 ├── services/
-│   └── apiClient.ts                   # Axios instance + all API endpoints
+│   ├── apiClient.ts                          # Axios client with silent refresh queue & typed APIs
+│   └── errorHandler.ts                       # Standardized user-friendly error alerts
 │
-└── types/
-    └── dashboard-registry.types.ts    # TypeScript type definitions
+├── utils/
+│   ├── shiftTimingEngine.ts                  # Real-time shift math, stage calculation & countdowns
+│   └── imageUrl.ts                           # Avatar URL resolver (local / uploads / absolute)
+│
+└── types/                                    # TypeScript interfaces & DTO models
 ```
 
 ---
 
 ## Pages & Screens
 
-| Route                    | Screen                          | Description                                        |
-| :----------------------- | :------------------------------ | :------------------------------------------------- |
-| `/dashboard`             | Manager Dashboard               | Unified daily/weekly/monthly attendance overview    |
-| `/attendance-reports`    | Attendance Reports              | Tabular attendance records with filters             |
-| `/attendance-log`        | Detailed Attendance Log         | Per-employee detailed attendance history            |
-| `/live-pulse`            | Live Attendance Pulse           | Real-time workforce attendance monitoring           |
-| `/employees`             | Employee Directory              | Searchable employee listing with quick actions      |
-| `/employee-profile`      | Employee Profile                | Individual employee details and settings            |
-| `/employee-dashboard`    | Employee Personal Dashboard     | Personal attendance stats and discipline rate       |
-| `/departments`           | Departments & Shifts            | Department and shift CRUD management                |
-| `/clock`                 | Clock In/Out                    | Employee self-service attendance punch              |
+| Route                           | Screen                          | Description                                                        |
+| :------------------------------ | :------------------------------ | :----------------------------------------------------------------- |
+| `/manager-dashboard`            | Manager Dashboard               | Unified daily/weekly/monthly registry, metrics & live status       |
+| `/attendance-departure-check`   | Attendance & Departure Check    | Clock in/out with isolated 10-minute interactive demo simulation  |
+| `/departments`                  | Departments & Shifts            | Department CRUD, shifts, and operational penalty rules             |
+| `/my-employees-list`            | Team Directory                  | Managed subordinates list, profile inspection & department transfer|
+| `/employee-dashboard`           | Employee Dashboard              | Personal attendance stats, discipline percentage & bento grid      |
+| `/my-profile`                   | User Profile                    | Profile details management & avatar image upload                   |
+| `/search`                       | Search Directory                | Workforce search with live filtering                               |
+| `/settings`                     | Manager Settings                | Automation toggles (Auto checkout, combined deductions)            |
+| `/login`                        | Sign In                         | Secure authentication with JWT & refresh token storage             |
+| `/signup`                       | Sign Up                         | New account registration with role selection                       |
 
 ---
 
 ## State Management
 
-The application uses **Zustand v5** for lightweight, scalable state management with six purpose-specific stores:
+The application utilizes **Zustand v5** with focused, decoupled stores:
 
-| Store                      | Responsibility                                          |
-| :------------------------- | :------------------------------------------------------ |
-| `useAuthStore`             | JWT token storage, login/logout, authentication state   |
-| `useDashboardUIStore`      | Active tab (daily/weekly/monthly), date anchor, navigation |
-| `useCardUIStore`           | Modal visibility, pagination, column toggles, filters   |
-| `useCardStatsStore`        | Fetched statistics data for cards and modals            |
-| `useGeneralStatsStore`     | General dashboard statistics and summary data           |
-| `useRegistryFilterStore`   | Registry table filters, search, sorting, and pagination |
-
----
-
-## API Integration
-
-All API communication is centralized in [`apiClient.ts`](src/services/apiClient.ts), which provides:
-
-- **Axios instance** with configurable `NEXT_PUBLIC_API_URL` base URL
-- **JWT interceptor** that automatically attaches `Bearer` tokens from the auth store
-- **Typed API namespace** (`API.public`, `API.employee`, `API.managing`, `API.department`) mapping directly to backend endpoints
-
-### API Namespaces
-
-```typescript
-API.public.loginIn(data)            // POST /users/loginIn
-API.public.logUp(data)              // POST /users/logUp
-
-API.employee.getProfile()           // GET  /employee/profile
-API.employee.getTodayStatus()       // GET  /employee/today-status
-API.attendance.checkIn()            // POST /attendance/check-in
-
-API.managing.getDashboardRegistry() // GET  /managing/dashboard-registry
-API.managing.getMyEmployees()       // GET  /managing/my-employees
-API.managing.approveExcuse(id)      // POST /managing/approve-excuse/:id
-
-API.department.getAll()             // GET  /department
-API.department.create(data)         // POST /department
-```
+| Store                     | Responsibility                                                     |
+| :------------------------ | :----------------------------------------------------------------- |
+| `useAuthStore`            | Authentication tokens, user credentials, role detection & refresh  |
+| `useCheckAttendStore`     | Active attendance status, demo shift lifecycle & clock in/out state|
+| `useDeptShiftStore`       | Department listing, active shifts, working days & penalty settings |
+| `useDirectoryStore`       | Search queries, directory results & pagination                     |
+| `useEmployeeRecordStore`  | Selected employee detailed records and attendance drill-down       |
+| `useProfileStore`         | Profile update mutations, avatar preview & upload state            |
+| `useSettingStore`         | Manager automation preferences & deduction combinations            |
+| `useCardUIStore`          | UI modals, card visibility, and navigation tabs                    |
 
 ---
 
@@ -246,7 +227,7 @@ API.department.create(data)         // POST /department
 ### Prerequisites
 
 - **Node.js** v18 or higher
-- **npm** (bundled with Node.js)
+- **npm** package manager
 - **WorkTime Backend** running at `http://localhost:3030` (see [backend README](../nestjs-prisma/README.md))
 
 ### 1. Clone the Repository
@@ -262,15 +243,21 @@ cd workTime-fornt
 npm install
 ```
 
-### 3. Configure Environment
+### 3. Configure Environment Variables
 
-Create a `.env.local` file in the project root:
+Copy the example configuration:
+
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local`:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3030
 ```
 
-### 4. Start the Development Server
+### 4. Start Development Server
 
 ```bash
 npm run dev
@@ -291,73 +278,34 @@ npm run start
 
 | Script          | Description                               |
 | :-------------- | :---------------------------------------- |
-| `npm run dev`   | Start dev server with hot-reload          |
-| `npm run build` | Create optimized production build         |
-| `npm run start` | Serve the production build                |
-| `npm run lint`  | Run ESLint checks                         |
+| `npm run dev`   | Start development server with hot-reload  |
+| `npm run build` | Create optimized production bundle        |
+| `npm run start` | Serve production build locally            |
+| `npm run lint`  | Run ESLint checks across project          |
 
 ---
 
-## Design Tokens
+## Release History
 
-The design system is built on custom CSS variables defined in `globals.css`:
+### 🚀 v4.0.0 — Unified System Release & Interactive Simulation Engine
+- **Interactive Shift Simulation Engine**: Integrated `shiftTimingEngine.ts`, `ShiftCountdown.tsx`, and `AutomaticProcess.tsx` for live 10-minute demo shift testing.
+- **Department Operational Rules UI**: Added working days configuration, custom weekends, and status penalty inputs in `/departments`.
+- **Manager Automation Settings**: New `/settings` page with granular deduction switches and end-of-shift combination toggles.
+- **Standardized Route Restructuring**: Renamed misspelled directories to `/my-employees-list` and `/search` with updated navigation links.
+- **Profile Media Presentation**: Added `UserAvatar` and updated modal cards (`EmployeeInfoCardModal`, `StatistcEmployeesCard`, `ChronicleTable`).
+- **Silent Refresh & Request Queue**: Enhanced `apiClient.ts` with transparent token refreshing and request retries.
 
-| Token                         | Value       | Usage                      |
-| :---------------------------- | :---------- | :------------------------- |
-| `--color-primary`             | `#003527`   | Primary brand color        |
-| `--color-primary-container`   | `#064e3b`   | Primary container fills    |
-| `--color-primary-fixed-dim`   | `#95d3ba`   | Dimmed primary accents     |
-| `--color-secondary`           | `#4059aa`   | Secondary action color     |
-| `--color-error`               | `#ba1a1a`   | Error/destructive states   |
-| `--color-surface`             | `#f8f9fa`   | Page background            |
-| `--color-on-surface`          | `#191c1d`   | Primary text color         |
-| `--font-sans`                 | DM Sans     | Body text                  |
-| `--font-heading`              | Oswald      | Headings                   |
-| `--font-label`                | Source Sans 3 | Labels and table headers |
-
----
-
-## Project Structure
-
-```
-frontend/
-├── src/
-│   ├── app/                   # Next.js App Router pages
-│   ├── components/            # Reusable UI & layout components
-│   ├── store/                 # Zustand state stores
-│   ├── services/              # API client & HTTP layer
-│   └── types/                 # TypeScript type definitions
-├── public/                    # Static assets
-├── next.config.mjs            # Next.js configuration
-├── postcss.config.mjs         # PostCSS + Tailwind v4
-├── tsconfig.json              # TypeScript configuration
-├── .eslintrc.json             # ESLint configuration
-└── package.json               # Dependencies & scripts
-```
-
----
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## Related
-
-- **Backend API** — [WorkTime Backend (NestJS + Prisma)](../nestjs-prisma/README.md)
+### 📦 v3.5.0 — Client Optimization & Bento Grid Architecture
+- **Responsive Bento Grid**: Redesigned `/employee-dashboard` into an interactive bento-grid layout with live evaluations.
+- **Role-Based Navigation**: Dynamic sidebar navigation adapting seamlessly between `SUPER_ADMIN`, `MANAGER`, and `EMPLOYEE`.
+- **Search Directory**: Searchable directory page with live filtering and employee modal inspection.
+- **UI Architecture & Theme**: Standardized Tailwind CSS layers and color tokens.
 
 ---
 
 ## License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
-
----
 
 <p align="center">
   Built with ❤️ using <a href="https://nextjs.org/">Next.js</a>
