@@ -3,6 +3,7 @@ import { globalCache } from '@/utils/cacheManager';
 
 interface AuthUser {
   id: string;
+  profileId: string;
   name: string;
   role: string;
   avatar?: string;

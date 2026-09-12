@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 
 export interface FormattedApiError {
   userFriendlyMessage: string;
@@ -35,18 +35,22 @@ export function handleApiError(
   let traceId = generateClientTraceId();
   let devDetails: FormattedApiError['devDetails'];
 
-  if (err instanceof AxiosError) {
-    statusCode = err.response?.status || 500;
-    const responseData = err.response?.data as any;
+  const isAxios =
+    err instanceof AxiosError ||
+    (axios.isAxiosError ? axios.isAxiosError(err) : false) ||
+    (Boolean(err) && typeof err === 'object' && ('response' in (err as any) || 'isAxiosError' in (err as any)));
+
+  if (isAxios) {
+    const axiosErr = err as any;
+    statusCode = axiosErr.response?.status || 500;
+    const responseData = axiosErr.response?.data as any;
     traceId = responseData?.traceId || traceId;
-    const backendMessage = responseData?.message || responseData?.systemMessage;
+    const backendMessage = responseData?.message || responseData?.systemMessage || responseData?.error;
     const category = responseData?.errorCategory;
 
     devDetails = {
       statusCode,
-      path: err.config?.url,
-      systemMessage: backendMessage || err.message,
-      rawCause: responseData?.cause || err.response?.data,
+      rawCause: responseData?.cause || axiosErr.response?.data,
       timestamp: responseData?.timestamp || new Date().toISOString(),
     };
 
@@ -54,7 +58,7 @@ export function handleApiError(
       errorCategory = category;
     }
 
-    if (err.code === 'ERR_NETWORK' || !err.response) {
+    if (axiosErr.code === 'ERR_NETWORK' || !axiosErr.response) {
       statusCode = 503;
       errorCategory = 'NETWORK_OR_SERVER_UNAVAILABLE';
       userFriendlyMessage = 'تعذر الاتصال بالخادم، يرجى التحقق من اتصال الإنترنت وتشغيل السيرفر.';
@@ -167,6 +171,12 @@ export const ManagingErrorCatch = {
   },
   report: (err: unknown): FormattedApiError => {
     return handleApiError(err, 'تعذر جلب تقرير الحضور للموظف المحدد.');
+  },
+  settingEvents: (err: unknown): FormattedApiError => {
+    return handleApiError(err, 'تعذر جلب إعدادات الأحداث التلقائية.');
+  },
+  updateSettingEvents: (err: unknown): FormattedApiError => {
+    return handleApiError(err, 'تعذر تحديث إعدادات الأحداث التلقائية.');
   },
 };
 

@@ -69,13 +69,13 @@ export function Topbar() {
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchTerm.trim()) {
       setIsSearchOpen(false);
-      router.push(`/searsh?q=${encodeURIComponent(searchTerm.trim())}`);
+      router.push(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
     }
   };
 
   const handleNavigateToDirectory = () => {
     setIsSearchOpen(false);
-    router.push(`/searsh?q=${encodeURIComponent(searchTerm.trim())}`);
+    router.push(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
   };
 
 
@@ -327,10 +327,23 @@ export function Topbar() {
             {/* Mobile Settings Link */}
             <div className="pt-2 border-t border-outline/10">
               <Link 
+                href="/my-profile"
+                className={clsx(
+                  'flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 select-none',
+                  pathname?.startsWith('/my-profile')
+                    ? 'bg-primary/10 text-primary border-r-[3px] border-primary font-bold'
+                    : 'text-on-surface-variant hover:bg-surface-container-low'
+                )}
+              >
+                <User size={18} className="shrink-0" />
+                <span>الملف الشخصي</span>
+              </Link>
+
+              <Link 
                 href="/settings"
                 className={clsx(
                   'flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 select-none',
-                  pathname === '/settings'
+                  pathname?.startsWith('/settings')
                     ? 'bg-primary/10 text-primary border-r-[3px] border-primary font-bold'
                     : 'text-on-surface-variant hover:bg-surface-container-low'
                 )}

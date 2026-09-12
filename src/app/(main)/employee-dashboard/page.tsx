@@ -55,15 +55,13 @@ export default function EmployeeDashboardPage() {
  const [EmplsIds, setEmplsIds] = useState<string[]>([]);
 
  const roleAdmin = user?.role === "SUPER_ADMIN"
- const days = summary?.totalDays||0
+ const days = summary?.totalDays|| 0
  useEffect(()=>{
-    
-     
-     if(roleAdmin && typeof window !== 'undefined'){
-       const data = window.localStorage.getItem("employeeId")
-       const id = data && data !== "" ? JSON.parse(data as string) : [];
-       setEmplsIds(id);
-     }
+  if(roleAdmin && typeof window !== 'undefined'){
+      const data = window.localStorage.getItem("employeeId")
+      const id = data && data !== "" ? JSON.parse(data as string) : [];
+      setEmplsIds(id);
+    }
    },[roleAdmin])
 
    
@@ -73,7 +71,7 @@ export default function EmployeeDashboardPage() {
 
     
     useEffect( ()=> {
-      if(EmplsIds.length === 0)return;
+   if (typeof window === 'undefined' )return;
 
      if(EmplsIds.length > 0 && targetEmployeeId){
       fetchDashboardEmployee(mode,dateAnchor,targetEmployeeId);
@@ -614,7 +612,7 @@ export default function EmployeeDashboardPage() {
         ) : (
           <>
             <div className="overflow-x-auto w-full rounded-lg">
-              <table className="chronicle-table min-w-full text-right font-sans" dir="rtl">
+              <table className="chronicle-table m-auto w-auto text-right font-sans" dir="rtl">
                 <thead>
                   <tr>
                     <th className="p-4 text-right text-primary font-bold border-b border-outline-variant/20 font-label w-40">التاريخ</th>

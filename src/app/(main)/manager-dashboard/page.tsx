@@ -125,7 +125,16 @@ const showFilterBar = !isLoading;
 
  const activeWorkers = registry.filter(r => r.isWorking=== true).length;
   const TotalPages = isDaily ? totalPagesFiltered : (meta?.pagination?.totalPages || totalPagesDash);
-  console.log(TAB_LABEL[activeTab]);
+  let fixedModeTabs:string=""
+  useEffect(() => {
+    if(typeof window === "undefined")return;
+
+    fixedModeTabs = window.scrollY > 0 ? 'fixed' : ''
+
+      console.log(fixedModeTabs)
+  
+  }, [])
+
   // ── source code ───────────────────────────────────────────────────
   return (
     <div className="space-y-8 pb-12" dir="rtl">
@@ -143,7 +152,7 @@ const showFilterBar = !isLoading;
 
         {/* Mode tabs */}
        <ModesTabs activeTab={activeTab} 
-       className='lg:scale-[1.3] lg:translate-x-[14%]'       
+       className= {`${fixedModeTabs}  mt-5 scroll-m-0 lg:scale-[1.3] lg:translate-x-[14%] `}      
        setActiveTab={setActiveTab}
         TAB_LABEL={TAB_LABEL}  />
       </div>
@@ -184,8 +193,8 @@ const showFilterBar = !isLoading;
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <StatCard
-              title="إجمالي الحضور" 
-              value={activeWorkers || 0}
+              title=" الحضور المبكر" 
+              value={metrics?.totalPresent || 0}
               icon={<Users className="text-primary" size={20} />}
               variant="primary" 
               limit={meta?.totalSubordinates || 0}
@@ -196,7 +205,7 @@ const showFilterBar = !isLoading;
             />
             <StatCard
               title="القسم والوردية" 
-              text={meta?.activeShiftContext || 'الإدارة العامة'}
+              text={"كل الأقسم والوردية"}
               icon={<Clock className="text-error" size={20} />}
               variant="surface" 
               delay={0.2}

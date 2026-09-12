@@ -14,7 +14,7 @@ const ROLE_ROUTES: Record<string, string[]> = {
   // Routes restricted to admins/managers only
   ADMIN_ONLY: [
    
-    '/my-employee-lest',
+    '/my-employees-list',
     '/departments',
     '/manager-dashboard'
   ],

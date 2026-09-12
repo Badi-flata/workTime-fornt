@@ -26,7 +26,7 @@ export interface EmployeeProfileOutput {
     name: string;
     startTime: string;
     endTime: string;
-    department?: {
+    departments?: {
       id: string;
       name: string;
     };
