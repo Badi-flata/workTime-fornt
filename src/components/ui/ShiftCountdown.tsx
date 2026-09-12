@@ -1,258 +1,225 @@
 "use client";
 
-import { format } from 'date-fns';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
+import {
+  AttendanceLockStatus,
+  ShiftDefinition,
+  ShiftPhase,
+  computeAttendanceLockStatus,
+} from '@/utils/shiftTimingEngine';
+import { todayReport } from '@/types/demoAttendance.types';
 
-interface ShiftCountdownProps {
-  shiftStartTime?: string;     // e.g., "08:00"
-  shiftEndTime?: string;       // e.g., "17:00"
-  gracePeriodMinIn?: number;    // e.g., 15
-  gracePeriodMinOut?: number;   // e.g., 30
-  periodOfTime?:string;
- workTimNear?:(near:boolean)=>void
- shiftEnded?:(shiftEnded:boolean)=>void
- garceOut?:(garOut:boolean)=>void
-
+export interface ShiftCountdownProps {
+  shift?: ShiftDefinition | null;
+  currentTime?: Date;
+  dateAnchor?: string;
+  hasCheckedIn?: boolean;
+  hasCheckedOut?: boolean;
+  attendanceStatus?: string;
+  lockStatus?: AttendanceLockStatus;
+  onPhaseChange?: (newPhase: ShiftPhase, phaseLabel: string) => void;
+  // Legacy optional props for backwards compatibility
+  shiftStartTime?: string;
+  shiftEndTime?: string;
+  gracePeriodMinIn?: number;
+  gracePeriodMinOut?: number;
+  periodOfTime?: string;
+  workTimNear?: (near: boolean) => void;
+  shiftEnded?: (shiftEnded: boolean) => void;
+  garceOut?: (garOut: boolean) => void;
+  todayReport: todayReport |null;
 }
-
-type Phase = 'PREPARATION' | 'GRACE_IN' | 'SHIFT_WORK' | 'GRACE_OUT' | 'OFF_WORK'|"PAST_REPORT";
-
-interface PhaseDetail {
-  phase: Phase;
-  targetTime: Date;
-  totalDurationMs: number;
-  label: string;
-  color: string;
-  bgColor: string;
-}
-// only to perview and testing
-const da = new Date()
-const d =new  Date(da.getTime() + 3*60*1000 ) 
-const t = new Date(d.getTime()  + 6*60*1000);
 
 export function ShiftCountdown({
-  shiftStartTime =format(d,"HH:mm"),
-  shiftEndTime =format(t,"HH:mm") ,
-  gracePeriodMinIn = 1,
-  gracePeriodMinOut = 1,
-  periodOfTime = format(new Date(), "yyyy-MM-dd"),
-  workTimNear,
-  shiftEnded,
-  garceOut
+  shift,
+  currentTime,
+  dateAnchor,
+  hasCheckedIn = false,
+  hasCheckedOut = false,
+  attendanceStatus,
+  lockStatus: passedLockStatus,
+  todayReport,
+  onPhaseChange,
 }: ShiftCountdownProps) {
-  const [time, setTime] = useState<Date | null>(null);
-  const [phaseDetail, setPhaseDetail] = useState<PhaseDetail | null>(null);
+  const now = currentTime || new Date();
+  const dateStr = dateAnchor || new Date().toISOString().split('T')[0];
 
-  
-  const pastReport = periodOfTime !== format((time || new Date()), "yyyy-MM-dd");
+  // If lockStatus not provided directly, compute it
+  const lockStatus: AttendanceLockStatus =
+    passedLockStatus ||
+    computeAttendanceLockStatus({
+      currentTime: now,
+      dateAnchor: dateStr,
+      shift: shift || null,
+      hasCheckedIn,
+      hasCheckedOut,
+      status: attendanceStatus,
+      todayReport
+    });
 
-  // Initialize time on client side to avoid SSR mismatch
+  // Track phase change to notify parent
+  const prevPhaseRef = useRef<ShiftPhase | null>(null);
   useEffect(() => {
-    setTime(new Date());
-    const timer = setInterval(() => {
-      setTime(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    if (!time || pastReport) return;
-
-    // Helper to get phase details for a specific base date
-    const getPhaseForBaseDate = (baseDate: Date): PhaseDetail | null => {
-      const sHours = parseInt(shiftStartTime.split(':')[0], 10)   || 0;
-      const sMinutes = parseInt(shiftStartTime.split(':')[1], 10) || 0;
-      const eHours = parseInt(shiftEndTime.split(':')[0], 10)     || 0;
-      const eMinutes = parseInt(shiftEndTime.split(':')[1], 10)   || 0;
-
-      // Construct Start Time (S)
-      const S = new Date(baseDate);
-      S.setHours(sHours, sMinutes, 0, 0);
-
-      // Construct End Time (E)
-      const E = new Date(baseDate);
-      E.setHours(eHours, eMinutes, 0, 0);
-      if (E.getTime() < S.getTime()) {
-        E.setDate(E.getDate() + 1); // Spans across midnight
-      }
-
-      const pStart =  new Date(S.getTime() - 30 * 60 * 1000); // 30 mins before shift
-      const gInEnd =  new Date(S.getTime() + gracePeriodMinIn * 60 * 1000);
-      const gOutEnd = new Date(E.getTime() + gracePeriodMinOut * 60 * 1000);
-
-      const currentTimeMs =  time.getTime() ;
-      // Check which phase the current time fits into
-      if (currentTimeMs >= pStart.getTime() && currentTimeMs < S.getTime()) {
-        garceOut?.(false);
-        shiftEnded?.(false);
-        workTimNear?.(true);
-        return {
-          phase: 'PREPARATION',
-          targetTime: S,
-          totalDurationMs: 30 * 60 * 1000,
-          label: 'التحضير لبدء الدوام',
-          color: '#1a73e8', // Primary Blue
-          bgColor: '#e8f0fe',
-        };
-      }
-      if (currentTimeMs >= S.getTime() && currentTimeMs < gInEnd.getTime()) {
-        garceOut?.(false);
-        shiftEnded?.(false);
-        workTimNear?.(false);
-        return {
-          phase: 'GRACE_IN',
-          targetTime: gInEnd,
-          totalDurationMs: gracePeriodMinIn * 60 * 1000,
-          label: 'فترة سماح الدخول',
-          color: '#b06000', // Amber/Yellow
-          bgColor: '#fef7e0',
-        };
-      }
-      if (currentTimeMs >= gInEnd.getTime() && currentTimeMs < E.getTime()) {
-        garceOut?.(false);
-        shiftEnded?.(false);
-        workTimNear?.(false);
-        return {
-          phase: 'SHIFT_WORK',
-          targetTime: E,
-          totalDurationMs: E.getTime() - gInEnd.getTime(),
-          label: 'وقت الدوام الرسمي',
-          color: '#0d652d', // Green
-          bgColor: '#e6f4ea',
-        };
-      }
-      if (currentTimeMs >= E.getTime() && currentTimeMs < gOutEnd.getTime()) {
-        garceOut?.(true);
-        shiftEnded?.(false);
-        workTimNear?.(false);
-        return {
-          phase: 'GRACE_OUT',
-          targetTime: gOutEnd,
-          totalDurationMs: gracePeriodMinOut * 60 * 1000,
-          label: 'فترة سماح الانصراف',
-          color: '#c5221f', // Red
-          bgColor: '#fce8e6',
-        };
-      }
-      if (currentTimeMs >= gOutEnd.getTime()) {
-        shiftEnded?.(true);
-        garceOut?.(false);
-        workTimNear?.(false);
-        return null;
-      }
-
-      return null;
-    };
-
-    // Evaluate candidate dates: Yesterday, Today, Tomorrow
-    const candidates = [
-      new Date(time.getTime() - 24 * 60 * 60 * 1000), // Yesterday
-      new Date(time.getTime()),                       // Today
-      new Date(time.getTime() + 24 * 60 * 60 * 1000)  // Tomorrow
-    ];
-
-    let detectedPhase: PhaseDetail | null = null;
-    for (const d of candidates) {
-      const p = getPhaseForBaseDate(d);
-      if (p) {
-        detectedPhase = p;
-        break;
-      }
+    if (prevPhaseRef.current && prevPhaseRef.current !== lockStatus.phase) {
+      onPhaseChange?.(lockStatus.phase, lockStatus.phaseLabel);
     }
-   
-    setPhaseDetail(detectedPhase);
-  }, [time, shiftStartTime, shiftEndTime, gracePeriodMinIn, gracePeriodMinOut, garceOut, shiftEnded, workTimNear, pastReport]);
+    prevPhaseRef.current = lockStatus.phase;
+  }, [lockStatus.phase, lockStatus.phaseLabel, onPhaseChange]);
 
-  if (!time) {
+  // Handle Static / Non-Active phases
+  if (lockStatus.phase === 'PAST_REPORT') {
     return (
-      <div className="flex flex-col items-center justify-center w-64 h-64 mb-8">
-        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      <div className="flex flex-col items-center justify-center w-64 h-64 mb-8 rounded-full bg-surface-container-low border border-outline-variant/30 relative shadow-sm">
+        <div className="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-2">
+          <span className="material-symbols-outlined text-outline text-[32px]">history</span>
+        </div>
+        <p className="font-label-lg text-[#5f6368] font-bold">سجل حضور قديم</p>
+        <p className="text-[11px] text-outline mt-1 font-sans text-center px-4">
+          عرض أرشيف اليوم السابق
+        </p>
       </div>
     );
   }
-;
-    
-  
-  // If outside working hours, show off work interface
-  if ((pastReport && !phaseDetail) ||  phaseDetail?.phase === 'PAST_REPORT') {
+  if (lockStatus.phase === "TODAY_IS_CHECKED_IN_OFFICIAL_SHIFT") {
     return (
-      <div className="flex flex-col items-center justify-center w-64 h-64 mb-8 rounded-full bg-surface-container-low border border-outline-variant/30 relative">
+      <div className="flex flex-col items-center justify-center w-64 h-64 mb-8 rounded-full bg-surface-container-low border border-outline-variant/30 relative shadow-sm">
         <div className="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-2">
-          <span className="material-symbols-outlined text-outline text-[32px]">lock_clock</span>
+          <span className="material-symbols-outlined text-red-700  text-[32px]">back_hand</span>
         </div>
-        <p className="font-label-lg text-[#5f6368] font-bold">سجل حضور وانصراف  قديم</p>
-      </div>
-    );
-  }
-  // If outside working hours, show off work interface
-  if (!phaseDetail || phaseDetail.phase === 'OFF_WORK') {
-    return (
-      <div className="flex flex-col items-center justify-center w-64 h-64 mb-8 rounded-full bg-surface-container-low border border-outline-variant/30 relative">
-        <div className="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-2">
-          <span className="material-symbols-outlined text-outline text-[32px]">nights_stay</span>
-        </div>
-        <p className="font-label-lg text-[#5f6368] font-bold">خارج أوقات العمل</p>
-        <p className="text-[12px] text-outline mt-1 font-sans text-center px-4">
-          يبدأ العداد قبل الوردية بـ 30 دقيقة
+        <p className="font-label-lg  text-center p-2 text-error font-bold">{lockStatus.phaseLabel}</p>
+        <p className="text-[11px] text-orange-500 text-center  font-sans m-2 px-4">
+         {lockStatus.checkIn.reason}
         </p>
       </div>
     );
   }
 
-  // Calculate remaining time
-  const remainingMs = Math.max(0, phaseDetail.targetTime.getTime() - time.getTime());
+  if (lockStatus.phase === 'FUTURE_REPORT') {
+    return (
+      <div className="flex flex-col items-center justify-center w-64 h-64 mb-8 rounded-full bg-surface-container-low border border-outline-variant/30 relative shadow-sm">
+        <div className="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-2">
+          <span className="material-symbols-outlined text-outline text-[32px]">calendar_month</span>
+        </div>
+        <p className="font-label-lg text-[#5f6368] font-bold">تاريخ مستقبلي</p>
+        <p className="text-[11px] text-outline mt-1 font-sans text-center px-4">
+          لا يمكن تسجيل حضور لتاريخ لاحق
+        </p>
+      </div>
+    );
+  }
+
+  if (lockStatus.phase === 'NO_SHIFT') {
+    return (
+      <div className="flex flex-col items-center justify-center w-64 h-64 mb-8 rounded-full bg-error-container/10 border border-error/20 relative shadow-sm">
+        <div className="w-16 h-16 rounded-full bg-error-container/30 flex items-center justify-center mb-2">
+          <span className="material-symbols-outlined text-error text-[32px]">block</span>
+        </div>
+        <p className="font-label-lg text-error font-bold">لا توجد وردية معينة</p>
+        <p className="text-[11px] text-outline mt-1 font-sans text-center px-4">
+          يرجى التواصل مع مدير النظام
+        </p>
+      </div>
+    );
+  }
+
+  if (lockStatus.phase === 'SHIFT_ENDED') {
+    return (
+      <div className="flex flex-col items-center justify-center w-64 h-64 mb-8 rounded-full bg-[#f1f8f4] border border-[#34a853]/30 relative shadow-sm">
+        <div className="w-16 h-16 rounded-full bg-[#e6f4ea] flex items-center justify-center mb-2">
+          <span className="material-symbols-outlined text-[#0d652d] text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+            event_available
+          </span>
+        </div>
+        <p className="font-label-lg text-[#0d652d] font-bold">انتهت وردية اليوم</p>
+        <p className="text-[11px] text-outline mt-1 font-sans text-center px-4">
+          اكتملت جميع فترات العمل لهذا اليوم
+        </p>
+      </div>
+    );
+  }
+
+  if (lockStatus.phase === 'OFF_WORK_BEFORE') {
+    const remainingMs = Math.max(0, lockStatus.remainingMs);
+    const totalSeconds = Math.floor(remainingMs / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const formatted = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+    return (
+      <div className="flex flex-col items-center justify-center w-64 h-64 mb-8 rounded-full bg-surface-container-low border border-outline-variant/30 relative shadow-sm">
+        <div className="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-2">
+          <span className="material-symbols-outlined text-outline text-[32px]">nights_stay</span>
+        </div>
+        <p className="font-label-lg text-[#5f6368] font-bold">خارج أوقات العمل</p>
+        {remainingMs > 0 ? (
+          <>
+            <div className="font-display-md text-display-md font-bold font-sans tracking-tight text-[#5f6368] mt-1">
+              {formatted}
+            </div>
+            <p className="text-[11px] text-outline mt-0.5 font-label">حتى بدء التحضير للدوام</p>
+          </>
+        ) : (
+          <p className="text-[11px] text-outline mt-1 font-sans text-center px-4">
+            يبدأ التحضير قريباً
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  // Active Counting Phase: PREPARATION | GRACE_IN | SHIFT_WORK | GRACE_OUT
+  const remainingMs = Math.max(0, lockStatus.remainingMs);
   const totalSeconds = Math.floor(remainingMs / 1000);
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-
-  // Format countdown string: hh:mm:ss
   const formattedCountdown = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
   // Progress logic
-  const progressRatio = phaseDetail.totalDurationMs > 0 ? remainingMs / phaseDetail.totalDurationMs : 0;
+  const progressRatio = lockStatus.totalDurationMs > 0 ? remainingMs / lockStatus.totalDurationMs : 0;
   const strokeDasharray = 283; // 2 * PI * r (r = 45) => ~282.7
-  const strokeDashoffset = strokeDasharray * (1 - progressRatio);
+  const strokeDashoffset = strokeDasharray * (1 - Math.max(0, Math.min(1, progressRatio)));
 
   return (
     <div className="relative flex items-center justify-center w-64 h-64 mb-8">
       <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
         {/* Background Track */}
-        <circle 
-          className="text-surface-container-high" 
+        <circle
+          className="text-surface-container-high"
           cx="50"
-          cy="50" 
-          fill="transparent" 
-          r="45" 
-          stroke="currentColor" 
+          cy="50"
+          fill="transparent"
+          r="45"
+          stroke="currentColor"
           strokeWidth="3.5"
         />
         {/* Dynamic Shrinking Circle Arc */}
-        <circle 
-          className="transition-all duration-1000 ease-linear" 
-          cx="50" 
-          cy="50" 
-          fill="transparent" 
-          r="45" 
-          stroke={phaseDetail.color} 
-          strokeDasharray={strokeDasharray} 
-          strokeDashoffset={strokeDashoffset} 
-          strokeLinecap="round" 
+        <circle
+          className="transition-all duration-1000 ease-linear"
+          cx="50"
+          cy="50"
+          fill="transparent"
+          r="45"
+          stroke={lockStatus.phaseColor}
+          strokeDasharray={strokeDasharray}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
           strokeWidth="3.5"
         />
       </svg>
 
       {/* Internal Content */}
       <div className="flex flex-col items-center z-10 text-center px-4">
-        <span 
-          className="px-3 py-1 rounded-full text-[11px] font-bold mb-2 transition-all duration-300"
-          style={{ backgroundColor: phaseDetail.bgColor, color: phaseDetail.color }}
+        <span
+          className="px-3 py-1 rounded-full text-[11px] font-bold mb-2 transition-all duration-300 shadow-sm"
+          style={{ backgroundColor: lockStatus.phaseBgColor, color: lockStatus.phaseColor }}
         >
-          {phaseDetail.label}
+          {lockStatus.phaseLabel}
         </span>
-        <div 
+        <div
           className="font-display-lg text-display-lg font-bold font-sans tracking-tight"
-          style={{ color: phaseDetail.color }}
+          style={{ color: lockStatus.phaseColor }}
         >
           {formattedCountdown}
         </div>

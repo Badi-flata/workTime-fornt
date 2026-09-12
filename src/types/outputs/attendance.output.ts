@@ -22,7 +22,7 @@ export interface DailyBreakdownOutput {
   checkOut: string | null;
   earlyLeaveMinutes?: number;
   lateMinutes?: number;
-  totalWorkedHours?: number | string;
+  totalWorkedHours?: number ;
   totalWorkedMinutes?: number;
   deduction?: number;
   excuseNotes?: string | null;
