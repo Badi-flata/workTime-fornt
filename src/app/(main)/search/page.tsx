@@ -23,7 +23,7 @@ import { UserAvatar } from '@/components/ui/UserAvatar';
 
 function SearchDirectoryContent() {
   const searchParams = useSearchParams();
-  const initialQuery = searchParams.get('q') || '';
+  const initialQuery = searchParams.get('q') ||'' ;
 
   const {
     searchResults,
@@ -44,10 +44,11 @@ function SearchDirectoryContent() {
     clearMessages,
   } = useDirectoryStore();
 
-  const [inputTerm, setInputTerm] = useState(initialQuery);
+  const [inputTerm, setInputTerm] = useState(initialQuery!);
 
   // Initial fetch or when role/page changes
   useEffect(() => {
+    if(typeof window === 'undefined')return;
     if (initialQuery && !searchQuery) {
       setSearchQuery(initialQuery);
       setInputTerm(initialQuery);
@@ -57,7 +58,7 @@ function SearchDirectoryContent() {
       role: roleFilter,
       page: currentPage,
     });
-  }, [roleFilter, currentPage, searchDirectory, initialQuery ]);
+  }, [roleFilter, currentPage, searchDirectory, initialQuery ,searchQuery]);
 
   // Handle Search Input Submission
   const handleSearchSubmit = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +76,7 @@ function SearchDirectoryContent() {
     searchDirectory({ role, page: 1 });
   };
   
-
+console.log("search Query:", searchQuery)
 const paginationSlice = searchResults;
 
   return (
@@ -92,7 +93,7 @@ const paginationSlice = searchResults;
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            exit={  { opacity: 0, y: -10 }}
             className="bg-primary/10 border border-primary/20 text-primary px-4 py-3 rounded-xl flex items-center justify-between shadow-sm"
           >
             <div className="flex items-center gap-2 font-label text-sm">
@@ -195,12 +196,20 @@ const paginationSlice = searchResults;
         </div>
       ) : paginationSlice.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {paginationSlice.map((user: DirectoryUserOutput) => {
+        {
+         paginationSlice.map((user: DirectoryUserOutput) => {
             const isEmployee = user.role === 'EMPLOYEE';
             const isManager = user.role === 'MANAGER' || user.role === 'SUPER_ADMIN';
             const isUnassigned = isEmployee && !user.employeeProfile?.managerId;
-            const disciplineRate = user.employeeProfile?.disciplineRate?.rate ?? 95;
+            const disciplineRateEmp  =  user?.employeeProfile?.disciplineRate?.rate  
+            const organizationDisciplineRate  =  user?.adminProfile?.organizationDiscipline?.rate  
 
+          // const disciplineLabelEmp =  user?.employeeProfile?.disciplineRate?.label 
+          // const organizationDisciplineLabel =  user?.adminProfile?.organizationDiscipline?.label 
+
+            const disciplineRate = isEmployee ? disciplineRateEmp : organizationDisciplineRate
+          // const disciplineLabel = isEmployee ? disciplineLabelEmp : organizationDisciplineLabel
+      // console.log(organizationDisciplineRate)
             return (
               <article
                 key={user.id}
@@ -252,13 +261,14 @@ const paginationSlice = searchResults;
                     <div className="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gradient-to-l from-emerald-500 to-emerald-300 rounded-full"
-                        style={{ width: `${Math.min(100, Math.max(0, disciplineRate))}%` }}
+                        style={{ width: `${Math.min(100, Math.max(0, disciplineRate!))}%` }}
                       />
                     </div>
                   </div>
                 )}
 
                 {isManager && (
+                  <div className='grid grid-cols-2 gap-2'>
                   <div className="bg-surface-container-low rounded-xl p-3 mb-5 text-right flex items-center justify-between">
                     <span className="text-[11px] font-bold text-on-surface-variant/70 font-label flex items-center gap-1">
                       <ShieldCheck size={14} className="text-primary" />
@@ -267,6 +277,25 @@ const paginationSlice = searchResults;
                     <span className="font-heading text-sm font-bold text-primary">
                       {user.adminProfile?.managedDepartments?.length || 1} قسم
                     </span>
+
+                  </div>
+
+                  <div className="bg-surface-container-low rounded-xl p-3 mb-5 text-right">
+                    <div className="flex justify-between items-baseline mb-1">
+                      <span className="text-[11px] font-bold text-on-surface-variant/70 font-label">
+                        معدل الانضباط
+                      </span>
+                      <span className="font-heading text-base font-bold text-primary">
+                        {disciplineRate}%
+                      </span>
+                    </div>
+                    <div className="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-l from-emerald-500 to-emerald-300 rounded-full"
+                        style={{ width: `${Math.min(100, Math.max(0, disciplineRate!))}%` }}
+                      />
+                    </div>
+                  </div>
                   </div>
                 )}
 
@@ -308,13 +337,14 @@ const paginationSlice = searchResults;
             );
           })}
         </div>
-      ) : (
+      ) : 
+        (
         <div className="py-16 text-center text-outline font-label text-sm bg-surface-container-lowest rounded-2xl border border-outline-variant/10">
           لم يتم العثور على أي نتائج مطابقة لمعايير البحث الحالية.
         </div>
-      )}
+        )}
 
-      {/* ── Pagination Footer ─────────────────────────────────────────── */}
+           {/* ── Pagination Footer ─────────────────────────────────────────── */}
                     {totalPages > 1 && (
                         <div
                          className="p-2 border-t mb-15 sticky bottom-20  z-50 max-sm:scale-[0.85] max-sm:min-w-87.5 

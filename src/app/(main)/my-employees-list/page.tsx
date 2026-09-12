@@ -67,7 +67,7 @@ export default function EmployeesDirectoryPage() {
   useEffect(() => {
     if (!selectedEmployee) return;
     const dateAnchor =  searchDate || new Date().toISOString().split('T')[0]
-    const employeeId = selectedEmployee.userId || selectedEmployee?.id;
+    const employeeId = selectedEmployee.id || selectedEmployee?.userId;
     const mode = periodMode || "MONTHLY"
 
     fetchEmployeeAttendanceReport(dateAnchor,mode,employeeId)
@@ -383,7 +383,7 @@ const handlerApply= (userId:string)=>{
                       <div>
                         <p className="font-label text-[11px] text-on-surface-variant">القسم التابع له</p>
                         <p className="font-body text-[14px] font-semibold text-on-surface">
-                          {selectedEmployee.shift?.department?.name || 'الهندسة والتطوير'}
+                          {selectedEmployee.shift?.departments?.name || 'الهندسة والتطوير'}
                         </p>
                       </div>
                     </div>

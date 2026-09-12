@@ -27,13 +27,13 @@ export const navSections = [
           items: [
             { 
               href: '/manager-dashboard', 
-              label: 'لوحة التحكم الإدرية', 
+              label: 'لوحة التحكم الإدارية', 
               icon: LayoutDashboard,
               screen: 'Manager_Dashboard_Main' 
             },
             { 
               href: '/employee-dashboard', 
-              label: 'لوحة التحكم الوظفية', 
+              label: 'لوحة التحكم الوظيفية', 
               icon: LayoutDashboard,
               screen: 'Employee_Personal_Dashboard' 
             },
@@ -44,7 +44,7 @@ export const navSections = [
               screen: 'Attendance_Departure_Check' 
             },
             { 
-              href: '/searsh', 
+              href: '/search', 
               label: 'البحث الشامل', 
               icon: Users,
               screen: 'Employees_Directory' 
@@ -62,7 +62,7 @@ export const navSections = [
               screen: 'Departments_Shifts_Management' 
             },
             {
-              href: '/my-employees-lest',
+              href: '/my-employees-list',
               label: 'تفاصيل الموظفين',
               icon: Users,
               screen: 'My_Employees'
@@ -80,13 +80,13 @@ export const navSections = [
           items: [
             { 
               href: '/manager-dashboard', 
-              label: 'لوحة التحكم الإدرية', 
+              label: 'لوحة التحكم الإدارية', 
               icon: LayoutDashboard,
               screen: 'Manager_Dashboard_Main' 
             },
             
             {
-              href: '/my-employees-lest',
+              href: '/my-employees-list',
               label: 'تفاصيل الموظفين',
               icon: Users,
               screen: 'My_Employees_Lest'
@@ -99,7 +99,7 @@ export const navSections = [
           label: 'العمليات',
           items: [
              { 
-              href: '/searsh', 
+              href: '/search', 
               label: 'البحث الشامل', 
               icon: Users,
               screen: 'Employees_Directory' 
@@ -123,7 +123,7 @@ export const navSections = [
             items: [
               { 
                 href: '/employee-dashboard', 
-                label: 'لوحة التحكم الوظفية', 
+                label: 'لوحة التحكم الوظيفية', 
                 icon: LayoutDashboard,
                 screen: 'Employee_Personal_Dashboard' 
               },
@@ -134,7 +134,7 @@ export const navSections = [
                 screen: 'Attendance_Departure_Check' 
               },
               { 
-                href: '/searsh', 
+                href: '/search', 
                 label: 'البحث الشامل', 
                 icon: Users,
                 screen: 'Employees_Directory' 
