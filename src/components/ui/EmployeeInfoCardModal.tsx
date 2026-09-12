@@ -52,6 +52,7 @@ export function EmployeeInfoCardModal() {
     }
   }, [selectedUser, departmentNames, shifts]);
 
+  //auto close modal after 5 seconds when success message or error message
    useEffect(() => {
   if (successMessage|| (error|| messageError)) {
     const timer = setTimeout(() => {
@@ -68,6 +69,7 @@ export function EmployeeInfoCardModal() {
   }, [successMessage, clearMessages, error, messageError]);
 
   if (!isInfoModalOpen || !selectedUser) return null;
+
   // selected elements role
   const isEmployee = selectedUser.role === 'EMPLOYEE';
   const isManager = selectedUser.role === 'MANAGER' || selectedUser.role === 'SUPER_ADMIN';
@@ -77,10 +79,23 @@ export function EmployeeInfoCardModal() {
   const isCurrentUserEmployee = currentUser?.role === 'EMPLOYEE';
   // status of selected user
   const isUnassignedEmployee = isEmployee && !selectedUser.employeeProfile?.managerId;
-  const isMyEmployee = isCurrentUserAdmin && selectedUser.employeeProfile?.managerId === currentUser?.id;
+  const currentAdminProfileId = (currentUser as any)?.adminProfile?.id;
+  const isMyEmployee = isCurrentUserAdmin && (
+    (currentAdminProfileId && selectedUser.employeeProfile?.managerId === currentAdminProfileId) ||
+    selectedUser.employeeProfile?.managerId === currentUser?.id
+  );
   
-  const disciplineRate  = isCurrentUserEmployee ? selectedUser.employeeProfile?.disciplineRate?.rate ?? 95 : selectedUser.adminProfile?.organizationDiscipline?.rate ?? 95;
-  const disciplineLabel = isCurrentUserEmployee ? selectedUser.employeeProfile?.disciplineRate?.label ?? 'ممتاز' : selectedUser.adminProfile?.organizationDiscipline?.label ?? 'ممتاز';
+  const disciplineRateEmp  =  selectedUser?.employeeProfile?.disciplineRate?.rate  
+  const organizationDisciplineRate  =  selectedUser?.adminProfile?.organizationDiscipline?.rate  
+
+  const disciplineLabelEmp =  selectedUser?.employeeProfile?.disciplineRate?.label 
+  const organizationDisciplineLabel =  selectedUser?.adminProfile?.organizationDiscipline?.label 
+
+  const disciplineRate = isEmployee ? disciplineRateEmp : organizationDisciplineRate
+  const disciplineLabel = isEmployee ? disciplineLabelEmp : organizationDisciplineLabel
+
+  console.log("disciplineRate", disciplineRate);
+  console.log("disciplineLabel", disciplineLabel);
 
   const handleConfirmAssignment = async () => {
     if (!selectedUser) {
@@ -133,7 +148,7 @@ export function EmployeeInfoCardModal() {
       return;
     }
 
-   const adminId =  selectedUser?.adminProfile?.userId ||selectedUser.id
+   const adminId =  selectedUser?.adminProfile?.id || selectedUser?.adminProfile?.userId ||selectedUser.id
 
     await setManagerForEmployee(adminId);
   };
@@ -367,7 +382,7 @@ export function EmployeeInfoCardModal() {
                 <div className="w-full bg-surface-container-high rounded-full h-2 overflow-hidden">
                   <div
                     className="bg-primary h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min(100, Math.max(0, disciplineRate))}%` }}
+                    style={{ width: `${Math.min(100, Math.max(0, disciplineRate!))}%` }}
                   />
                 </div>
               </div>

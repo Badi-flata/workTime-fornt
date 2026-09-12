@@ -12,6 +12,7 @@ import Image from 'next/image';
 
 import '../../app/globals.css';
 import { useCardUIStore } from '@/store/useCardUIStore';
+import { useRegistryFilterStore } from '@/store/useRegistryFilterStore';
 
 const STATUS_LABELS: Record<string, string> = {
   "ON_TIME": 'الحاضرين',
@@ -89,19 +90,21 @@ export function StatisticEmployeeCard() {
      closeModals, statisticFilter ,turnColumnsCard , setTogglePageCard , setTurnColumnsCard} = useCardUIStore();
      
      const { activeTab, dateAnchor } = useDashboardUIStore();
-     const { modalRegistry, modalIsLoading, fetchModalRegistry } = useCardStatsStore();
+     const { searchDate } = useRegistryFilterStore()
+     const { modalRegistry, modalIsLoading, fetchModalRegistry , } = useCardStatsStore();
 
      useEffect(() => {
        if (isStatisticEmployeesCardOpen) {
          fetchModalRegistry({
            mode: activeTab,
-           dateAnchor: dateAnchor,
+           dateAnchor: searchDate,
            status: statisticFilter,
            limit: String(totalItemsCard || 50),
            excludeBreakdown: true,
          });
+
        }
-     }, [isStatisticEmployeesCardOpen, activeTab, dateAnchor, statisticFilter, totalItemsCard, fetchModalRegistry]);
+     }, [isStatisticEmployeesCardOpen, activeTab, searchDate , statisticFilter, totalItemsCard, fetchModalRegistry]);
   
     if(!isStatisticEmployeesCardOpen) return null;
 
@@ -122,7 +125,7 @@ export function StatisticEmployeeCard() {
   const paginatedData = modalRegistry.slice((PageCard - 1) * Limit, PageCard * Limit);
 
   console.log("Items Card:", modalRegistry.length)
-  console.log("Items Card:", pageCard)
+  console.log("page Card:", pageCard)
 
   return (
     <AnimatePresence>
@@ -249,23 +252,22 @@ export function StatisticEmployeeCard() {
                         </td>):(
                         <td>
                       <td>
-                  <div className={`flex items-center gap-2 ${COUNT_COLOR[statisticFilter][0]} px-3 py-1.5 rounded-lg  select-none`}>
+                  <span className={`flex items-center gap-2 ${COUNT_COLOR[statisticFilter][0]} px-3 py-1.5 rounded-lg  select-none`}>
                     <span className={`text-sm font-sans leading-5 font-medium ${COUNT_COLOR[statisticFilter][1]}`}>
                             {STATUS_LABEL[statisticFilter] || employee?.dailyBreakdown[0]?.status ||'-'}
                     </span>
-                  </div>
+                  </span>
                 </td>
-                        </td>) }
-
+             </td>) }
                     {/* التقيم */}
                       <td>
                          <td>
-                  <div className={`flex items-center gap-2 ${RATING_COLOR[employee.disciplineRating][0]} px-3 py-1.5 rounded-lg  select-none`}>
+                  <span className={`flex items-center gap-2 ${RATING_COLOR[employee.disciplineRating][0]} px-3 py-1.5 rounded-lg  select-none`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${RATING_COLOR[employee.disciplineRating][1]} animate-pulse`} />
                       <span className={` text-sm font-sans leading-5 font-medium ${RATING_COLOR[employee.disciplineRating][2]}`}>
                       {RATING_LABEL[employee.disciplineRating] || employee.disciplineRating}
                     </span>
-                  </div>
+                  </span>
                 </td>
                       </td>
                     {/* عداد ايام التي تكرار فيها الحالة */}
@@ -296,8 +298,8 @@ export function StatisticEmployeeCard() {
                       <td className="tabular-nums text-on-surface-variant">{entry?.checkOut ? entry.checkOut : '—'}</td>
                       <td className="text-on-surface-variant">{entry?.excuseNotes !== null ? entry?.excuseNotes: '—'}</td>
                       <td>{ statisticFilter !== "DEDUCTED" ?
-                              <span className="text-error font-bold">
-                          {employee?.summary.totalDeductions.toLocaleString('ar-SA')}
+                          <span className="text-error font-bold">
+                            {employee?.summary.totalDeductions.toLocaleString('ar-SA')}
                           <span className="text-on-surface-variant text-xs font-normal mr-1">ر.س</span>
                         </span>:"-"}</td>
                     </>
@@ -305,7 +307,6 @@ export function StatisticEmployeeCard() {
                 })()
               )}
                   </motion.tr>
-                
               )):
               (
                <tr>
@@ -314,8 +315,7 @@ export function StatisticEmployeeCard() {
               </td>
               </tr>
               )
-               }
-              
+            }
               </tbody>
             </table>
   

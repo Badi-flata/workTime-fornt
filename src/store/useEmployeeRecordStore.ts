@@ -131,7 +131,8 @@ export const useEmployeeRecordStore = create<EmployeeRecordStore>((set, get) => 
     try {
       set({ isLoadingReport: true, errorMessage: null });
       const res = await API.managing.getPeriodReport({ dateAnchor, mode, employeeId });
-      const result = res.data;
+      const rawData = res.data as any;
+      const result = rawData?.data || rawData;
 
       if (result && result.records && result.summary) {
         globalCache.set(cacheKey, result, 'managing', 5);

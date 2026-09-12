@@ -92,7 +92,7 @@ export const useCardUIStore = create<useCardUIState>((set) => ({
   statisData: { fil: undefined, totalItemsCard: 0 },
 
   turnColumnsCard: 1,
-  isSidebarCollapsed: false,
+  isSidebarCollapsed: true,
 
   statisticFilter: 'ON_TIME',
   periodScope: '',

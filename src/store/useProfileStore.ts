@@ -135,7 +135,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         set({ message: 'لم يتم العثور على بيانات المستخدم', isLoading: false });
         return;
       }
-     console.log("mate",mate)
+
       const rawProfile = user.role === 'EMPLOYEE' ? user.employeeProfile : user.adminProfile;
       const isEmployee = user.role === 'EMPLOYEE';
 
@@ -199,10 +199,12 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
                   rate: mate.rate,
                   label: mate.label,
                   periodCountDiscipline: mate.periodCountDiscipline,
-                  includeSum: { totalDays: mate.includeSum.totalDays,
+                  includeSum: mate.includeSum && { 
+                  totalDays: mate.includeSum.totalDays,
                   onTimeDays: mate.includeSum.onTimeDays,
                   lateDays: mate.includeSum.lateDays,
-                  absentDays: mate.includeSum.absentDays,}
+                  absentDays: mate.includeSum.absentDays,
+                  } 
                 },
               },
             }

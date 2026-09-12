@@ -55,7 +55,7 @@ export const useDirectoryStore = create<DirectoryState>((set, get) => ({
 
   searchQuery: '',
   roleFilter: 'all',
-  currentPage: 5,
+  currentPage: 1,
   totalPages: 1,
   totalCount: 0,
   itemsPerPage: 6,
@@ -244,6 +244,8 @@ export const useDirectoryStore = create<DirectoryState>((set, get) => ({
     try {
       const res = await API.employee.setManager({ managerId: managerUserId });
       globalCache.invalidateTag('directory');
+      globalCache.invalidateTag('attendance');
+      globalCache.invalidateTag('profile');
 
       set({
         successMessage: (res.data as any)?.message || 'تم تعيين المدير بنجاح',
@@ -278,7 +280,8 @@ export const useDirectoryStore = create<DirectoryState>((set, get) => ({
     try {
       const res = await API.managing.firedEmployee(id);
       globalCache.invalidateTag('directory');
-
+      globalCache.invalidateTag('attendance');
+      globalCache.invalidateTag('profile');
       set({
         successMessage: (res.data as any)?.message || 'تم فصل الموظف بنجاح',
         isAssigning: false,

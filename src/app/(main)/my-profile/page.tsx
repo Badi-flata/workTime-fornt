@@ -244,9 +244,14 @@ export default function EmployeeProfilePage() {
   const disciplineRate = role === "EMPLOYEE" && dsicipline?.employee?.rate !== undefined ? dsicipline?.employee?.rate + '%' :
    (role ==="SUPER_ADMIN" || role === "MANAGER") && dsicipline?.admin?.organizationRate !== undefined ? dsicipline?.admin?.organizationRate + "%" : '0%';
  
-   const disciplineLabel = role === "EMPLOYEE " && dsicipline?.employee?.label !== undefined ? dsicipline?.employee?.label :
-   (role ==="SUPER_ADMIN" || role === "MANAGER") && dsicipline?.admin?.organizationLabel !== undefined ? dsicipline?.admin?.organizationLabel : " لا يوجد بيانات ";
-   console.log("emp count",emp?.length)
+   const disciplineLabel = role === "EMPLOYEE" && dsicipline?.employee?.label !== undefined ?
+    dsicipline?.employee?.label :
+   (role === "SUPER_ADMIN" || role === "MANAGER") && dsicipline?.admin?.organizationLabel !== undefined ? 
+    dsicipline?.admin?.organizationLabel :
+     " لا يوجد بيانات ";
+
+
+   console.log("discipline label",disciplineLabel)
 
   if (error && !fullName) {
     return (
@@ -648,7 +653,7 @@ export default function EmployeeProfilePage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
                     <div className="flex flex-col gap-2">
                       <span className="font-body text-[16px] font-semibold text-secondary">القسم</span>
-                      <div className="bg-secondary/5 border border-outline-variant/20 p-4 rounded-xl shadow-xs">
+                      <div className="bg-secondary/3 border border-outline-variant/20 p-4 rounded-xl shadow-lg">
                         <p className="font-body text-[20px] font-semibold text-[#581c87]">
                           {profile?.employee?.departmentName || 'غير محدد'}
                         </p>
@@ -657,7 +662,7 @@ export default function EmployeeProfilePage() {
 
                     <div className="flex flex-col gap-2">
                       <span className="font-body text-[16px] font-semibold text-secondary">المدير المباشر</span>
-                      <div className="bg-secondary/5 border border-outline-variant/20 p-4 rounded-xl shadow-xs">
+                      <div className="bg-secondary/3 border border-outline-variant/20 p-4 rounded-xl shadow-lg">
                         <p className="font-body text-[20px] font-semibold text-[#581c87]">
                           {profile?.employee?.managerName || 'غير محدد'}
                         </p>
@@ -666,7 +671,7 @@ export default function EmployeeProfilePage() {
 
                     <div className="flex flex-col gap-2">
                       <span className="font-body text-[16px] font-semibold text-secondary">الوردية</span>
-                      <div className="bg-secondary/5 border border-outline-variant/20 p-4 rounded-xl shadow-xs">
+                      <div className="bg-secondary/3 shadow-lg border border-outline-variant/20 p-4 rounded-xl ">
                         <p className="font-body text-[20px] font-semibold text-[#581c87]">
                           {profile?.employee?.shiftName || 'غير محدد'}
                         </p>
@@ -675,13 +680,27 @@ export default function EmployeeProfilePage() {
 
                     <div className="flex flex-col gap-2">
                       <span className="font-body text-[16px] font-semibold text-secondary">معلومات التواصل للمدير</span>
-                      <div className="bg-secondary/5 border border-outline-variant/20 p-4 rounded-xl shadow-xs flex flex-col gap-1">
-                        <p className="font-body text-[16px] font-medium text-[#581c87]" dir="ltr">
-                          {profile?.employee?.managerPhone || 'لا يوجد هاتف'}
-                        </p>
-                        <p className="font-body text-[16px] font-medium text-[#581c87]" dir="ltr">
-                          {profile?.employee?.managerEmail || 'لا يوجد بريد إلكتروني'}
-                        </p>
+                     
+                    <div className=" shadow-lg border border-outline-variant/20 p-4 rounded-xl bg-secondary/3 flex flex-col justify-baseline gap-1">
+                      <div className="flex items-center gap-2">
+                      <div className="w-9 h-9 rounded-full bg-secondary/10 flex items-center justify-center text-secondary mt-0.5 shrink-0">
+                      <span className="material-symbols-outlined   text-[#581c87]  text-[18px]">call</span>
+                     </div>
+                    <div>
+                      <p className="font-label text-[12px] text-on-surface-variant mb-0.5">رقم الهاتف</p>
+                      <p className="font-body text-[16px] font-medium text-secondary" dir="ltr">{profile?.employee?.managerPhone || 'غير محدد'}</p>
+                    </div>
+                   </div>
+
+                   <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-full bg-secondary/10 flex items-center justify-center text-secondary mt-0.5 shrink-0">
+                      <span className="material-symbols-outlined text-[#581c87] text-[18px]">email</span>
+                    </div>
+                    <div>
+                      <p className="font-label text-[12px] text-on-surface-variant mb-0.5">البريد الإلكتروني</p>
+                      <p className=" font-body text-[16px] font-medium text-secondary" dir="ltr">{profile?.employee?.managerEmail || 'غير محدد'}</p>
+                    </div>
+                   </div>
                       </div>
                     </div>
                   </div>

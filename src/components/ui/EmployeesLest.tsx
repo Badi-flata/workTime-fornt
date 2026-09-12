@@ -121,7 +121,7 @@ export function EmployeesLest ({setFilter,setQuery ,setSidebarPage,
                                 <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                                   isSelected ? 'bg-white/20 text-white' : 'bg-primary/10 text-primary'
                                 }`}>
-                                  {emp.shift?.department?.name || 'موظف'}
+                                  {emp.shift?.departments?.name || 'موظف'}
                                 </span>
                               </div>
                               <p className={`text-xs truncate ${isSelected ? 'text-white/80' : 'text-outline'}`}>
