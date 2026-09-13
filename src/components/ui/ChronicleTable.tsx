@@ -51,7 +51,7 @@ function AvatarCell({ name, avatar }: { name: string; avatar: string }) {
     <div className="flex items-center gap-3">
       <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center
                       text-primary font-bold text-sm shrink-0 overflow-hidden">
-            <UserAvatar src={avatar} alt={name} size={32}  className="rounded-full object-cover" />
+            <UserAvatar name={name} src={avatar} alt={name} size={32}  className="rounded-full object-cover" />
       </div>
       <span className="font-semibold text-on-surface whitespace-nowrap">{name}</span>
     </div>
