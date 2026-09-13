@@ -166,7 +166,7 @@ export default function EmployeeProfilePage() {
       return;
     }
 
-    if (!formEmail.trim() || !formEmail.includes('@gmail.com')) {
+    if (!formEmail.trim()) {
       setFormError('يرجى إدخال بريد إلكتروني صالح');
       return;
     }
@@ -252,7 +252,7 @@ export default function EmployeeProfilePage() {
      " لا يوجد بيانات ";
 
 
-   console.log("discipline label",disciplineLabel)
+  //  console.log("discipline label",disciplineLabel)
 
   if (error && !fullName) {
     return (

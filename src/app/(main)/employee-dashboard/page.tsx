@@ -51,7 +51,7 @@ export default function EmployeeDashboardPage() {
  const [customMessage , setCustomMessage] = useState<string|null>(null)
  const [currentPage , setCurrentPage] = useState<number>(1)
  const [searchQueryDate , setSearchQueryDate] = useState<string>("")
- const [statusFilter, setStatusFilter] = useState<'ALL' | 'PRESENT' | 'LATE' | 'EXCUSED' | 'DEDUCTED'>('ALL');
+ const [statusFilter, setStatusFilter] = useState<'ALL' | 'PRESENT' | 'LATE' | 'EXCUSED'| 'ABSENT' | 'DEDUCTED'>('ALL');
  const [EmplsIds, setEmplsIds] = useState<string[]>([]);
 
  const roleAdmin = user?.role === "SUPER_ADMIN"
@@ -127,7 +127,11 @@ export default function EmployeeDashboardPage() {
       setCurrentPage(1);
  
    } else if (statusFilter === 'EXCUSED') {
-     result = result.filter(rec => rec.status === 'EXCUSED' || rec.status === 'ABSENT');
+     result = result.filter(rec => rec.status === 'EXCUSED');
+      setCurrentPage(1);
+
+   } else if (statusFilter === 'ABSENT') {
+     result = result.filter(rec => rec.status === 'ABSENT');
       setCurrentPage(1);
      
    } else if (statusFilter === 'DEDUCTED') {
@@ -450,7 +454,7 @@ export default function EmployeeDashboardPage() {
         
         <div className="flex flex-col sm:flex-row md:justify-around items-center gap-4 w-full lg:w-auto">
           {/* Filters Modes Switcher */}
-          <div className="flex flex-col items-center sm:items-end gap-1 w-full sm:w-auto">
+          <div className="flex flex-col items-center sm:items-end gap-1 w-auto sm:w-auto">
             <div className="flex items-center bg-surface-container-low p-1.5 rounded-lg border border-outline-variant/30 w-full sm:w-auto justify-center">
               <button
                 onClick={() => setFiltersMode('WEEKLY')}
@@ -487,6 +491,45 @@ export default function EmployeeDashboardPage() {
         </div>
       </div>
 
+        {/* deductions filter cards */}
+          <div
+              className="col-span-4 lg:col-span-6 bg-surface-container-lowest border
+              border-outline-variant/20 rounded-xl p-5 flex max-[450px]:flex-col  justify-between max-md:justify-center gap-4 shadow-sm">
+            <div 
+            onClick={() => setStatusFilter(prev => prev === 'DEDUCTED' ? 'ALL' : 'DEDUCTED')}
+            className={`bg-surface-container-lowest shrink-1 border rounded-xl p-5 flex flex-col justify-between hover:border-error/40 transition-all shadow-sm cursor-pointer w-2/2 bg-error-container/5 ${
+                statusFilter === 'DEDUCTED' ? 'border-error ring-2 ring-error/20 bg-error/5' : 'border-outline-variant/20'
+              }`} >
+                <div className="flex justify-between items-start mb-2">
+                <p className="font-label text-[11px] text-on-surface-variant">إجمالي أيام الخصم</p>
+                <span className="material-symbols-outlined text-error text-[20px]">calendar_month</span>
+              </div>
+              <div className="flex items-baseline gap-1 mt-2">
+                <span className="font-headline text-[32px] font-bold text-error leading-none">
+                  {summary?.deductionDays || 0}
+                </span>
+                <span className="font-label text-[10px] font-semibold text-error/80 uppercase">أيام</span>
+              </div>
+            </div>
+
+            <div 
+            className={`bg-surface-container-lowest shrink-0 border rounded-xl p-5 
+            flex flex-col justify-between hover:border-error/40 transition-all
+            shadow-sm cursor-pointer w-1/3 max-[450px]:w-2/2 bg-error-container/5 `
+              }>
+                <div className="flex justify-between items-start w-full mb-2">
+                <p className="font-label text-[11px] text-on-surface-variant">إجمالي الخصومات</p>
+                <span className="material-symbols-outlined text-error text-[20px]">payments</span>
+              </div>
+              <div className="flex items-baseline gap-1 mt-2">
+                <span className="font-headline text-[32px] font-bold text-error leading-none">
+                  {summary?.totalDeductions || 0}
+                </span>
+                <span className="font-label text-[10px] font-semibold text-error/80 uppercase">SAR</span>
+              </div>
+          </div>
+
+          </div>
       {/* Metrics Cards (Clickable Filters) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         {/* Present Days Card */}
@@ -594,6 +637,7 @@ export default function EmployeeDashboardPage() {
                   statusFilter === 'PRESENT' ? 'الحاضرين' :
                   statusFilter === 'LATE' ? 'المتأخرين' :
                   statusFilter === 'EXCUSED' ? 'المعذورين' :
+                  statusFilter === 'ABSENT' ? 'الغائبين' :
                   statusFilter === 'DEDUCTED' ? 'المخصوم منهم' : ''
                 }) ✕
               </button>

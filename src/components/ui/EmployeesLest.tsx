@@ -78,7 +78,7 @@ export function EmployeesLest ({setFilter,setQuery ,setSidebarPage,
                   </div>
 
                   {/* Subordinates list structured like a vertical timeline */}
-                  <div className="py-5 space-y-6 relative">
+                  <div className=" py-5 space-y-6 relative">
                     {/* Vertical timeline line */}
                     <div className="absolute inset-y-0 right-[15px] w-px bg-outline-variant/30 pointer-events-none" />
 

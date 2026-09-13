@@ -66,10 +66,12 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
 
       - name: Build Next.js (Static Export)
-        # NEXT_PUBLIC_API_URL يُحقن من GitHub Secrets لحماية الرابط
+        # حقن متغيرات البيئة من GitHub Actions Secrets أو Variables لحماية الروابط الخاصة
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
         env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_API_DEV_URL: ${{ secrets.NEXT_PUBLIC_API_DEV_URL || vars.NEXT_PUBLIC_API_DEV_URL }}
+          NEXT_PUBLIC_API_PUBLISH_URL: ${{ secrets.NEXT_PUBLIC_API_PUBLISH_URL || vars.NEXT_PUBLIC_API_PUBLISH_URL || secrets.NEXT_PUBLIC_API_DEV_URL || vars.NEXT_PUBLIC_API_DEV_URL }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || vars.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_DEV_URL || vars.NEXT_PUBLIC_API_DEV_URL }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

@@ -30,31 +30,11 @@ import {
 import { DemoSourceData, DemoCheckInInput, DemoCheckOutInput } from '../types/demoAttendance.types';
 import { useAuthStore } from '../store/useAuthStore';
 
-// استخراج رابط الـ Backend ديناميكياً ودقيقاً حسب البيئة الحالية للمتصفح أو السيرفر
+import { getBackendBaseUrl } from '../utils/imageUrl';
+
+// استخراج رابط الـ Backend ديناميكياً ودقيقاً عبر دالة getBackendBaseUrl المركزية
 export const getApiBaseUrl = (): string => {
-  if (typeof window !== 'undefined') {
-    // إذا كان المتصفح يتصفح من localhost أو 127.0.0.1 بأي منفذ: استخدام سيرفر التطوير المحلي
-
-    // في بيئة النشر السحابي (Railway أو Vercel أو النطاقات الحية):
-    return (
-      process.env.NEXT_PUBLIC_API_PUBLISH_URL ||
-      process.env.NEXT_PUBLIC_API_URL  ||""
-    );
-  }
-
-  // في جهة السيرفر / وقت البناء (SSR / Build time):
-  if (process.env.RAILWAY_ENVIRONMENT || process.env.VERCEL) {
-    return (
-      process.env.NEXT_PUBLIC_API_PUBLISH_URL ||
-      process.env.NEXT_PUBLIC_API_URL  ||""
-    );
-  }
-
-  return (
-    process.env.NEXT_PUBLIC_API_DEV_URL ||
-    process.env.NEXT_PUBLIC_API_URL ||
-    'http://localhost:3030'
-  );
+  return getBackendBaseUrl();
 };
   
 export const apiClient = axios.create({

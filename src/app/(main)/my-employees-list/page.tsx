@@ -52,7 +52,7 @@ export default function EmployeesDirectoryPage() {
   // Report Filter states
   
   // Metric Cards Filter State
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'PRESENT' | 'LATE' | 'EXCUSED' | 'DEDUCTED'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'PRESENT' | 'LATE' | 'EXCUSED'| 'ABSENT' | 'DEDUCTED'>('ALL');
 
   // Table pagination
   const [tablePage, setTablePage] = useState(1);
@@ -118,7 +118,11 @@ export default function EmployeesDirectoryPage() {
       result = result.filter(rec => rec.status === 'LATE');
      setTablePage(1);
     } else if (statusFilter === 'EXCUSED') {
-      result = result.filter(rec => rec.status === 'EXCUSED' || rec.status === 'ABSENT');
+      result = result.filter(rec => rec.status === 'EXCUSED');
+       setTablePage(1);
+    
+    } else if (statusFilter === 'ABSENT') {
+      result = result.filter(rec => rec.status === 'ABSENT');
        setTablePage(1);
     } else if (statusFilter === 'DEDUCTED') {
       result = result.filter(rec => (rec.deduction ?? 0) > 0);
@@ -297,7 +301,7 @@ const handlerApply= (userId:string)=>{
                 className="space-y-6"
               >
                 {/* Selected Employee Header Card */}
-                <div className="bg-surface-container-lowest border border-primary/10 rounded-xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+                <div className="bg-surface-container-lowest border border-primary/10 rounded-xl p-6 md:p-8 flex flex-col sm:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
                   <div className="absolute -right-24 -top-24 w-64 h-64 bg-primary-container/5 rounded-full blur-3xl pointer-events-none"></div>
                   <div className="flex items-center gap-6 relative z-10">
                     <UserAvatar
@@ -323,8 +327,8 @@ const handlerApply= (userId:string)=>{
                   </div>
 
                   {/* Switch Period Options */}
-                  <div className="relative z-10 flex flex-col items-end gap-2 w-full md:w-auto">
-                    <div className="flex items-center bg-surface-container-low p-1.5 rounded-lg border border-outline-variant/30 w-full md:w-auto justify-center">
+                  <div className="relative z-10 flex flex-col items-center sm:items-end  gap-2 w-full sm:w-auto">
+                    <div className="flex items-center bg-surface-container-low p-1.5 rounded-lg border border-outline-variant/30 w-auto  justify-center">
                       <button
                         onClick={() => setPeriodMode('WEEKLY')}
                         className={`px-6 py-1.5 rounded-md text-xs font-semibold font-label transition-all cursor-pointer ${
@@ -360,7 +364,7 @@ const handlerApply= (userId:string)=>{
                     <h4 className="font-headline text-[18px] text-primary font-bold">فلترة سجل الحضور بتاريخ معين</h4>
                   </div>
                   {/* PRE-MADE DatePicker Component Integration */}
-                  <div className="w-full md:w-auto translate-x-[8%] flex items-center gap-2">
+                  <div className="w-full md:w-auto max-md:mr-5 md:ml-5 self-center flex items-center gap-2">
                     {searchDate && (
                       <button
                         onClick={() => setSearchDate('')}
@@ -369,7 +373,7 @@ const handlerApply= (userId:string)=>{
                         عرض جميع الأيام ✕
                       </button>
                     )}
-                    <DatePicker value={searchDate} onChange={handleSearchDateChange} placeholder="تصفية بيوم معين"  className='translate-x-[25%]'/>
+                    <DatePicker value={searchDate} onChange={handleSearchDateChange} placeholder="تصفية بيوم معين"  className=' md:translate-x-20'/>
                   </div>
                 </div>
 
@@ -430,10 +434,10 @@ const handlerApply= (userId:string)=>{
                   >
                     <div className="flex justify-between items-start mb-2">
                       <p className="font-label text-[11px] text-on-surface-variant">مرات التأخير</p>
-                      <span className="material-symbols-outlined text-secondary text-[20px]">pending_actions</span>
+                      <span className="material-symbols-outlined text-amber-500 text-[20px]">pending_actions</span>
                     </div>
                     <div className="flex items-end gap-1.5">
-                      <span className="font-headline text-[32px] font-bold text-secondary leading-none">
+                      <span className="font-headline text-[32px] font-bold text-amber-500 leading-none">
                         {reportSummary?.lateDays || 0}
                       </span>
                       <span className="font-label text-[11px] text-on-surface-variant pb-1">مرة</span>
@@ -455,20 +459,57 @@ const handlerApply= (userId:string)=>{
                       <span className="font-headline text-[32px] font-bold text-tertiary leading-none">
                         {reportSummary?.excusedDays || 0}
                       </span>
-                      <span className="font-label text-[11px] text-on-surface-variant pb-1">
-                        ({reportSummary?.absentDays || 0} غياب)
-                      </span>
+                     <span className="font-label text-[10px] font-semibold text-tertiary/80 uppercase">يوم</span>
                     </div>
                   </div>
 
                   {/* Total Deductions Card (Filters: deduction > 0) */}
                   <div 
-                    onClick={() => setStatusFilter(prev => prev === 'DEDUCTED' ? 'ALL' : 'DEDUCTED')}
-                    className={`bg-surface-container-lowest border rounded-xl p-5 flex flex-col justify-between hover:border-error/40 transition-all shadow-sm cursor-pointer bg-error-container/5 ${
-                      statusFilter === 'DEDUCTED' ? 'border-error ring-2 ring-error/20 bg-error/5' : 'border-outline-variant/20'
+                    onClick={() => setStatusFilter(prev => prev === 'ABSENT' ? 'ALL' : 'ABSENT')}
+                    className={`bg-surface-container-lowest border rounded-xl p-5 flex flex-col justify-between hover:border-orange-600/40 transition-all shadow-sm cursor-pointer bg-orange-600/5 ${
+                      statusFilter === 'ABSENT' ? 'border-orange-600 ring-2 ring-orange-600/20 bg-orange-600/5' : 'border-outline-variant/20'
                     }`}
                   >
                     <div className="flex justify-between items-start mb-2">
+                      <p className="font-label text-[11px] text-on-surface-variant">إجمالي ايام الغياب</p>
+                      <span className="material-symbols-outlined text-orange-600 text-[20px]">not_interested</span>
+                    </div>
+                    <div className="flex items-baseline gap-1 mt-2">
+                      <span className="font-headline text-[32px] font-bold text-orange-600 leading-none">
+                        {reportSummary?.absentDays || 0}
+                      </span>
+                      <span className="font-label text-[10px] font-semibold text-orange-600/80 uppercase">مرة</span>
+                    </div>
+                  </div>
+                 
+             </div>
+              {/* deductions filter cards */}
+                  <div
+                   className="col-span-4 lg:col-span-6 bg-surface-container-lowest border
+                   border-outline-variant/20 rounded-xl p-5 flex max-[450px]:flex-col  justify-between max-md:justify-center gap-4 shadow-sm">
+                 <div 
+                 onClick={() => setStatusFilter(prev => prev === 'DEDUCTED' ? 'ALL' : 'DEDUCTED')}
+                 className={`bg-surface-container-lowest shrink-1 border rounded-xl p-5 flex flex-col justify-between hover:border-error/40 transition-all shadow-sm cursor-pointer w-2/2 bg-error-container/5 ${
+                      statusFilter === 'DEDUCTED' ? 'border-error ring-2 ring-error/20 bg-error/5' : 'border-outline-variant/20'
+                    }`} >
+                     <div className="flex justify-between items-start mb-2">
+                      <p className="font-label text-[11px] text-on-surface-variant">إجمالي أيام الخصم</p>
+                      <span className="material-symbols-outlined text-error text-[20px]">calendar_month</span>
+                    </div>
+                    <div className="flex items-baseline gap-1 mt-2">
+                      <span className="font-headline text-[32px] font-bold text-error leading-none">
+                        {reportSummary?.deductionDays || 0}
+                      </span>
+                      <span className="font-label text-[10px] font-semibold text-error/80 uppercase">أيام</span>
+                    </div>
+                 </div>
+
+                 <div 
+                 className={`bg-surface-container-lowest shrink-0 border rounded-xl p-5 
+                 flex flex-col justify-between hover:border-error/40 transition-all
+                  shadow-sm cursor-pointer w-1/3 max-[450px]:w-2/2 bg-error-container/5 `
+                    }>
+                     <div className="flex justify-between items-start w-full mb-2">
                       <p className="font-label text-[11px] text-on-surface-variant">إجمالي الخصومات</p>
                       <span className="material-symbols-outlined text-error text-[20px]">payments</span>
                     </div>
@@ -478,12 +519,13 @@ const handlerApply= (userId:string)=>{
                       </span>
                       <span className="font-label text-[10px] font-semibold text-error/80 uppercase">SAR</span>
                     </div>
-                  </div>
                 </div>
+ 
+               </div>
              </div>
 
                 {/* Detailed Data Table Section */}
-                <div className="bg-surface-container-lowest px-6 max-w-[1050px] border border-outline-variant/20 rounded-xl overflow-hidden flex flex-col gap-6 shadow-sm">
+                <div className="bg-surface-container-lowest px-6 w-full border border-outline-variant/20 rounded-xl overflow-hidden flex flex-col gap-6 shadow-sm">
                   <div className="p-5 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container/5">
                     <div className="flex flex-wrap items-center gap-4">
                       <h3 className="font-headline text-[20px] text-primary font-bold">سجلات الحضور اليومية المفصلة</h3>
@@ -498,6 +540,7 @@ const handlerApply= (userId:string)=>{
                             statusFilter === 'PRESENT' ? 'الحاضرين' :
                             statusFilter === 'LATE' ? 'المتأخرين' :
                             statusFilter === 'EXCUSED' ? 'المعذورين' :
+                            statusFilter === 'ABSENT' ? 'الغائبين' :
                             statusFilter === 'DEDUCTED' ? 'المخصوم منهم' : ''
                           }) ✕
                         </button>
@@ -515,7 +558,7 @@ const handlerApply= (userId:string)=>{
                     </div>
                   ) : (
                     <>
-                      <div className="overflow-x-auto mx-auto mb-6  max-w-[950px] rounded-lg">
+                      <div className="overflow-x-scroll mx-auto mb-6  w-full rounded-lg">
                         <table className="chronicle-table min-w-full text-right font-sans" dir="rtl">
                           <thead>
                             <tr>

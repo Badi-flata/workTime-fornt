@@ -71,13 +71,11 @@ function SearchDirectoryContent() {
 
   // Filter Pill clicks
   const handleRoleChange = (role: 'all' | 'EMPLOYEE' | 'MANAGER' | 'SUPER_ADMIN') => {
-    
     setRoleFilter(role);
     searchDirectory({ role, page: 1 });
   };
-  
 
-const paginationSlice = searchResults;
+  const paginationSlice = searchResults;
 
   return (
     <motion.div
