@@ -54,7 +54,7 @@ return ()=> clearTimeout(time);
     }
 
     try {
-      const res = await API.public.loginIn({ password,  email});
+      const res = await API.public.logIn({ password,  email});
       const mess =res.data.message;
       console.log("mess",mess)
       setMess(mess!);

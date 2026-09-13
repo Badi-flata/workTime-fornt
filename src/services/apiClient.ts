@@ -219,7 +219,7 @@ export const API = {
   // 🔓 Public Route APIs
   public: {
     logUp: (data: SignUpInput) => apiClient.post('/users/logUp', data),
-    loginIn: (data: LoginInput) => apiClient.post('/users/loginIn', data),
+    logIn: (data: LoginInput) => apiClient.post('/users/logIn', data),
   },
   
   // 👥 Authenticated User APIs
