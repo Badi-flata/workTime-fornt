@@ -1,6 +1,32 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/useAuthStore';
+
 export default function Home() {
+  const router = useRouter();
+  const { isAuthenticated, isInitialized, user, initializeAuth } = useAuthStore();
+
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
+
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    if (isAuthenticated) {
+      if (user?.role === 'SUPER_ADMIN' || user?.role === 'MANAGER') {
+        router.replace('/manager-dashboard');
+      } else if (user?.role === 'EMPLOYEE') {
+        router.replace('/employee-dashboard');
+      } else {
+        router.replace('/manager-dashboard');
+      }
+    } else {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, isInitialized, user, router]);
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-surface-container-lowest" dir="rtl">
       <div className="relative flex flex-col items-center space-y-4">

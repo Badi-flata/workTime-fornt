@@ -13,7 +13,6 @@ interface AuthGuardProps {
 const ROLE_ROUTES: Record<string, string[]> = {
   // Routes restricted to admins/managers only
   ADMIN_ONLY: [
-   
     '/my-employees-list',
     '/departments',
     '/manager-dashboard'
@@ -21,17 +20,20 @@ const ROLE_ROUTES: Record<string, string[]> = {
   // Routes restricted to employees only
   EMPLOYEE_ONLY: [
     '/employee-dashboard',
-    "/attendance-departuer-check",
+    '/attendance-departure-check',
   ]
 };
 
-const PUBLIC_ROUTES = ['/login', '/signup', "/my-profile", "/search"];
+const PUBLIC_ROUTES = ['/login', '/signup', '/my-profile', '/search'];
 
 export function AuthGuard({ children }: AuthGuardProps) {
   const { isAuthenticated, isInitialized, user, initializeAuth } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
   const [hasPermission, setHasPermission] = useState(true);
+
+  // Normalize pathname to strip trailing slashes for consistent matching
+  const cleanPathname = (pathname ? pathname.replace(/\/+$/, '') : '') || '/';
 
   useEffect(() => {
     // 1. Initialize auth status from localStorage on mount
@@ -41,43 +43,43 @@ export function AuthGuard({ children }: AuthGuardProps) {
   useEffect(() => {
     if (!isInitialized) return;
 
-    const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+    const isPublicRoute = PUBLIC_ROUTES.includes(cleanPathname);
 
-    // 2. Redirect to login if not authenticated and trying to access a protected route
+    // 2. Redirect to login if not authenticated and trying to access a protected route or root
     if (!isAuthenticated) {
-      if (pathname.startsWith("/signup")) {
-        router.replace(pathname);
-      } else if (!isPublicRoute && pathname !== '/') {
-        router.replace('/login');
+      if (cleanPathname === '/login' || cleanPathname === '/signup' || isPublicRoute) {
+        return;
       }
+      router.replace('/login');
       return;
     }
 
-    // 3. Authenticated users redirects:
+    // 3. Authenticated users redirects from login/signup or root page:
     const role = user?.role;
-
-    // If visiting login/signup or the root page, redirect to their home page
-    if (isAuthenticated && (isPublicRoute || pathname === '/')) {
+    if (isAuthenticated && (cleanPathname === '/login' || cleanPathname === '/signup' || cleanPathname === '/')) {
       if (role === 'SUPER_ADMIN' || role === 'MANAGER') {
         router.replace('/manager-dashboard');
       } else if (role === 'EMPLOYEE') {
         router.replace('/employee-dashboard');
+      } else {
+        router.replace('/manager-dashboard');
       }
+      return;
     }
 
     // 4. Verify access permission for protected pages
     let permission = true;
     if (role === 'EMPLOYEE') {
-      if (ROLE_ROUTES.ADMIN_ONLY.some(route => pathname.startsWith(route))) {
+      if (ROLE_ROUTES.ADMIN_ONLY.some(route => cleanPathname.startsWith(route))) {
         permission = false;
       }
-    } else if ( role === 'MANAGER') {
-      if (ROLE_ROUTES.EMPLOYEE_ONLY.some(route => pathname.startsWith(route))) {
+    } else if (role === 'MANAGER') {
+      if (ROLE_ROUTES.EMPLOYEE_ONLY.some(route => cleanPathname.startsWith(route))) {
         permission = false;
       }
     }
     setHasPermission(permission);
-  }, [isAuthenticated, isInitialized, user, pathname, router]);
+  }, [isAuthenticated, isInitialized, user, cleanPathname, router]);
 
   // Show a premium loading screen during initial loading
    if (!isInitialized) {
@@ -159,11 +161,11 @@ export function AuthGuard({ children }: AuthGuardProps) {
    }
 
   // If not authenticated:
-  // - Show login/signup directly
-  // - Show nothing for other routes as they are redirecting to /login
+  // - Show login/signup, public routes, or root (which redirects) directly
+  // - Show loading for protected routes while redirecting to /login
   if (!isAuthenticated) {
-    if (pathname.endsWith("/login") || pathname.endsWith('/') || pathname.endsWith("/signup")  ) {
-    return <>{children}</>
+    if (cleanPathname === '/login' || cleanPathname === '/signup' || PUBLIC_ROUTES.includes(cleanPathname) || cleanPathname === '/') {
+      return <>{children}</>;
     }
     return null;
   }
