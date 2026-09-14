@@ -145,10 +145,13 @@ export const useDeptShiftStore = create<DeptShiftState>((set, get) => ({
     }
 
     try {
-      const res = await API.department.getListNames();
+      const res = await API.department.getAll();
       const data = res.data || [];
+      const mapped: DepartmentListItemOutput[] = data.map((d: DepartmentOutput) => ({
+        id: d.id,
+        name: d.name,}));
       globalCache.set(cacheKey, data, 'department', 5);
-      set({ departmentNames: data  });
+      set({ departmentNames: mapped  });
     } catch (err: unknown) {
       const formatted = DepartmentErrorCatch.names(err);
       const stale = globalCache.getStale<DepartmentListItemOutput[]>(cacheKey);
