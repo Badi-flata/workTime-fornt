@@ -530,6 +530,7 @@ export default function EmployeeDashboardPage() {
           </div>
 
           </div>
+
       {/* Metrics Cards (Clickable Filters) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         {/* Present Days Card */}
@@ -612,12 +613,7 @@ export default function EmployeeDashboardPage() {
             <p className="font-label text-xs font-bold text-on-surface-variant">إجمالي الخصومات</p>
             <span className="material-symbols-outlined text-error text-[20px]">payments</span>
           </div>
-          <div className="flex items-baseline gap-1 mt-2">
-            <span className="font-heading text-2xl md:text-3xl font-bold text-error leading-none">
-              {summary?.totalDeductions || 0}
-            </span>
-            <span className="font-label text-[10px] font-semibold text-error/80 uppercase">SAR</span>
-          </div>
+
         </div>
       </div>
 
