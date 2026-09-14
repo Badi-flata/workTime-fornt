@@ -118,11 +118,11 @@ export default function EmployeesDirectoryPage() {
       result = result.filter(rec => rec.status === 'LATE');
      setTablePage(1);
     } else if (statusFilter === 'EXCUSED') {
-      result = result.filter(rec => rec.status === 'EXCUSED');
+      result = result.filter(rec => rec.status === 'EXCUSED' );
        setTablePage(1);
     
     } else if (statusFilter === 'ABSENT') {
-      result = result.filter(rec => rec.status === 'ABSENT');
+      result = result.filter(rec => rec.status === 'ABSENT' );
        setTablePage(1);
     } else if (statusFilter === 'DEDUCTED') {
       result = result.filter(rec => (rec.deduction ?? 0) > 0);

@@ -127,7 +127,7 @@ export default function EmployeeDashboardPage() {
       setCurrentPage(1);
  
    } else if (statusFilter === 'EXCUSED') {
-     result = result.filter(rec => rec.status === 'EXCUSED');
+     result = result.filter(rec => rec.status === 'EXCUSED' );
       setCurrentPage(1);
 
    } else if (statusFilter === 'ABSENT') {
