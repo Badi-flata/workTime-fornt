@@ -600,24 +600,10 @@ export default function EmployeeDashboardPage() {
           </div>
         </div>
 
-        {/* Total Deductions Card */}
-        <div 
-          onClick={() => setStatusFilter(prev => prev === 'DEDUCTED' ? 'ALL' : 'DEDUCTED')}
-          className={`bg-surface-container-lowest border rounded-xl p-5 flex flex-col justify-between hover:border-error/40 transition-all duration-200 shadow-sm cursor-pointer bg-error-container/5 ${
-            statusFilter === 'DEDUCTED' 
-              ? 'border-error ring-2 ring-error/20 bg-error/5' 
-              : 'border-outline-variant/20 hover:bg-surface-container-low/30'
-          }`}
-        >
-          <div className="flex justify-between items-start mb-2">
-            <p className="font-label text-xs font-bold text-on-surface-variant">إجمالي الخصومات</p>
-            <span className="material-symbols-outlined text-error text-[20px]">payments</span>
-          </div>
-
-        </div>
+       
       </div>
 
-      {/* Detailed Data Table Section */}
+      {/* Detailed Data Table Section  */}
       <div className="bg-surface-container-lowest p-6 mb-8 w-full border border-outline-variant/20 rounded-xl overflow-hidden flex flex-col gap-6 shadow-sm">
         <div className="p-4 border-b border-outline-variant/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-surface-container/5 rounded-t-lg">
           <div className="flex flex-wrap items-center gap-3">
