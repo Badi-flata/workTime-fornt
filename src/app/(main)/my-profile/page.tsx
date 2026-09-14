@@ -645,7 +645,7 @@ export default function EmployeeProfilePage() {
                       </span>
                       <div className="bg-secondary/5 border border-outline-variant/20 p-4 rounded-xl shadow-xs transition-all hover:border-primary/20">
                         <p className="font-body text-[20px] font-semibold text-[#581c87]">
-                          {profile?.admin?.subordinates?.length || 0} موظف
+                          {emp?.length || 0} موظف
                         </p>
                       </div>
                     </div>
