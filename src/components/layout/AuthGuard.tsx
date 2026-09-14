@@ -32,8 +32,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname();
   const [hasPermission, setHasPermission] = useState(true);
 
-  // Normalize pathname to strip trailing slashes for consistent matching
-  const cleanPathname = (pathname ? pathname.replace(/\/+$/, '') : '') || '/';
+  // Normalize pathname to strip trailing slashes and GitHub Pages basePath for consistent matching
+  const rawPath = (pathname || (typeof window !== 'undefined' ? window.location.pathname : '') || '/').trim();
+  const cleanPathname = rawPath.replace(/^\/workTime-fornt(?:\/|$)/, '/').replace(/\/+$/, '') || '/';
 
   useEffect(() => {
     // 1. Initialize auth status from localStorage on mount
@@ -174,7 +175,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
   // If authenticated but has NO permission, show a beautiful access denied screen
   if (isAuthenticated&&!hasPermission  ) {
-    const defaultHome = isAuthenticated && user?.role === 'EMPLOYEE' ? '/employee-dashboard' : '/dashboard';
+    const defaultHome = isAuthenticated && user?.role === 'EMPLOYEE' ? '/employee-dashboard' : '/manager-dashboard';
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#fcfdfe] p-6 text-center" dir="rtl">
         <div className="w-20 h-20 rounded-full bg-[#fce8e6] flex items-center justify-center mb-6 shadow-sm border border-[#f5c6cb]">

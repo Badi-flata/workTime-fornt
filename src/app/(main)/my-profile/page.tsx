@@ -225,7 +225,7 @@ export default function EmployeeProfilePage() {
   const subordinatesList = [];
   if(emp !== undefined && list !== undefined && list?.length > 0){
   for (const empRate of emp){
-    const empProfile= list.find((empProfile) => empProfile.id === empRate?.employeeId)
+    const empProfile = list.find((empProfile) => empProfile.id === empRate?.employeeId)
     
     subordinatesList.push({
       ...(empProfile || list[list.length -1] ),

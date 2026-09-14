@@ -45,9 +45,14 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
   config.baseURL = getApiBaseUrl();
   if (typeof window !== 'undefined') {
-    const token = useAuthStore.getState().token;
+    const token = useAuthStore.getState().token || localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      if (config.headers && typeof (config.headers as any).set === 'function') {
+        (config.headers as any).set('Authorization', `Bearer ${token}`);
+      } else {
+        config.headers = config.headers || ({} as any);
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
   }
   return config;
@@ -137,8 +142,11 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // إذا كان الخطأ 401 والطلب لم تتم محاولة تجديده مسبقاً
-    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/users/loginIn') && !originalRequest.url?.includes('/users/refresh-token')) {
+    const reqUrl = originalRequest.url?.toLowerCase() || '';
+    const isAuthEndpoint = reqUrl.includes('/users/log') || reqUrl.includes('/users/refresh-token') || reqUrl.includes('/auth/');
+
+    // إذا كان الخطأ 401 والطلب لم تتم محاولة تجديده مسبقاً وليس نقطة نهاية مصادقة
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       if (isRefreshing) {
         // تعليق الطلب في الطابور لحين انتهاء عملية التجديد
         return new Promise((resolve, reject) => {

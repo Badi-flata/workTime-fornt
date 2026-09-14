@@ -22,6 +22,31 @@ interface AuthState {
   initializeAuth: () => void;
 }
 
+// دالة مساعدة لفك تشفير JWT بأمان تام مع دعم نصوص الـ UTF-8 واللغة العربية وصيغة Base64URL
+function parseJwtPayload(token: string): { exp?: number; [key: string]: any } | null {
+  try {
+    const base64Url = token.split('.')[1];
+    if (!base64Url) return null;
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    try {
+      const base64Url = token.split('.')[1];
+      if (!base64Url) return null;
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      return JSON.parse(atob(base64));
+    } catch {
+      return null;
+    }
+  }
+}
+
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
@@ -76,14 +101,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       
       if (token && userStr) {
         try {
-          // التحقق من صلاحية الـ Token
-          const payloadBase64 = token.split('.')[1];
+          // التحقق من صلاحية الـ Token بشكل آمن يدعم الرموز العربية والـ Base64URL
+          const payload = parseJwtPayload(token);
           let isTokenExpired = false;
-          if (payloadBase64) {
-            const payload = JSON.parse(atob(payloadBase64));
-            if (payload.exp && payload.exp * 1000 < Date.now()) {
-              isTokenExpired = true;
-            }
+          if (payload && payload.exp && payload.exp * 1000 < Date.now()) {
+            isTokenExpired = true;
           }
 
           // إذا كان منتهياً ولا يوجد refreshToken صالح
@@ -103,10 +125,21 @@ export const useAuthStore = create<AuthState>((set) => ({
             isInitialized: true,
           });
         } catch {
-          // بيانات تالفة في localStorage
-          localStorage.clear();
-          globalCache.clear();
-          set({ user: null, token: null, refreshToken: null, isAuthenticated: false, isInitialized: true });
+          // في حال حدوث خطأ غير متوقع لا نقوم بمسح البيانات فوراً إن كان التوكن موجوداً
+          try {
+            const user = JSON.parse(userStr) as AuthUser;
+            set({
+              user,
+              token,
+              refreshToken: refreshToken || null,
+              isAuthenticated: true,
+              isInitialized: true,
+            });
+          } catch {
+            localStorage.clear();
+            globalCache.clear();
+            set({ user: null, token: null, refreshToken: null, isAuthenticated: false, isInitialized: true });
+          }
         }
       } else {
         // لا يوجد token
