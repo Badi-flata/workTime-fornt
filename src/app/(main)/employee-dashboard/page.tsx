@@ -119,7 +119,7 @@ export default function EmployeeDashboardPage() {
    }
 
    if (statusFilter === 'PRESENT') {
-     result = result.filter(rec => rec.status === 'ON_TIME' || rec.status === 'LATE');
+     result = result.filter(rec => rec.status === 'ON_TIME' );
       setCurrentPage(1);
 
    } else if (statusFilter === 'LATE') {
@@ -600,10 +600,27 @@ export default function EmployeeDashboardPage() {
           </div>
         </div>
 
-       
+        {/* Total absent Card */}
+          <div 
+                    onClick={() => setStatusFilter(prev => prev === 'ABSENT' ? 'ALL' : 'ABSENT')}
+                    className={`bg-surface-container-lowest border rounded-xl p-5 flex flex-col justify-between hover:border-orange-600/40 transition-all shadow-sm cursor-pointer bg-orange-600/5 ${
+                      statusFilter === 'ABSENT' ? 'border-orange-600 ring-2 ring-orange-600/20 bg-orange-600/5' : 'border-outline-variant/20'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <p className="font-label text-[11px] text-on-surface-variant">إجمالي ايام الغياب</p>
+                      <span className="material-symbols-outlined text-orange-600 text-[20px]">not_interested</span>
+                    </div>
+                    <div className="flex items-baseline gap-1 mt-2">
+                      <span className="font-headline text-[32px] font-bold text-orange-600 leading-none">
+                        {summary?.absentDays || 0}
+                      </span>
+                      <span className="font-label text-[10px] font-semibold text-orange-600/80 uppercase">مرة</span>
+                    </div>
+                  </div>
       </div>
 
-      {/* Detailed Data Table Section  */}
+      {/* Detailed Data Table Section */}
       <div className="bg-surface-container-lowest p-6 mb-8 w-full border border-outline-variant/20 rounded-xl overflow-hidden flex flex-col gap-6 shadow-sm">
         <div className="p-4 border-b border-outline-variant/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-surface-container/5 rounded-t-lg">
           <div className="flex flex-wrap items-center gap-3">

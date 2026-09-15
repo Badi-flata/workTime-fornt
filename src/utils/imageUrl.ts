@@ -10,8 +10,8 @@
 export function getBackendBaseUrl(): string {
   // 1. فحص المتغيرات المحقونة من GitHub Actions (secrets / vars) أو البيئة المحلية
   const apiUrl =
+  process.env.NEXT_PUBLIC_API_PUBLISH_URL ||
     process.env.NEXT_PUBLIC_API_DEV_URL ||
-    process.env.NEXT_PUBLIC_API_PUBLISH_URL ||
     process.env.NEXT_PUBLIC_API_URL;
 
   if (apiUrl && typeof apiUrl === 'string' && apiUrl.trim()) {

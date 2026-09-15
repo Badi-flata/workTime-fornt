@@ -112,7 +112,7 @@ export default function EmployeesDirectoryPage() {
     // }
 
     if (statusFilter === 'PRESENT') {
-      result = result.filter(rec => rec.status === 'ON_TIME' || rec.status === 'LATE');
+      result = result.filter(rec => rec.status === 'ON_TIME' );
       setTablePage(1);
     } else if (statusFilter === 'LATE') {
       result = result.filter(rec => rec.status === 'LATE');
