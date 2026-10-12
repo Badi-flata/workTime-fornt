@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2026 Badi Flata (عبادي فلاتة). All rights reserved.
+ * Project: WorkTime - Smart Attendance & Workforce Discipline Management System.
+ * Core Algorithm: Shift Timing State Machine & Real-Time Attendance Locks Engine.
+ * Unauthorized copying, distribution, or commercial use is strictly prohibited.
+ */
+
 import { todayReport } from '@/types/demoAttendance.types';
 import { format } from 'date-fns';
 

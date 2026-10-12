@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2026 Badi Flata (عبادي فلاتة). All rights reserved.
+ * Project: WorkTime - Smart Attendance & Workforce Discipline Management System.
+ * Module: Attendance & Departure Verification Interface with Interactive Shift Engine.
+ * Unauthorized copying, distribution, or commercial use is strictly prohibited.
+ */
+
 "use client";
 
 import { motion, AnimatePresence } from 'framer-motion';

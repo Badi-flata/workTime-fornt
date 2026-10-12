@@ -58,10 +58,10 @@ export function EmployeeInfoCardModal() {
     const timer = setTimeout(() => {
       if(successMessage||(error|| messageError)) {
 
-        if(error|| messageError)closeEmployeeCard();
-         clearMessages()
-         }else{
+        if(error|| messageError){
           setMessageError("")
+          closeEmployeeCard()};
+          clearMessages()
          }
       }, 5000);
       return () => clearTimeout(timer);

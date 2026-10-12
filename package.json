@@ -1,7 +1,15 @@
 {
   "name": "frontend",
   "version": "4.0.0",
+  "description": "WorkTime - Smart Attendance & Workforce Discipline Management System (Frontend Application)",
+  "author": "Badi Flata <badiflatt@gmail.com>",
+  "homepage": "https://badi-flata.github.io/workTime-fornt/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Badi-flata/workTime-fornt.git"
+  },
   "private": true,
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

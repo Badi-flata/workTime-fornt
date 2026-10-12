@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2026 Badi Flata (عبادي فلاتة). All rights reserved.
+ * Project: WorkTime - Smart Attendance & Workforce Discipline Management System.
+ * Component: Summary Attendances Strip & Period Synchronizer.
+ * Unauthorized copying, distribution, or commercial use is strictly prohibited.
+ */
+
 import { parseISO } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
