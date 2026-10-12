@@ -34,14 +34,18 @@
 </p>
 
 <h1 align="center">
-  <span style="color: #1b7550;">WORK</span><span style="color: #1e1e1e;">TIME</span> — Frontend
+  <span style="color: #2bbb76;">WORK</span><span style="color: #e2e8f0;">TIME</span> — Frontend
 </h1>
 <p align="center" style="margin-top: -10px; font-weight: bold; color: #64748b;">
-  منصة إدارة الحضور والانضباط الذكية
+  منصة إدارة الحضور والانصراف الذكية
 </p>
 
 <p align="center">
-  A modern, RTL-first <strong>Attendance & Workforce Management Dashboard</strong> built with <strong>Next.js 14</strong>, <strong>TypeScript</strong>, <strong>Tailwind CSS v4</strong>, and <strong>Zustand</strong>.
+  A modern, RTL-first <strong>Smart Attendance & Departure Management System</strong> built with <strong>Next.js 14</strong>, <strong>TypeScript</strong>, <strong>Tailwind CSS v4</strong>, and <strong>Zustand</strong>.
+</p>
+
+<p align="center">
+  🌐 <strong>Live Demo:</strong> <a href="https://badi-flata.github.io/workTime-fornt/">https://badi-flata.github.io/workTime-fornt</a> — <em>Experience the live interactive application</em>
 </p>
 
 <p align="center">

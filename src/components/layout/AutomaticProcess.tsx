@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * Copyright (c) 2026 Badi Flata (عبادي فلاتة). All rights reserved.
+ * Project: WorkTime - Smart Attendance & Departure Management System.
+ * Component: Automatic Process Engine (Background Supervisor - periodic auto check-out evaluation). 
+ * Unauthorized copying, distribution, or commercial use is strictly prohibited.
+ */
+
 import { ReactNode, useEffect, useRef } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSettingStore } from '@/store/useSettingStore';
