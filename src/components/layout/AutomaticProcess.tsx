@@ -30,7 +30,7 @@ export function AutomaticProcess({ children }: AutomaticProcessProps) {
   // 1. تحميل تفضيلات الأتمتة للمدير إذا لم تكن محملة
   useEffect(() => {
     if (isInitialized && isManagerOrAdmin && !eventsSetting) {
-      fetchEventsSettting().catch(() => {});
+      fetchEventsSettting().catch(() => { });
     }
   }, [isInitialized, isManagerOrAdmin, eventsSetting, fetchEventsSettting]);
 

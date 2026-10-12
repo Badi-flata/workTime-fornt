@@ -1,46 +1,46 @@
 {
-  "name": "frontend",
-  "version": "4.0.0",
-  "description": "WorkTime - Smart Attendance & Departure Management System (Frontend Application)",
-  "author": "Badi Flata <badiflatt@gmail.com>",
-  "homepage": "https://badi-flata.github.io/workTime-fornt/",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Badi-flata/workTime-fornt.git"
-  },
-  "private": true,
-  "license": "SEE LICENSE IN LICENSE",
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "axios": "^1.13.2",
-    "clsx": "^2.1.1",
-    "date-fns": "^4.4.0",
-    "framer-motion": "^12.40.0",
-    "lucide-react": "^1.17.0",
-    "next": "^14.2.35",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-hook-form": "^7.53.1",
-    "recharts": "^2.13.8",
-    "tailwind-merge": "^2.6.0",
-    "tailwindcss": "^4.3.0",
-    "zod": "^4.1.13",
-    "zustand": "^5.0.8"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.0",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "^14.2.35",
-    "postcss": "^8.5.15",
-    "tailwindcss": "^4.3.0",
-    "typescript": "^5"
-  }
+    "name": "frontend",
+    "version": "4.0.0",
+    "description": "WorkTime - Smart Attendance & Workforce Discipline Management System (Frontend Application)",
+    "author": "Badi Flata <badiflatt@gmail.com>",
+    "homepage": "https://badi-flata.github.io/workTime-fornt/",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Badi-flata/workTime-fornt.git"
+    },
+    "private": true,
+    "license": "SEE LICENSE IN LICENSE",
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint"
+    },
+    "dependencies": {
+        "axios": "^1.13.2",
+        "clsx": "^2.1.1",
+        "date-fns": "^4.4.0",
+        "framer-motion": "^12.40.0",
+        "lucide-react": "^1.17.0",
+        "next": "^14.2.35",
+        "react": "^18",
+        "react-dom": "^18",
+        "react-hook-form": "^7.53.1",
+        "recharts": "^2.13.8",
+        "tailwind-merge": "^2.6.0",
+        "tailwindcss": "^4.3.0",
+        "zod": "^4.1.13",
+        "zustand": "^5.0.8"
+    },
+    "devDependencies": {
+        "@tailwindcss/postcss": "^4.3.0",
+        "@types/node": "^20",
+        "@types/react": "^18",
+        "@types/react-dom": "^18",
+        "eslint": "^8.57.1",
+        "eslint-config-next": "^14.2.35",
+        "postcss": "^8.5.15",
+        "tailwindcss": "^4.3.0",
+        "typescript": "^5"
+    }
 }
